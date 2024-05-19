@@ -1,0 +1,7 @@
+{
+    "flake8.args": ["--config=config/.flake8"],
+    "black-formatter.args": ["--config=config/.pyproject.toml"],
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  }
