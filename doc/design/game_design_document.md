@@ -30,9 +30,9 @@ controller support and mobile platforms in the future.
 
 ### Target audience
 
-The game is aimed at players aged 12 and above who enjoy strategy and
-multiplayer games, targeting both casual gamers and competitive players looking
-for an engaging multiplayer experience with a mix of PvP (Player vs Player)
+The game is aimed at players aged 12 and above who enjoy fast action-based
+combat and multiplayer games, targeting both casual gamers and competitive
+players looking for an engaging experience with a mix of PvP (Player vs Player)
 and PvE (Player vs Environment) elements.
 
 ## Gameplay mechanics
@@ -52,8 +52,8 @@ and PvE (Player vs Environment) elements.
 
 ### Game flow
 
-1. **Matchmaking**: Players join a lobby and are matched with others based on
-   skill level.
+1. **Matchmaking**: Players join a lobby and are matched with others.
+
 2. **Character selection**: Players choose or create their characters, selecting
    their class and skills.
 3. **Gameplay**: Players engage in combat, using their skills strategically to
