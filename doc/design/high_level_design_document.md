@@ -2,54 +2,45 @@
 
 ## Introduction
 
-This High-Level Design (HLD) document provides a comprehensive overview of the
-architecture for Project OMG, a 2D top-down, multiplayer, match-based game.
-The document outlines the system architecture, major components, data flow,
-technology stack, integration points, non-functional requirements, and
-deployment strategy. The objective is to create a robust, scalable, and
-maintainable game system that delivers an engaging multiplayer experience.
+The objective is to create a robust, scalable, and maintainable game system that
+delivers an engaging multiplayer experience.
+This document outlines the functional / non-functional requirements, system
+architecture and the component overview.
 
 ## Requirements
 
 ### Functional requirements
 
-1. **Multiplayer support**:
-   - The game must support multiplayer gameplay with players connecting from
-     different PCs.
+1. **Multiplayer support**: The game must support multiplayer gameplay with
+     players connecting from different PCs.
 
-2. **Top-down 2D view**:
-   - The game must have a top-down 2D view.
+2. **Top-down 2D view**: The game must have a top-down 2D view.
 
-3. **Character lock on camera**:
-   - The camera must stay locked on the player's character during gameplay.
+3. **Character lock on camera**: The camera must stay locked on the player's
+   character during gameplay.
 
-4. **Match-based gameplay**:
-   - The game must be match-based with no progression save between matches.
+4. **Match-based gameplay**: The game must be match-based with no progression
+   save between matches
 
-5. **Character creation**:
-   - Players must be able to create characters, choosing from various classes
-     and skills.
+5. **Character creation**: Players must be able to create characters, choosing
+     from various classes and skills.
 
-6. **Skill synergy**:
-   - The game must support skill synergy (e.g., combining fire and poison skills
-     to create different effects).
+6. **Skill synergy**: The game must support skill synergy (e.g., combining fire
+     and poison skills to create different effects). .
 
-7. **PvPvE gameplay**:
-   - The game must support both player versus player (PvP) and player versus
-     environment (PvE) interactions.
+7. **PvPvE gameplay**: The game must support both player versus player (PvP) and
+     player versus environment (PvE) interactions.
 
-8. **Intelligent bots**:
-   - The game must include intelligent AI-controlled bots.
+8. **Intelligent bots**: The game must include intelligent AI-controlled bots
 
-9. **Interactive environment**:
-   - The game environment must include interactable elements such as
-     destructible objects.
+9. **Interactive environment**: The game environment must include interactable
+     elements such as destructible objects.
 
-10. **End-game statistics**:
-    - The game must display detailed statistics at the end of each match.
+10. **End-game statistics**: The game must display detailed statistics at the
+    end of each match.
 
-11. **Monitoring statistics throughout the game**:
-    - The game must monitor and display statistics during gameplay.
+11. **Monitoring statistics throughout the game**: The game must monitor and
+    display statistics during gameplay.
 
 ### Non-functional requirements
 
@@ -77,10 +68,6 @@ maintainable game system that delivers an engaging multiplayer experience.
    - The codebase should be modular and well-documented to facilitate easy
      maintenance and updates.
 
-7. **Portability**:
-   - The game should be easily portable to different platforms in the future,
-     including potential support for mobile devices.
-
 ### Optional features
 
 1. **Controller support**: The game should optionally support game controllers.
@@ -89,11 +76,30 @@ maintainable game system that delivers an engaging multiplayer experience.
 
 ### System architecture
 
-The Battle Realms game architecture is based on a monolithic design, where all
+Project OMG game architecture is based on a monolithic design, where all
 components are integrated into a single codebase. This approach simplifies
 development and deployment, making it suitable for the project's initial scope.
-The architecture consists of three main components: the Client Application, the
-Game Server, and the Database.
+The architecture consists of three main components:
+
+- [Client application][client_app_doc]
+- [Game server][game_server_doc]
+- [Database][database_doc]
+
+### Functional requirements coverage by components
+
+| Functional requirement | Client application | Game server | Database |
+|------------------------|--------------------|-------------|----------|
+| Multiplayer support    |                    |      ✓      |          |
+| Top-down 2D view       |         ✓          |             |          |
+| Character lock on camera |       ✓          |             |          |
+| Match-based gameplay   |         ✓          |      ✓      |          |
+| Character creation     |         ✓          |      ✓      |     ✓    |
+| Skill synergy          |         ✓          |      ✓      |          |
+| PvPvE gameplay         |                    |      ✓      |          |
+| Intelligent bots       |                    |      ✓      |          |
+| Interactive environment |        ✓          |             |          |
+| End-game statistics    |         ✓          |      ✓      |     ✓    |
+| Monitoring statistics throughout the game | ✓ |      ✓      |     ✓  |
 
 ### High-level architecture diagram
 
@@ -101,7 +107,7 @@ Game Server, and the Database.
 
 ### Component overview
 
-#### [Client Application][client_app_doc]
+#### [Client application][client_app_doc]
 
 - **Game UI**: The user interface for the game, including menus, in-game HUD,
   and end-game statistics.
@@ -131,21 +137,6 @@ Game Server, and the Database.
 - **Game state**: Saves the current state of ongoing games for synchronization
   and recovery.
 - **Leaderboards**: Tracks player rankings and scores.
+- **Statistics**: Stores statistics over the match.
 
 [database_doc]: hld_database.md
-
-### Functional requirements coverage by components
-
-| Functional requirement | Client application | Game server | Database |
-|------------------------|--------------------|-------------|----------|
-| Multiplayer support    |                    |      ✓      |          |
-| Top-down 2D view       |         ✓          |             |          |
-| Character lock on camera |       ✓          |             |          |
-| Match-based gameplay   |         ✓          |      ✓      |          |
-| Character creation     |         ✓          |      ✓      |     ✓    |
-| Skill synergy          |         ✓          |      ✓      |          |
-| PvPvE gameplay         |                    |      ✓      |          |
-| Intelligent bots       |                    |      ✓      |          |
-| Interactive environment |        ✓          |             |          |
-| End-game statistics    |         ✓          |      ✓      |     ✓    |
-| Monitoring statistics throughout the game | ✓ |      ✓      |     ✓  |

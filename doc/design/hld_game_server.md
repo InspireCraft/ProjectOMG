@@ -1,5 +1,7 @@
 # Game server
 
+![Game server](figures/hld_game_server.png)
+
 ## Functional requirements coverage
 
 | Functional requirement| Matchmaker| Session manager | Game logic |
@@ -32,4 +34,3 @@
   ensures state synchronization between clients.
 - **Interactions**: Interacts with the Session Manager and Database to maintain
   game state.
-
