@@ -120,8 +120,7 @@ The architecture consists of three main components:
 
 #### [Game server][game_server_doc]
 
-- **Matchmaker**: Manages player matchmaking, pairing players based on skill
-  level and other criteria.
+- **Matchmaker**: Manages player matchmaking, pairing players.
 - **Session manager**: Handles the creation, management, and termination of game
   sessions.
 - **Game logic**: Implements game rules, processes game events, and ensures
