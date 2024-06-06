@@ -12,6 +12,7 @@
 | Skill synergy                           |            |                 |✓|
 | PvPvE gameplay                          |            |        ✓        |✓|
 | Intelligent bots                        |            |                 |✓|
+| Interactive environment                 |            |         ✓      |✓|
 | End-game statistics                     |            |                 |✓|
 | Monitoring statistics throughout the game |            |                |✓|
 
