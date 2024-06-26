@@ -22,7 +22,10 @@ jobs:
 
       - name: Check for changelog fragments
         run: |
-          if [ -z "$(ls -A changelog-fragments)" ]; then
+          if [ -z "$(ls -A changelog-fragments\*.txt)" ]; then
             echo "No changelog fragments found!";
             exit 1;
+          else
+            echo "Changelog fragments found:";
+            ls changelog-fragments;
           fi
