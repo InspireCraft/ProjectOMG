@@ -22,10 +22,10 @@ jobs:
 
       - name: Check for changelog fragments
         run: |
-          if [ -z "$(ls -A changelog-fragments\*.txt)" ]; then
+          if [ -z "$(find changelog-fragments -type f -name '*.txt' -not -name '.gitignore')" ]; then
             echo "No changelog fragments found!";
             exit 1;
           else
             echo "Changelog fragments found:";
-            ls changelog-fragments;
+            find changelog-fragments -type f -name '*.txt' -not -name '.gitignore';
           fi
