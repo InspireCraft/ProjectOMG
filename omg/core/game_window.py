@@ -24,6 +24,10 @@ class GameWindow(arcade.Window):
         self.mouse_y = 0
         self.on_key_press_handler = None
         self.on_key_release_handler = None
+        self.skill_icons = []
+        self.icon_scale = 0.1
+        self.icon_margin = 10
+        self.icon_size = 64
 
     def setup(self):
         self.player = Player(
@@ -33,30 +37,61 @@ class GameWindow(arcade.Window):
             scale=0.2,
             initial_angle=0
         )
+        # Set custom movement keys (optional)
+        self.player.set_movement_keys(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
         self.on_key_press_handler, self.on_key_release_handler = setup_movement_keys(self.player)
         
         # Create obstacles
         self.obstacles = arcade.SpriteList()
         obstacle_image = os.path.join(ROOT_DIR, "obstacles", "obstacle.png")
-        obstacle = Obstacle(obstacle_image, 0.1, health=50)
+        obstacle = Obstacle(obstacle_image, 0.2, health=50)
         obstacle.center_x = 400
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
+
+        # Add projectile types
+        self.player.add_projectile_type(
+            name="Fireball",
+            image_file=os.path.join(ROOT_DIR, "skills", "fireball.PNG"),
+            scale=0.05,
+            damage=10,
+            speed=5
+        )
+        self.player.add_projectile_type(
+            name="Ice Shard",
+            image_file=os.path.join(ROOT_DIR, "skills", "ice_shard.PNG"),
+            scale=0.05,
+            damage=15,
+            speed=7
+        )
+
+        # Load skill icons
+        self.load_skill_icons()
+
+    def load_skill_icons(self):
+        for projectile in self.player.projectile_types:
+            icon_texture = arcade.load_texture(projectile['image_file'])
+            self.skill_icons.append(icon_texture)
 
     def on_draw(self):
         arcade.start_render()
         self.player.draw()
         self.obstacles.draw()
+        self.draw_ui()
 
     def update(self, delta_time):
-        self.player.update(self.mouse_x, self.mouse_y, self.obstacles, SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.player.update(self.mouse_x, self.mouse_y, self.obstacles, SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
         self.check_for_collisions()
 
     def on_key_press(self, key, modifiers):
         if self.on_key_press_handler:
             self.on_key_press_handler(key, modifiers)
         if key == arcade.key.SPACE:
-            self.player.shoot(os.path.join(ROOT_DIR, "skills", "fireball.PNG"), scale=0.05, damage=10, speed=5)
+            self.player.shoot()
+        elif key == arcade.key.KEY_1:
+            self.player.select_projectile(0)
+        elif key == arcade.key.KEY_2:
+            self.player.select_projectile(1)
 
     def on_key_release(self, key, modifiers):
         if self.on_key_release_handler:
@@ -68,6 +103,27 @@ class GameWindow(arcade.Window):
 
     def check_for_collisions(self):
         handle_projectile_collisions(self.player.projectiles, self.obstacles)
+
+    def draw_ui(self):
+        for i, icon in enumerate(self.skill_icons):
+            x = self.icon_margin + i * (self.icon_size + self.icon_margin)
+            y = self.icon_margin
+            if i == self.player.current_projectile_index:
+                arcade.draw_rectangle_outline(
+                    x + self.icon_size // 2,
+                    y + self.icon_size // 2,
+                    self.icon_size,
+                    self.icon_size,
+                    arcade.color.RED,
+                    border_width=3
+                )
+            arcade.draw_texture_rectangle(
+                x + self.icon_size // 2,
+                y + self.icon_size // 2,
+                self.icon_size,
+                self.icon_size,
+                icon
+            )
 
 def main():
     window = GameWindow()
