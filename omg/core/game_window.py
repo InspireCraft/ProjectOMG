@@ -35,8 +35,11 @@ class GameWindow(arcade.Window):
             char_class="Wizard",
             image_file=os.path.join(ROOT_DIR, "characters", "wizard_td2.PNG"),
             scale=0.2,
+            screen_height=SCREEN_HEIGHT,
+            screen_width=SCREEN_WIDTH,
             initial_angle=0
         )
+
         # Set custom movement keys (optional)
         self.player.set_movement_keys(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
         self.on_key_press_handler, self.on_key_release_handler = setup_movement_keys(self.player)
@@ -84,8 +87,9 @@ class GameWindow(arcade.Window):
         self.check_for_collisions()
 
     def on_key_press(self, key, modifiers):
-        if self.on_key_press_handler:
-            self.on_key_press_handler(key, modifiers)
+        # Delegate the input to the characters
+        self.player.on_key_press(key, modifiers)
+
         if key == arcade.key.SPACE:
             self.player.shoot()
         elif key == arcade.key.KEY_1:
@@ -94,8 +98,8 @@ class GameWindow(arcade.Window):
             self.player.select_projectile(1)
 
     def on_key_release(self, key, modifiers):
-        if self.on_key_release_handler:
-            self.on_key_release_handler(key, modifiers)
+        self.player.on_key_release(key, modifiers)
+
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_x = x
