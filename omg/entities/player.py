@@ -55,21 +55,6 @@ class Player(arcade.Sprite):
         self.projectiles.update()
         self.regenerate_mana(delta_time)
 
-    def update_position(self):
-        forward_x, forward_y = self.calculate_movement_vector(self.angle + 90)
-        right_x, right_y = self.calculate_movement_vector(self.angle)
-
-        self.center_x += self.change_x * forward_x + self.change_y * right_x
-        self.center_y += self.change_x * forward_y + self.change_y * right_y
-
-    def calculate_movement_vector(self, angle):
-        radian_angle = math.radians(angle)
-        return math.cos(radian_angle), math.sin(radian_angle)
-
-    def face_mouse(self, mouse_x, mouse_y):
-        # Adjust the angle by 90 degrees to ensure the top of the sprite faces the mouse
-        self.angle = math.degrees(math.atan2(mouse_y - self.center_y, mouse_x - self.center_x)) - 90
-
     def shoot(self):
         if not self.projectile_types or self.current_mana < 20:
             return

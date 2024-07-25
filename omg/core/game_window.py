@@ -2,7 +2,6 @@ import arcade
 import os
 from entities.player import Player
 from entities.obstacle import Obstacle
-from mechanics.movement import setup_movement_keys
 from mechanics.collision import handle_projectile_collisions
 
 SCREEN_WIDTH = 800
@@ -42,8 +41,8 @@ class GameWindow(arcade.Window):
 
         # Set custom movement keys (optional)
         self.player.set_movement_keys(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
-        self.on_key_press_handler, self.on_key_release_handler = setup_movement_keys(self.player)
-        
+
+
         # Create obstacles
         self.obstacles = arcade.SpriteList()
         obstacle_image = os.path.join(ROOT_DIR, "obstacles", "obstacle.png")
