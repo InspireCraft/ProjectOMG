@@ -20,7 +20,7 @@ class GameWindow(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.player: Player = None
-        self.obstacles: List[Obstacle] = None
+        self.obstacles: arcade.SpriteList = None
         self.mouse_x = 0
         self.mouse_y = 0
         self.skill_icons = []
@@ -80,13 +80,15 @@ class GameWindow(arcade.Window):
             self.mouse_x, self.mouse_y,
             self.obstacles,
             SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
+        self.obstacles.update()
         self.check_for_collisions()
 
     def on_key_press(self, key, modifiers):
-        # Delegate the input to the characters
+        # Delegate the input
         self.player.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):
+        # Delegate the input
         self.player.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
