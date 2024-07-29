@@ -7,20 +7,28 @@ from mechanics.collision import handle_obstacle_collisions, handle_screen_bounda
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
 class Player(arcade.Sprite):
-    def __init__(self, name, char_class, image_file, scale, screen_width, screen_height, initial_angle=0):
+    def __init__(self, name, char_class, image_file, scale, initial_angle=0):
         super().__init__(image_file, scale)
         self.name = name
         self.char_class = char_class
         self.center_x = 100
         self.center_y = 100
         self.projectiles = arcade.SpriteList()
-        self.screen_width = screen_width
-        self.screen_height = screen_height
         self.angle = initial_angle  # Set initial angle here
 
         # Movement
-        self.movement_logic = movement.CompassDirected(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
-        # self.movement_logic = movement.MouseDirected(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
+        # self.movement_logic = movement.CompassDirected(
+        #     forward=arcade.key.W,
+        #     backward=arcade.key.S,
+        #     left=arcade.key.A,
+        #     right=arcade.key.D
+        # )
+        self.movement_logic = movement.MouseDirected(
+            forward=arcade.key.W,
+            backward=arcade.key.S,
+            left=arcade.key.A,
+            right=arcade.key.D
+        )
         self.change_x = MOVEMENT_SPEED_SIDE
         self.change_y = MOVEMENT_SPEED_FORWARD
         # Health

@@ -34,14 +34,8 @@ class GameWindow(arcade.Window):
             char_class="Wizard",
             image_file=os.path.join(ROOT_DIR, "characters", "wizard_td2.PNG"),
             scale=0.2,
-            screen_height=SCREEN_HEIGHT,
-            screen_width=SCREEN_WIDTH,
             initial_angle=0
         )
-
-        # Set custom movement keys (optional)
-        self.player.set_movement_keys(arcade.key.W, arcade.key.S, arcade.key.A, arcade.key.D)
-
 
         # Create obstacles
         self.obstacles = arcade.SpriteList()
