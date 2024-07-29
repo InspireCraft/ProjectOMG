@@ -12,24 +12,26 @@ class Player(arcade.Sprite):
         self.char_class = char_class
         self.center_x = 100
         self.center_y = 100
+        self.change_x = 0
+        self.change_y = 0
         self.projectiles = arcade.SpriteList()
         self.angle = initial_angle  # Set initial angle here
 
         # Movement
-        # self.movement_logic = movement.CompassDirected(
-        #     forward=arcade.key.W,
-        #     backward=arcade.key.S,
-        #     left=arcade.key.A,
-        #     right=arcade.key.D
-        # )
+        self.movement_logic = movement.CompassDirected(
+            forward=arcade.key.W,
+            backward=arcade.key.S,
+            left=arcade.key.A,
+            right=arcade.key.D
+        )
         self.movement_logic = movement.MouseDirected(
             forward=arcade.key.W,
             backward=arcade.key.S,
             left=arcade.key.A,
             right=arcade.key.D
         )
-        self.change_x = MOVEMENT_SPEED_SIDE
-        self.change_y = MOVEMENT_SPEED_FORWARD
+        self.mov_speed_lr = MOVEMENT_SPEED_SIDE
+        self.mov_speed_ud = MOVEMENT_SPEED_FORWARD
         # Health
         self.max_health = 100
         self.current_health = 100
@@ -59,10 +61,12 @@ class Player(arcade.Sprite):
         """Called when the user releases a key. """
         self.movement_logic.on_key_release(key, modifiers)
 
-    def update(self, mouse_x, mouse_y, obstacles, screen_width, screen_height, delta_time):
+    def update(self, mouse_x, mouse_y, delta_time):
 
-        (self.center_x, self.center_y, self.angle) = self.movement_logic.calculate_player_state(
-            self.center_x, self.center_y, mouse_x, mouse_y, self.change_x, self.change_y
+        (self.change_x, self.change_y, self.angle) = self.movement_logic.calculate_player_state(
+            self.center_x, self.center_y,
+            mouse_x, mouse_y,
+            self.mov_speed_lr, self.mov_speed_ud
         )
         self.projectiles.update()
         self.regenerate_mana(delta_time)

@@ -65,7 +65,12 @@ class PlayerMovement:
 
 
 class MouseDirected(PlayerMovement):
-    def calculate_player_state(self, center_x, center_y, mouse_x, mouse_y, mov_speed_lr, mov_speed_ud, *args, **_ignored):
+    def calculate_player_state(
+        self,
+        center_x, center_y,
+        mouse_x, mouse_y,
+        mov_speed_lr, mov_speed_ud, *args, **_ignored
+    ):
 
         # Velocity is defined relative to where the player looks.
         # Map it to the coordinate system of the Window by rotation
@@ -79,16 +84,19 @@ class MouseDirected(PlayerMovement):
         vx_wrt_ground = cos_ang * vx_player - sin_ang * vy_player
         vy_wrt_ground = sin_ang * vx_player + cos_ang * vy_player
 
-        center_x += vx_wrt_ground
-        center_y += vy_wrt_ground
+        return vx_wrt_ground, vy_wrt_ground, angle
 
-        # TODO: return PlayerState or PlayerPose object
-        return center_x, center_y, angle
+
 class CompassDirected(PlayerMovement):
-    def calculate_player_state(self, center_x, center_y, mouse_x, mouse_y, mov_speed_lr, mov_speed_ud, *args, **_ignored):
-        center_x += mov_speed_lr * self.change_direction_x
-        center_y += mov_speed_ud * self.change_direction_y
+    def calculate_player_state(
+        self,
+        center_x, center_y,
+        mouse_x, mouse_y,
+        mov_speed_lr, mov_speed_ud,
+        *args, **_ignored
+    ):
+        vx_wrt_ground = mov_speed_lr * self.change_direction_x
+        vy_wrt_ground = mov_speed_ud * self.change_direction_y
         angle_rad = self.face_mouse(mouse_x, mouse_y, center_x, center_y)
         angle = math.degrees(angle_rad)
-        # TODO: return PlayerState or PlayerPose object
-        return center_x, center_y, angle
+        return vx_wrt_ground, vy_wrt_ground, angle

@@ -82,9 +82,7 @@ class GameWindow(arcade.Window):
 
     def update(self, delta_time):
         self.player.update(
-            self.mouse_x, self.mouse_y,
-            self.obstacles,
-            SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
+            self.mouse_x, self.mouse_y, delta_time)
         self.obstacles.update()
         self.physics_engine.update()
         handle_projectile_collisions(self.player.projectiles, self.obstacles)
