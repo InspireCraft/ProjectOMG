@@ -3,6 +3,7 @@ import os
 from entities.player import Player
 from entities.obstacle import Obstacle
 from mechanics.collision import handle_projectile_collisions
+from mechanics.physics import PhysicsEngineBoundary
 from typing import List
 
 SCREEN_WIDTH = 800
@@ -21,6 +22,7 @@ class GameWindow(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
+        self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
         self.skill_icons = []
@@ -36,7 +38,6 @@ class GameWindow(arcade.Window):
             scale=0.2,
             initial_angle=0
         )
-
         # Create obstacles
         self.obstacles = arcade.SpriteList()
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
@@ -45,6 +46,10 @@ class GameWindow(arcade.Window):
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
 
+        self.physics_engine = PhysicsEngineBoundary(
+            player_sprite=self.player, walls=self.obstacles,
+            screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT
+        )
         # Add projectile types
         self.player.add_projectile_type(
             name="Fireball",
@@ -81,7 +86,8 @@ class GameWindow(arcade.Window):
             self.obstacles,
             SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
         self.obstacles.update()
-        self.check_for_collisions()
+        self.physics_engine.update()
+        handle_projectile_collisions(self.player.projectiles, self.obstacles)
 
     def on_key_press(self, key, modifiers):
         # Delegate the input
@@ -94,9 +100,6 @@ class GameWindow(arcade.Window):
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_x = x
         self.mouse_y = y
-
-    def check_for_collisions(self):
-        handle_projectile_collisions(self.player.projectiles, self.obstacles)
 
     def draw_ui(self):
         for i, icon in enumerate(self.skill_icons):

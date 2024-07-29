@@ -2,7 +2,6 @@ import arcade
 import math
 from mechanics import movement
 from entities.projectile import Projectile
-from mechanics.collision import handle_obstacle_collisions, handle_screen_boundary_collision
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
@@ -65,8 +64,6 @@ class Player(arcade.Sprite):
         (self.center_x, self.center_y, self.angle) = self.movement_logic.calculate_player_state(
             self.center_x, self.center_y, mouse_x, mouse_y, self.change_x, self.change_y
         )
-        handle_obstacle_collisions(self, obstacles)
-        handle_screen_boundary_collision(self, screen_width, screen_height)
         self.projectiles.update()
         self.regenerate_mana(delta_time)
 
