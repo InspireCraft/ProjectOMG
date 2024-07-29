@@ -49,6 +49,13 @@ class Player(arcade.Sprite):
         """Called whenever a key is pressed. """
         self.movement_logic.on_key_press(key, modifiers)
 
+        if key == arcade.key.SPACE:
+            self.shoot()
+        elif key == arcade.key.KEY_1:
+            self.select_projectile(0)
+        elif key == arcade.key.KEY_2:
+            self.select_projectile(1)
+
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
         self.movement_logic.on_key_release(key, modifiers)

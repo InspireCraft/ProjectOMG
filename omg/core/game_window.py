@@ -3,6 +3,7 @@ import os
 from entities.player import Player
 from entities.obstacle import Obstacle
 from mechanics.collision import handle_projectile_collisions
+from typing import List
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -76,23 +77,18 @@ class GameWindow(arcade.Window):
         self.draw_ui()
 
     def update(self, delta_time):
-        self.player.update(self.mouse_x, self.mouse_y, self.obstacles, SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
+        self.player.update(
+            self.mouse_x, self.mouse_y,
+            self.obstacles,
+            SCREEN_WIDTH, SCREEN_HEIGHT, delta_time)
         self.check_for_collisions()
 
     def on_key_press(self, key, modifiers):
         # Delegate the input to the characters
         self.player.on_key_press(key, modifiers)
 
-        if key == arcade.key.SPACE:
-            self.player.shoot()
-        elif key == arcade.key.KEY_1:
-            self.player.select_projectile(0)
-        elif key == arcade.key.KEY_2:
-            self.player.select_projectile(1)
-
     def on_key_release(self, key, modifiers):
         self.player.on_key_release(key, modifiers)
-
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_x = x
