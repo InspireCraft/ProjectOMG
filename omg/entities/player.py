@@ -80,15 +80,13 @@ class Player(arcade.Sprite):
         projectile = Projectile(
             name=projectile_info['name'],
             image_file=projectile_info['image_file'],
+            init_px=self.center_x,
+            init_py=self.center_y,
+            angle=self.angle,
             scale=projectile_info['scale'],
             damage=projectile_info['damage'],
-            speed=projectile_info['speed']
+            speed=projectile_info['speed'],
         )
-        projectile.center_x = self.center_x
-        projectile.center_y = self.center_y
-        angle_rad = math.radians(self.angle + 90)  # Adjust the shooting angle accordingly
-        projectile.change_x = projectile_info['speed'] * math.cos(angle_rad)
-        projectile.change_y = projectile_info['speed'] * math.sin(angle_rad)
         self.projectiles.append(projectile)
 
     def regenerate_mana(self, delta_time):

@@ -6,6 +6,7 @@ from mechanics.collision import handle_projectile_collisions
 from mechanics.physics import PhysicsEngineBoundary
 from typing import List
 
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "2D Shooter RPG"
