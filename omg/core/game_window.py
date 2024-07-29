@@ -15,15 +15,14 @@ ROOT_DIR = os.path.join(
     "images"
 )
 
+
 class GameWindow(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        self.player = None
-        self.obstacles = None
+        self.player: Player = None
+        self.obstacles: List[Obstacle] = None
         self.mouse_x = 0
         self.mouse_y = 0
-        self.on_key_press_handler = None
-        self.on_key_release_handler = None
         self.skill_icons = []
         self.icon_scale = 0.1
         self.icon_margin = 10
