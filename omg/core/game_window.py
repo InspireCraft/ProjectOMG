@@ -9,7 +9,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "2D Shooter RPG"
 
-ROOT_DIR = os.path.join(
+ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."),
     "assets",
     "images"
@@ -32,14 +32,14 @@ class GameWindow(arcade.Window):
         self.player = Player(
             name="Hero",
             char_class="Wizard",
-            image_file=os.path.join(ROOT_DIR, "characters", "wizard_td2.PNG"),
+            image_file=os.path.join(ASSET_DIR, "characters", "wizard_td2.PNG"),
             scale=0.2,
             initial_angle=0
         )
 
         # Create obstacles
         self.obstacles = arcade.SpriteList()
-        obstacle_image = os.path.join(ROOT_DIR, "obstacles", "obstacle.png")
+        obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
         obstacle.center_x = 400
         obstacle.center_y = 300
@@ -48,14 +48,14 @@ class GameWindow(arcade.Window):
         # Add projectile types
         self.player.add_projectile_type(
             name="Fireball",
-            image_file=os.path.join(ROOT_DIR, "skills", "fireball.PNG"),
+            image_file=os.path.join(ASSET_DIR, "skills", "fireball.PNG"),
             scale=0.05,
             damage=10,
             speed=5
         )
         self.player.add_projectile_type(
             name="Ice Shard",
-            image_file=os.path.join(ROOT_DIR, "skills", "ice_shard.PNG"),
+            image_file=os.path.join(ASSET_DIR, "skills", "ice_shard.PNG"),
             scale=0.05,
             damage=15,
             speed=7
