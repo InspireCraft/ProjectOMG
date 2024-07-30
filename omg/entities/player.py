@@ -1,11 +1,30 @@
 import arcade
-import math
+from typing import List, Type
 from mechanics import movement
-from entities.projectile import Projectile
+from entities.projectile import ProjectileFactory, Projectile
+from structural.observer import Observer
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
-class Player(arcade.Sprite):
+
+
+class ObservableSprite(arcade.Sprite):
+    observers: List[Observer] = []
+
+    def add_observer(self, observer: Observer):
+        """Add an observer to the list."""
+        self.observers.append(observer)
+
+    def remove_observer(self, observer: Observer):
+        """Remove an observer from the list."""
+        self.observers.remove(observer)
+
+    def notify_observers(self, event_type: str, *args, **kwargs):
+        """Notify all observers of an event."""
+        for observer in self.observers:
+            observer.on_event(event_type, *args, **kwargs)
+
+class Player(ObservableSprite):
     def __init__(self, name, char_class, image_file, scale, initial_angle=0):
         super().__init__(image_file, scale)
         self.name = name
@@ -14,7 +33,6 @@ class Player(arcade.Sprite):
         self.center_y = 100
         self.change_x = 0
         self.change_y = 0
-        self.projectiles = arcade.SpriteList()
         self.angle = initial_angle  # Set initial angle here
 
         # Movement
@@ -43,7 +61,7 @@ class Player(arcade.Sprite):
         self.mana_regen_cooldown = 0
 
         # Projectile types
-        self.projectile_types = []
+        self.projectile_types: List[Type[ProjectileFactory]] = []
         self.current_projectile_index = 0
 
     def on_key_press(self, key, modifiers):
@@ -68,7 +86,6 @@ class Player(arcade.Sprite):
             mouse_x, mouse_y,
             self.mov_speed_lr, self.mov_speed_ud
         )
-        self.projectiles.update()
         self.regenerate_mana(delta_time)
 
     def shoot(self):
@@ -76,18 +93,9 @@ class Player(arcade.Sprite):
             return
 
         self.current_mana -= 20
-        projectile_info = self.projectile_types[self.current_projectile_index]
-        projectile = Projectile(
-            name=projectile_info['name'],
-            image_file=projectile_info['image_file'],
-            init_px=self.center_x,
-            init_py=self.center_y,
-            angle=self.angle,
-            scale=projectile_info['scale'],
-            damage=projectile_info['damage'],
-            speed=projectile_info['speed'],
-        )
-        self.projectiles.append(projectile)
+        selected_skill = self.projectile_types[self.current_projectile_index]
+        projectile = selected_skill.create(self.center_x, self.center_y, self.angle)
+        self.notify_observers('projectile_shot', projectile)
 
     def regenerate_mana(self, delta_time):
         self.mana_regen_cooldown += delta_time
@@ -97,14 +105,9 @@ class Player(arcade.Sprite):
                 self.current_mana = self.max_mana
             self.mana_regen_cooldown = 0
 
-    def add_projectile_type(self, name, image_file, scale, damage, speed):
-        self.projectile_types.append({
-            'name': name,
-            'image_file': image_file,
-            'scale': scale,
-            'damage': damage,
-            'speed': speed
-        })
+    # TODO: rename as skill
+    def add_projectile(self, projectile: Projectile):
+        self.projectile_types.append(projectile)
 
     def select_projectile(self, index):
         if 0 <= index < len(self.projectile_types):
@@ -118,7 +121,6 @@ class Player(arcade.Sprite):
 
     def draw(self):
         super().draw()
-        self.projectiles.draw()
         self.draw_health_bar()
         self.draw_mana_bar()
 
