@@ -4,7 +4,9 @@ from entities.player import Player
 from entities.obstacle import Obstacle
 from mechanics.collision import handle_projectile_collisions
 from mechanics.physics import PhysicsEngineBoundary
-from typing import List
+from structural.observer import Observer
+
+from entities.projectile import FireballFactory, IceShardFactory, Projectile
 
 
 SCREEN_WIDTH = 800
@@ -18,11 +20,17 @@ ASSET_DIR = os.path.join(
 )
 
 
-class GameWindow(arcade.Window):
+class GameWindowMeta(type(arcade.Window), type(Observer)):
+    '''Define new metaclass for GameWindow and Observer multiple inheritence.'''
+    pass
+
+
+class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
+        self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
@@ -39,8 +47,11 @@ class GameWindow(arcade.Window):
             scale=0.2,
             initial_angle=0
         )
+        self.player.add_observer(self)
+
         # Create obstacles
         self.obstacles = arcade.SpriteList()
+        self.projectiles = arcade.SpriteList()
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
         obstacle.center_x = 400
@@ -52,33 +63,28 @@ class GameWindow(arcade.Window):
             screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT
         )
         # Add projectile types
-        self.player.add_projectile_type(
-            name="Fireball",
-            image_file=os.path.join(ASSET_DIR, "skills", "fireball.PNG"),
-            scale=0.05,
-            damage=10,
-            speed=5
-        )
-        self.player.add_projectile_type(
-            name="Ice Shard",
-            image_file=os.path.join(ASSET_DIR, "skills", "ice_shard.PNG"),
-            scale=0.05,
-            damage=15,
-            speed=7
-        )
+        self.player.add_projectile(FireballFactory)
+        self.player.add_projectile(IceShardFactory)
 
         # Load skill icons
         self.load_skill_icons()
 
+    def on_event(self, event_type: str, *args, **kwargs):
+        """Handle the event notifications."""
+        if event_type == 'projectile_shot':
+            projectile: Projectile = args[0]
+            self.projectiles.append(projectile)
+
     def load_skill_icons(self):
-        for projectile in self.player.projectile_types:
-            icon_texture = arcade.load_texture(projectile['image_file'])
+        for projectile_type in self.player.projectile_types:
+            icon_texture = arcade.load_texture(projectile_type.image_file)
             self.skill_icons.append(icon_texture)
 
     def on_draw(self):
         arcade.start_render()
         self.player.draw()
         self.obstacles.draw()
+        self.projectiles.draw()
         self.draw_ui()
 
     def update(self, delta_time):
@@ -86,7 +92,8 @@ class GameWindow(arcade.Window):
             self.mouse_x, self.mouse_y, delta_time)
         self.obstacles.update()
         self.physics_engine.update()
-        handle_projectile_collisions(self.player.projectiles, self.obstacles)
+        self.projectiles.update()
+        handle_projectile_collisions(self.projectiles, self.obstacles)
 
     def on_key_press(self, key, modifiers):
         # Delegate the input
@@ -120,6 +127,8 @@ class GameWindow(arcade.Window):
                 self.icon_size,
                 icon
             )
+
+
 
 def main():
     window = GameWindow()
