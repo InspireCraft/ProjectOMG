@@ -1,5 +1,5 @@
 from typing import List
-
+import logging
 import arcade
 
 
@@ -54,8 +54,7 @@ class Observer:
         if handler:
             handler(event)
         else:
-            # TODO: Change to a logging call
-            print(f"No handler for event type: {event.event_type}")
+            logging.warning(f"No handler for event type:{event.event_type}")
 
 
 class ObservableSprite(arcade.Sprite):
