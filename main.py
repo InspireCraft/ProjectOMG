@@ -1,6 +1,6 @@
 import arcade
 import logging
-from core.game_window import GameWindow
+from omg.core.game_window import GameWindow
 
 
 def main():
