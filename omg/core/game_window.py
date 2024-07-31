@@ -6,7 +6,7 @@ from mechanics.collision import handle_projectile_collisions
 from mechanics.physics import PhysicsEngineBoundary
 from structural.observer import Observer
 
-from entities.projectile import FireballFactory, IceShardFactory, Projectile
+from entities.projectile import FireballFactory, IceShardFactory, ProjectileShotEvent
 
 
 SCREEN_WIDTH = 800
@@ -20,14 +20,10 @@ ASSET_DIR = os.path.join(
 )
 
 
-class GameWindowMeta(type(arcade.Window), type(Observer)):
-    '''Define new metaclass for GameWindow and Observer multiple inheritence.'''
-    pass
-
-
-class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
+class GameWindow(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        self.observer: Observer = None
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
         self.projectiles = None
@@ -40,6 +36,8 @@ class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
         self.icon_size = 64
 
     def setup(self):
+        self.observer = Observer()
+        self.observer.register_handler("projectile_shot", self.on_projectile_shot)
         self.player = Player(
             name="Hero",
             char_class="Wizard",
@@ -47,7 +45,7 @@ class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
             scale=0.2,
             initial_angle=0
         )
-        self.player.add_observer(self)
+        self.player.add_observer(self.observer)
 
         # Create obstacles
         self.obstacles = arcade.SpriteList()
@@ -69,12 +67,6 @@ class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
         # Load skill icons
         self.load_skill_icons()
 
-    def on_event(self, event_type: str, *args, **kwargs):
-        """Handle the event notifications."""
-        if event_type == 'projectile_shot':
-            projectile: Projectile = args[0]
-            self.projectiles.append(projectile)
-
     def load_skill_icons(self):
         for projectile_type in self.player.projectile_types:
             icon_texture = arcade.load_texture(projectile_type.image_file)
@@ -94,6 +86,9 @@ class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
         self.physics_engine.update()
         self.projectiles.update()
         handle_projectile_collisions(self.projectiles, self.obstacles)
+
+    def on_projectile_shot(self, event: ProjectileShotEvent):
+        self.projectiles.append(event.projectile)
 
     def on_key_press(self, key, modifiers):
         # Delegate the input
@@ -129,11 +124,11 @@ class GameWindow(arcade.Window, Observer, metaclass=GameWindowMeta):
             )
 
 
-
 def main():
     window = GameWindow()
     window.setup()
     arcade.run()
+
 
 if __name__ == "__main__":
     main()
