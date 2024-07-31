@@ -1,7 +1,7 @@
 import arcade
 from typing import List
-from entities.obstacle import Obstacle
-from entities.projectile import Projectile
+from omg.entities.obstacle import Obstacle
+from omg.entities.projectile import Projectile
 
 
 def handle_projectile_collisions(

@@ -1,8 +1,8 @@
 import arcade
 from typing import List, Type
-from mechanics import movement
-from entities.projectile import ProjectileFactory, Projectile, ProjectileShotEvent
-from structural.observer import ObservableSprite
+from omg.mechanics import movement
+from omg.entities.projectile import ProjectileFactory, Projectile, ProjectileShotEvent
+from omg.structural.observer import ObservableSprite
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1

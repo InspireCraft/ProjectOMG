@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from structural.observer import Event
+from omg.structural.observer import Event
 import arcade
 import math
 import os
