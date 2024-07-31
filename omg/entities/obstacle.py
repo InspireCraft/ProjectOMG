@@ -1,5 +1,6 @@
 import arcade
 
+
 class Obstacle(arcade.Sprite):
     def __init__(self, image_file, scale, health):
         super().__init__(image_file, scale)
@@ -25,13 +26,15 @@ class Obstacle(arcade.Sprite):
             health_bar_y,
             health_bar_width,
             health_bar_height,
-            arcade.color.RED
+            arcade.color.RED,
         )
-        current_health_width = health_bar_width * (self.current_health / self.max_health)
+        current_health_width = health_bar_width * (
+            self.current_health / self.max_health
+        )
         arcade.draw_rectangle_filled(
             health_bar_x - (health_bar_width - current_health_width) / 2,
             health_bar_y,
             current_health_width,
             health_bar_height,
-            arcade.color.GREEN
+            arcade.color.GREEN,
         )

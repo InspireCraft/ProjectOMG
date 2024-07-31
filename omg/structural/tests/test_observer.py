@@ -31,11 +31,13 @@ class TestObserver(unittest.TestCase):
         event = Event("unhandled_event")
 
         # Capture the output using a mock for print
-        with self.assertLogs(level='WARNING') as log:
+        with self.assertLogs(level="WARNING") as log:
             observer.on_event(event)
 
         # Verify that "No handler for event type" message is in the logs
-        self.assertIn("WARNING:root:No handler for event type:unhandled_event", log.output[0])
+        self.assertIn(
+            "WARNING:root:No handler for event type:unhandled_event", log.output[0]
+        )
 
 
 class TestObservableSprite(unittest.TestCase):
@@ -67,5 +69,5 @@ class TestObservableSprite(unittest.TestCase):
         mock_handler.assert_called_once_with(event)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

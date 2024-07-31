@@ -2,7 +2,11 @@ import arcade
 import os
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
-from omg.entities.projectile import FireballFactory, IceShardFactory, ProjectileShotEvent
+from omg.entities.projectile import (
+    FireballFactory,
+    IceShardFactory,
+    ProjectileShotEvent,
+)
 from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
@@ -13,9 +17,7 @@ SCREEN_HEIGHT = 600
 SCREEN_TITLE = "2D Shooter RPG"
 
 ASSET_DIR = os.path.join(
-    os.path.join(os.path.dirname(__file__), ".."),
-    "assets",
-    "images"
+    os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
 )
 
 
@@ -42,7 +44,7 @@ class GameWindow(arcade.Window):
             char_class="Wizard",
             image_file=os.path.join(ASSET_DIR, "characters", "wizard_td2.PNG"),
             scale=0.2,
-            initial_angle=0
+            initial_angle=0,
         )
         self.player.add_observer(self.observer)
 
@@ -56,8 +58,10 @@ class GameWindow(arcade.Window):
         self.obstacles.append(obstacle)
 
         self.physics_engine = PhysicsEngineBoundary(
-            player_sprite=self.player, walls=self.obstacles,
-            screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT
+            player_sprite=self.player,
+            walls=self.obstacles,
+            screen_width=SCREEN_WIDTH,
+            screen_height=SCREEN_HEIGHT,
         )
         # Add projectile types
         self.player.add_projectile(FireballFactory)
@@ -79,8 +83,7 @@ class GameWindow(arcade.Window):
         self.draw_ui()
 
     def update(self, delta_time):
-        self.player.update(
-            self.mouse_x, self.mouse_y, delta_time)
+        self.player.update(self.mouse_x, self.mouse_y, delta_time)
         self.obstacles.update()
         self.physics_engine.update()
         self.projectiles.update()
@@ -112,14 +115,14 @@ class GameWindow(arcade.Window):
                     self.icon_size,
                     self.icon_size,
                     arcade.color.RED,
-                    border_width=3
+                    border_width=3,
                 )
             arcade.draw_texture_rectangle(
                 x + self.icon_size // 2,
                 y + self.icon_size // 2,
                 self.icon_size,
                 self.icon_size,
-                icon
+                icon,
             )
 
 

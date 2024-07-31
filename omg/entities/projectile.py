@@ -35,7 +35,7 @@ class ProjectileShotEvent(Event):
         projectile : Projectile
             The projectile that was shot.
         """
-        super().__init__('projectile_shot')
+        super().__init__("projectile_shot")
         self.projectile = projectile
 
 
@@ -64,7 +64,7 @@ class FireballFactory(ProjectileFactory):
             init_px=init_px,
             init_py=init_py,
             speed=cls.speed,
-            angle=angle
+            angle=angle,
         )
 
 
@@ -84,5 +84,5 @@ class IceShardFactory(ProjectileFactory):
             init_px=init_px,
             init_py=init_py,
             speed=cls.speed,
-            angle=angle
+            angle=angle,
         )

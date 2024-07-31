@@ -1,5 +1,6 @@
 import math
 
+
 class PlayerMovement:
     def __init__(self, forward, backward, left, right):
         self.key_forward = forward
@@ -29,11 +30,12 @@ class PlayerMovement:
         elif key == self.key_right:
             self.pressed_right = True
 
-        [self.change_direction_x, self.change_direction_y] = self.calculate_displacement_directions()
-
+        [self.change_direction_x, self.change_direction_y] = (
+            self.calculate_displacement_directions()
+        )
 
     def on_key_release(self, key, modifiers):
-        """Called when the user releases a key. """
+        """Called when the user releases a key."""
 
         if key == self.key_forward:
             self.pressed_forward = False
@@ -44,8 +46,9 @@ class PlayerMovement:
         elif key == self.key_right:
             self.pressed_right = False
 
-        [self.change_direction_x, self.change_direction_y] = self.calculate_displacement_directions()
-
+        [self.change_direction_x, self.change_direction_y] = (
+            self.calculate_displacement_directions()
+        )
 
     def calculate_displacement_directions(self):
         forward = 1 if self.pressed_forward else 0
@@ -61,15 +64,20 @@ class PlayerMovement:
     @staticmethod
     def face_mouse(mouse_x, mouse_y, center_x, center_y):
         # angle = 0 on +y axis(TOP), increases counter-clockwise
-        return math.atan2(mouse_y - center_y, mouse_x - center_x) - math.pi/2
+        return math.atan2(mouse_y - center_y, mouse_x - center_x) - math.pi / 2
 
 
 class MouseDirected(PlayerMovement):
     def calculate_player_state(
         self,
-        center_x, center_y,
-        mouse_x, mouse_y,
-        mov_speed_lr, mov_speed_ud, *args, **_ignored
+        center_x,
+        center_y,
+        mouse_x,
+        mouse_y,
+        mov_speed_lr,
+        mov_speed_ud,
+        *args,
+        **_ignored
     ):
 
         # Velocity is defined relative to where the player looks.
@@ -90,10 +98,14 @@ class MouseDirected(PlayerMovement):
 class CompassDirected(PlayerMovement):
     def calculate_player_state(
         self,
-        center_x, center_y,
-        mouse_x, mouse_y,
-        mov_speed_lr, mov_speed_ud,
-        *args, **_ignored
+        center_x,
+        center_y,
+        mouse_x,
+        mouse_y,
+        mov_speed_lr,
+        mov_speed_ud,
+        *args,
+        **_ignored
     ):
         vx_wrt_ground = mov_speed_lr * self.change_direction_x
         vy_wrt_ground = mov_speed_ud * self.change_direction_y

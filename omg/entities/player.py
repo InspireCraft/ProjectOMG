@@ -24,13 +24,13 @@ class Player(ObservableSprite):
             forward=arcade.key.W,
             backward=arcade.key.S,
             left=arcade.key.A,
-            right=arcade.key.D
+            right=arcade.key.D,
         )
         self.movement_logic = movement.MouseDirected(
             forward=arcade.key.W,
             backward=arcade.key.S,
             left=arcade.key.A,
-            right=arcade.key.D
+            right=arcade.key.D,
         )
         self.mov_speed_lr = MOVEMENT_SPEED_SIDE
         self.mov_speed_ud = MOVEMENT_SPEED_FORWARD
@@ -49,7 +49,7 @@ class Player(ObservableSprite):
         self.current_projectile_index = 0
 
     def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed. """
+        """Called whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
 
         if key == arcade.key.SPACE:
@@ -60,15 +60,20 @@ class Player(ObservableSprite):
             self.select_projectile(1)
 
     def on_key_release(self, key, modifiers):
-        """Called when the user releases a key. """
+        """Called when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
 
     def update(self, mouse_x, mouse_y, delta_time):
 
-        (self.change_x, self.change_y, self.angle) = self.movement_logic.calculate_player_state(
-            self.center_x, self.center_y,
-            mouse_x, mouse_y,
-            self.mov_speed_lr, self.mov_speed_ud
+        (self.change_x, self.change_y, self.angle) = (
+            self.movement_logic.calculate_player_state(
+                self.center_x,
+                self.center_y,
+                mouse_x,
+                mouse_y,
+                self.mov_speed_lr,
+                self.mov_speed_ud,
+            )
         )
         self.regenerate_mana(delta_time)
 
@@ -80,9 +85,7 @@ class Player(ObservableSprite):
         self.current_mana -= 20
         selected_skill = self.projectile_types[self.current_projectile_index]
         projectile = selected_skill.create(
-            init_px=self.center_x,
-            init_py=self.center_y,
-            angle=self.angle
+            init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
 
         projectile_event = ProjectileShotEvent(projectile)
@@ -125,28 +128,32 @@ class Player(ObservableSprite):
             health_bar_y,
             health_bar_width,
             health_bar_height,
-            arcade.color.RED
+            arcade.color.RED,
         )
-        current_health_width = health_bar_width * (self.current_health / self.max_health)
+        current_health_width = health_bar_width * (
+            self.current_health / self.max_health
+        )
         arcade.draw_rectangle_filled(
             health_bar_x - (health_bar_width - current_health_width) / 2,
             health_bar_y,
             current_health_width,
             health_bar_height,
-            arcade.color.GREEN
+            arcade.color.GREEN,
         )
 
     def draw_mana_bar(self):
         mana_bar_width = 50
         mana_bar_height = 5
         mana_bar_x = self.center_x
-        mana_bar_y = self.center_y + self.height / 2 + 2  # Slightly below the health bar
+        mana_bar_y = (
+            self.center_y + self.height / 2 + 2
+        )  # Slightly below the health bar
         arcade.draw_rectangle_filled(
             mana_bar_x,
             mana_bar_y,
             mana_bar_width,
             mana_bar_height,
-            arcade.color.DARK_BLUE
+            arcade.color.DARK_BLUE,
         )
         current_mana_width = mana_bar_width * (self.current_mana / self.max_mana)
         arcade.draw_rectangle_filled(
@@ -154,5 +161,5 @@ class Player(ObservableSprite):
             mana_bar_y,
             current_mana_width,
             mana_bar_height,
-            arcade.color.LIGHT_BLUE
+            arcade.color.LIGHT_BLUE,
         )

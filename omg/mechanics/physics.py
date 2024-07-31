@@ -2,7 +2,8 @@ import arcade
 
 
 class PhysicsEngineBoundary(arcade.PhysicsEngineSimple):
-    '''Physics engine to handle collisions and boundary checking.'''
+    """Physics engine to handle collisions and boundary checking."""
+
     def __init__(self, *args, screen_width, screen_height, **kwargs):
         super().__init__(*args, **kwargs)
         self.screen_width = screen_width
@@ -16,7 +17,7 @@ class PhysicsEngineBoundary(arcade.PhysicsEngineSimple):
         self.check_boundaries()
 
     def check_boundaries(self):
-        ''' Check and handle if the player sprite is outside the screen boundaries.'''
+        """Check and handle if the player sprite is outside the screen boundaries."""
         if self.player_sprite.left < 0:
             self.player_sprite.left = 0
         elif self.player_sprite.right > self.screen_width:
