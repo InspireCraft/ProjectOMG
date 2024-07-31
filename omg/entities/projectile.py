@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+from structural.observer import Event
 import arcade
 import math
 import os
 
 ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
+
 
 # TODO: add source as the projectiles are emitted now
 class Projectile(arcade.Sprite):
@@ -21,6 +23,20 @@ class Projectile(arcade.Sprite):
         angle_rad = math.radians(angle + 90)  # Adjust the shooting angle accordingly
         self.change_x = self.speed * math.cos(angle_rad)
         self.change_y = self.speed * math.sin(angle_rad)
+
+
+class ProjectileShotEvent(Event):
+    """Event triggered when a projectile is shot."""
+
+    def __init__(self, projectile: Projectile):
+        """
+        Parameters
+        ----------
+        projectile : Projectile
+            The projectile that was shot.
+        """
+        super().__init__('projectile_shot')
+        self.projectile = projectile
 
 
 class ProjectileFactory(ABC):
