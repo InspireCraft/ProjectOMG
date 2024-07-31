@@ -1,28 +1,12 @@
 import arcade
 from typing import List, Type
 from mechanics import movement
-from entities.projectile import ProjectileFactory, Projectile
-from structural.observer import Observer
+from entities.projectile import ProjectileFactory, Projectile, ProjectileShotEvent
+from structural.observer import ObservableSprite
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
 
-
-class ObservableSprite(arcade.Sprite):
-    observers: List[Observer] = []
-
-    def add_observer(self, observer: Observer):
-        """Add an observer to the list."""
-        self.observers.append(observer)
-
-    def remove_observer(self, observer: Observer):
-        """Remove an observer from the list."""
-        self.observers.remove(observer)
-
-    def notify_observers(self, event_type: str, *args, **kwargs):
-        """Notify all observers of an event."""
-        for observer in self.observers:
-            observer.on_event(event_type, *args, **kwargs)
 
 class Player(ObservableSprite):
     def __init__(self, name, char_class, image_file, scale, initial_angle=0):
@@ -89,13 +73,20 @@ class Player(ObservableSprite):
         self.regenerate_mana(delta_time)
 
     def shoot(self):
+        """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
         if not self.projectile_types or self.current_mana < 20:
             return
 
         self.current_mana -= 20
         selected_skill = self.projectile_types[self.current_projectile_index]
-        projectile = selected_skill.create(self.center_x, self.center_y, self.angle)
-        self.notify_observers('projectile_shot', projectile)
+        projectile = selected_skill.create(
+            init_px=self.center_x,
+            init_py=self.center_y,
+            angle=self.angle
+        )
+
+        projectile_event = ProjectileShotEvent(projectile)
+        self.notify_observers(projectile_event)
 
     def regenerate_mana(self, delta_time):
         self.mana_regen_cooldown += delta_time
