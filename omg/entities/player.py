@@ -1,7 +1,7 @@
 import arcade
 from typing import List, Type
 from omg.mechanics import movement
-from omg.entities.projectile import ProjectileFactory, Projectile, ProjectileShotEvent
+from omg.entities.projectile import ProjectileFactory, ProjectileShotEvent
 from omg.structural.observer import ObservableSprite
 
 MOVEMENT_SPEED_FORWARD = 1
@@ -9,6 +9,8 @@ MOVEMENT_SPEED_SIDE = 1
 
 
 class Player(ObservableSprite):
+    """Controllable player logic."""
+
     def __init__(self, name, char_class, image_file, scale, initial_angle=0):
         super().__init__(image_file, scale)
         self.name = name
@@ -55,16 +57,16 @@ class Player(ObservableSprite):
         if key == arcade.key.SPACE:
             self.shoot()
         elif key == arcade.key.KEY_1:
-            self.select_projectile(0)
+            self._select_projectile(0)
         elif key == arcade.key.KEY_2:
-            self.select_projectile(1)
+            self._select_projectile(1)
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
 
     def update(self, mouse_x, mouse_y, delta_time):
-
+        """Update the sprite."""
         (self.change_x, self.change_y, self.angle) = (
             self.movement_logic.calculate_player_state(
                 self.center_x,
@@ -75,7 +77,7 @@ class Player(ObservableSprite):
                 self.mov_speed_ud,
             )
         )
-        self.regenerate_mana(delta_time)
+        self._regenerate_mana(delta_time)
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
@@ -91,7 +93,7 @@ class Player(ObservableSprite):
         projectile_event = ProjectileShotEvent(projectile)
         self.notify_observers(projectile_event)
 
-    def regenerate_mana(self, delta_time):
+    def _regenerate_mana(self, delta_time):
         self.mana_regen_cooldown += delta_time
         if self.mana_regen_cooldown >= 1:
             self.current_mana += self.mana_regen_rate
@@ -100,25 +102,28 @@ class Player(ObservableSprite):
             self.mana_regen_cooldown = 0
 
     # TODO: rename as skill
-    def add_projectile(self, projectile: Projectile):
+    def add_projectile(self, projectile: Type[ProjectileFactory]):
+        """Add projectile factory to the player."""
         self.projectile_types.append(projectile)
 
-    def select_projectile(self, index):
+    def _select_projectile(self, index):
         if 0 <= index < len(self.projectile_types):
             self.current_projectile_index = index
 
     def set_movement_keys(self, forward, backward, left, right):
+        """Bind keys to the movement logic."""
         self.movement_logic.key_forward = forward
         self.movement_logic.key_backward = backward
         self.movement_logic.key_left = left
         self.movement_logic.key_right = right
 
     def draw(self):
+        """Draw the sprite."""
         super().draw()
-        self.draw_health_bar()
-        self.draw_mana_bar()
+        self._draw_health_bar()
+        self._draw_mana_bar()
 
-    def draw_health_bar(self):
+    def _draw_health_bar(self):
         health_bar_width = 50
         health_bar_height = 5
         health_bar_x = self.center_x
@@ -141,7 +146,7 @@ class Player(ObservableSprite):
             arcade.color.GREEN,
         )
 
-    def draw_mana_bar(self):
+    def _draw_mana_bar(self):
         mana_bar_width = 50
         mana_bar_height = 5
         mana_bar_x = self.center_x
