@@ -22,6 +22,8 @@ ASSET_DIR = os.path.join(
 
 
 class GameWindow(arcade.Window):
+    """Main game window."""
+
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.observer: Observer = None
@@ -37,8 +39,9 @@ class GameWindow(arcade.Window):
         self.icon_size = 64
 
     def setup(self):
+        """Reset the game state."""
         self.observer = Observer()
-        self.observer.register_handler("projectile_shot", self.on_projectile_shot)
+        self.observer.register_handler("projectile_shot", self._on_projectile_shot)
         self.player = Player(
             name="Hero",
             char_class="Wizard",
@@ -68,43 +71,48 @@ class GameWindow(arcade.Window):
         self.player.add_projectile(IceShardFactory)
 
         # Load skill icons
-        self.load_skill_icons()
+        self._load_skill_icons()
 
-    def load_skill_icons(self):
+    def _load_skill_icons(self):
         for projectile_type in self.player.projectile_types:
             icon_texture = arcade.load_texture(projectile_type.image_file)
             self.skill_icons.append(icon_texture)
 
     def on_draw(self):
+        """Drawing code."""
         arcade.start_render()
         self.player.draw()
         self.obstacles.draw()
         self.projectiles.draw()
-        self.draw_ui()
+        self._draw_ui()
 
     def update(self, delta_time):
+        """Main update window."""
         self.player.update(self.mouse_x, self.mouse_y, delta_time)
         self.obstacles.update()
         self.physics_engine.update()
         self.projectiles.update()
         handle_projectile_collisions(self.projectiles, self.obstacles)
 
-    def on_projectile_shot(self, event: ProjectileShotEvent):
+    def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
 
     def on_key_press(self, key, modifiers):
+        """Key press logic."""
         # Delegate the input
         self.player.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):
+        """Key release logic."""
         # Delegate the input
         self.player.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
+        """Adds mouse functionality to the game."""
         self.mouse_x = x
         self.mouse_y = y
 
-    def draw_ui(self):
+    def _draw_ui(self):
         for i, icon in enumerate(self.skill_icons):
             x = self.icon_margin + i * (self.icon_size + self.icon_margin)
             y = self.icon_margin
@@ -127,6 +135,7 @@ class GameWindow(arcade.Window):
 
 
 def main():
+    """Main application code."""
     window = GameWindow()
     window.setup()
     arcade.run()
