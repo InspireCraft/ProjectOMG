@@ -4,6 +4,7 @@ from omg.core.game_window import GameWindow
 
 
 def main():
+    """Start the application."""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
