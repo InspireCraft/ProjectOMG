@@ -50,7 +50,7 @@ class PlayerMovement(ABC):
             self.pressed_right = True
 
         [self.change_direction_x, self.change_direction_y] = (
-            self.calculate_displacement_directions()
+            self._calculate_displacement_directions()
         )
 
     def on_key_release(self, key, modifiers):
