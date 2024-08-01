@@ -1,7 +1,10 @@
+from abc import ABC, abstractmethod
 import math
 
 
-class PlayerMovement:
+class PlayerMovement(ABC):
+    """Player movement logic abstract base class."""
+
     def __init__(self, forward, backward, left, right):
         self.key_forward = forward
         self.key_backward = backward
@@ -18,9 +21,25 @@ class PlayerMovement:
         self.pressed_left: bool = False
         self.pressed_right: bool = False
 
+    @abstractmethod
+    def calculate_player_state(
+        self,
+        center_x,
+        center_y,
+        mouse_x,
+        mouse_y,
+        mov_speed_lr,
+        mov_speed_ud,
+        *args,
+        **_ignored
+    ):
+        """Given input player state, move the player."""
+        pass
+
     # TODO: on_key_press and on_key_release can be simplified to single method,
     # TODO: make calculate_displacement_directions static
     def on_key_press(self, key, modifiers):
+        """Called when the user presses a key."""
         if key == self.key_forward:
             self.pressed_forward = True
         elif key == self.key_backward:
@@ -36,7 +55,6 @@ class PlayerMovement:
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
-
         if key == self.key_forward:
             self.pressed_forward = False
         elif key == self.key_backward:
@@ -47,10 +65,10 @@ class PlayerMovement:
             self.pressed_right = False
 
         [self.change_direction_x, self.change_direction_y] = (
-            self.calculate_displacement_directions()
+            self._calculate_displacement_directions()
         )
 
-    def calculate_displacement_directions(self):
+    def _calculate_displacement_directions(self):
         forward = 1 if self.pressed_forward else 0
         backward = -1 if self.pressed_backward else 0
         left = -1 if self.pressed_left else 0
@@ -63,11 +81,14 @@ class PlayerMovement:
 
     @staticmethod
     def face_mouse(mouse_x, mouse_y, center_x, center_y):
+        """Calculates angle that would face the player to the mouse in radians."""
         # angle = 0 on +y axis(TOP), increases counter-clockwise
         return math.atan2(mouse_y - center_y, mouse_x - center_x) - math.pi / 2
 
 
 class MouseDirected(PlayerMovement):
+    """Movement logic that accepts the mouse as the 'up' direction."""
+
     def calculate_player_state(
         self,
         center_x,
@@ -79,9 +100,11 @@ class MouseDirected(PlayerMovement):
         *args,
         **_ignored
     ):
+        """Given input player state, move the player.
 
-        # Velocity is defined relative to where the player looks.
-        # Map it to the coordinate system of the Window by rotation
+        Velocity is defined relative to where the player looks.
+        Map it to the coordinate system of the Window by rotation.
+        """
         angle_rad = self.face_mouse(mouse_x, mouse_y, center_x, center_y)
         angle = math.degrees(angle_rad)
         cos_ang = math.cos(angle_rad)
@@ -96,6 +119,8 @@ class MouseDirected(PlayerMovement):
 
 
 class CompassDirected(PlayerMovement):
+    """Movement logic that accepts the top of the window as the 'up' direction."""
+
     def calculate_player_state(
         self,
         center_x,
@@ -107,6 +132,10 @@ class CompassDirected(PlayerMovement):
         *args,
         **_ignored
     ):
+        """Given input player state, move the player.
+
+        Velocity is defined relative to the Window.
+        """
         vx_wrt_ground = mov_speed_lr * self.change_direction_x
         vy_wrt_ground = mov_speed_ud * self.change_direction_y
         angle_rad = self.face_mouse(mouse_x, mouse_y, center_x, center_y)
