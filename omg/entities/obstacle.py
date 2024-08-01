@@ -2,21 +2,25 @@ import arcade
 
 
 class Obstacle(arcade.Sprite):
+    """Class to represent destructable obstacles in the game."""
+
     def __init__(self, image_file, scale, health):
         super().__init__(image_file, scale)
         self.max_health = health
         self.current_health = health
 
     def take_damage(self, damage):
+        """Take damage logic."""
         self.current_health -= damage
         if self.current_health <= 0:
             self.kill()
 
     def draw(self):
+        """Draw the sprite."""
         super().draw()
-        self.draw_health_bar()
+        self._draw_health_bar()
 
-    def draw_health_bar(self):
+    def _draw_health_bar(self):
         health_bar_width = 50
         health_bar_height = 5
         health_bar_x = self.center_x
