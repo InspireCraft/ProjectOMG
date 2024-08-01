@@ -4,6 +4,7 @@ exclude =
     .git,
     .github,
     __pycache__,
-    .venv
+    .venv,
+    tests
 ignore = D100,D104,N802,D401
 docstring-convention=numpy
