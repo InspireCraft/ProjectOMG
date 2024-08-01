@@ -9,6 +9,8 @@ ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
 
 # TODO: add source as the projectiles are emitted now
 class Projectile(arcade.Sprite):
+    """Projectile logic."""
+
     def __init__(self, name, image_file, scale, damage, speed, init_px, init_py, angle):
         super().__init__(image_file, scale)
         self.image_file = image_file
@@ -29,17 +31,12 @@ class ProjectileShotEvent(Event):
     """Event triggered when a projectile is shot."""
 
     def __init__(self, projectile: Projectile):
-        """
-        Parameters
-        ----------
-        projectile : Projectile
-            The projectile that was shot.
-        """
         super().__init__("projectile_shot")
         self.projectile = projectile
 
 
 class ProjectileFactory(ABC):
+    """Abstract class for Projectile creating factories."""
 
     @classmethod
     @abstractmethod
@@ -49,6 +46,8 @@ class ProjectileFactory(ABC):
 
 
 class FireballFactory(ProjectileFactory):
+    """Convenience class to create Fireball Projectile."""
+
     image_file = os.path.join(ASSET_DIR, "skills", "fireball.PNG")
     scale = 0.05
     damage = 25
@@ -56,6 +55,7 @@ class FireballFactory(ProjectileFactory):
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create a Fireball projectile."""
         return Projectile(
             name=cls.__name__,
             image_file=cls.image_file,
@@ -69,6 +69,8 @@ class FireballFactory(ProjectileFactory):
 
 
 class IceShardFactory(ProjectileFactory):
+    """Convenience class to create IceShard Projectile."""
+
     image_file = os.path.join(ASSET_DIR, "skills", "ice_shard.PNG")
     scale = 0.05
     damage = 15
@@ -76,6 +78,7 @@ class IceShardFactory(ProjectileFactory):
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create an IceShard projectile."""
         return Projectile(
             name=cls.__name__,
             image_file=cls.image_file,
