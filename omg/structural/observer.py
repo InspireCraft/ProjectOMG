@@ -7,12 +7,6 @@ class Event:
     """Base class for events in the Observer pattern."""
 
     def __init__(self, event_type: str):
-        """
-        Parameters
-        ----------
-        event_type : str
-            The type of the event.
-        """
         self.event_type = event_type
 
 
@@ -58,6 +52,8 @@ class Observer:
 
 
 class ObservableSprite(arcade.Sprite):
+    """Wrapper to the sprite class to interact with Observers."""
+
     observers: List[Observer] = []
 
     def add_observer(self, observer: Observer):
