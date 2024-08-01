@@ -10,7 +10,7 @@ class PhysicsEngineBoundary(arcade.PhysicsEngineSimple):
         self.screen_height = screen_height
 
     def update(self):
-        # Perform the default physics update which handles the collisions
+        """Moves the player and resolves the collisions."""
         super().update()
 
         # Apply boundary checks
