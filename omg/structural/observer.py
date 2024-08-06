@@ -15,8 +15,6 @@ class Observer:
 
     Attributes
     ----------
-    game_window : GameWindow
-        The game window instance that this observer interacts with.
     _handlers : dict
         A dictionary mapping event types to handler methods.
     """

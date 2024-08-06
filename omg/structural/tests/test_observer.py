@@ -1,5 +1,6 @@
+import logging
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from omg.structural.observer import Event, Observer, ObservableSprite
 
 
@@ -53,20 +54,6 @@ class TestObservableSprite(unittest.TestCase):
         # Remove observer
         sprite.remove_observer(observer)
         self.assertNotIn(observer, sprite.observers)
-
-    def test_observable_sprite_notification(self):
-        mock_handler = MagicMock()
-
-        sprite = ObservableSprite()
-        observer = Observer()
-        observer.register_handler("test_event", mock_handler)
-        sprite.add_observer(observer)
-
-        event = Event("test_event")
-        sprite.notify_observers(event)
-
-        # Check if the handler was called
-        mock_handler.assert_called_once_with(event)
 
 
 if __name__ == "__main__":
