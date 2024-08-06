@@ -4,8 +4,8 @@ import arcade
 class PhysicsEngineBoundary(arcade.PhysicsEngineSimple):
     """Physics engine to handle collisions and boundary checking."""
 
-    def __init__(self, *args, screen_width, screen_height, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, player_sprite, walls, screen_width, screen_height):
+        super().__init__(player_sprite, walls)
         self.screen_width = screen_width
         self.screen_height = screen_height
 
