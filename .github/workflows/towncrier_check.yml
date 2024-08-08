@@ -27,6 +27,8 @@ jobs:
           source .venv/bin/activate
           git fetch origin main
           if ! git diff --quiet origin/main -- .; then
+              echo "Changes detected, listing changelog fragments:"
+              ls -la changelog-fragments/
               if towncrier check --config towncrier.toml --dir 'changelog-fragments/'; then
                   echo "Changelog fragments found, check passed.";
               else
