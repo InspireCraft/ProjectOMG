@@ -1,0 +1,2 @@
+towncrier tool now checks changelog fragments compared to the latest version of
+the main. The tool will succesfully fail if there are no new changelog fragments found.
