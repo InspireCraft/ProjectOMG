@@ -20,12 +20,18 @@ jobs:
           source .venv/bin/activate
           pip install towncrier
 
-      - name: Check for changelog fragments
+      - name: Fetch all branches
+        run: git fetch --all
+
+      - name: Check for changes compared to main and run Towncrier
         run: |
-          if [ -z "$(find changelog-fragments -type f -name '*.txt' -not -name '.gitignore')" ]; then
-            echo "No changelog fragments found!";
-            exit 1;
+          if ! git diff --quiet origin/main -- .; then
+              if towncrier check --config towncrier.toml --dir 'changelog-fragments/'; then
+                  echo "Changelog fragments found, check passed.";
+              else
+                  echo "Changes detected but no changelog fragments found!";
+                  exit 1;
+              fi
           else
-            echo "Changelog fragments found:";
-            find changelog-fragments -type f -name '*.txt' -not -name '.gitignore';
+              echo "No changes in the repository.";
           fi
