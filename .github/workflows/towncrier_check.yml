@@ -8,6 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Ensure full history is fetched
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -20,12 +22,10 @@ jobs:
           source .venv/bin/activate
           pip install towncrier
 
-      - name: Fetch all branches
-        run: git fetch --all
-
       - name: Check for changes compared to main and run Towncrier
         run: |
           source .venv/bin/activate
+          git fetch origin main
           if ! git diff --quiet origin/main -- .; then
               if towncrier check --config towncrier.toml --dir 'changelog-fragments/'; then
                   echo "Changelog fragments found, check passed.";
