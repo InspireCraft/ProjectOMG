@@ -20,11 +20,9 @@ jobs:
           source .venv/bin/activate
           pip install towncrier
 
-      - name: Fetch all branches
-        run: git fetch --all
-
       - name: Check for changes compared to main and run Towncrier
         run: |
+          source .venv/bin/activate
           if ! git diff --quiet origin/main -- .; then
               if towncrier check --config towncrier.toml --dir 'changelog-fragments/'; then
                   echo "Changelog fragments found, check passed.";
