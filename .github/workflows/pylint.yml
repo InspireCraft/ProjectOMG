@@ -15,6 +15,15 @@ jobs:
         python-version: 3.x
     - name: Install Python developing tools
       run: pip install -r dev_requirements.txt
+    - name: Check Flake8 Version
+      run: flake8 --version
+    - name: Show Flake8 Configuration
+      run: cat config/.flake8
+    - name: Show Python Version
+      run: python --version
+
+    - name: List Installed Packages
+      run: pip list
     - name: Linting - Run Flake8
       run: flake8 --config config/.flake8
 
