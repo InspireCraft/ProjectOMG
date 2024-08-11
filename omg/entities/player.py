@@ -3,13 +3,13 @@ from typing import TypeVar, Type
 from omg.mechanics import movement
 from omg.entities.projectile import ProjectileFactory
 from omg.structural.observer import ObservableSprite
-from omg.entities.events import ProjectileShotEvent
+from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
 N_SKILLS_MAX = 5
-T = TypeVar('T')  # Define a type variable
+T = TypeVar("T")  # Define a type variable
 
 
 class Player(ObservableSprite):
@@ -52,6 +52,7 @@ class Player(ObservableSprite):
 
         # Skills
         self.skills = SkillManager(N_SKILLS_MAX)
+        self.item_pickup_radius = 5
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -63,6 +64,8 @@ class Player(ObservableSprite):
             self.skills.set_prev()
         elif key == arcade.key.E:
             self.skills.set_next()
+        elif key == arcade.key.F:
+            self.pickup_skill()
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -107,6 +110,21 @@ class Player(ObservableSprite):
     def add_skill(self, skill: Type[ProjectileFactory]):
         """Add skill to the player."""
         self.skills.add_item(skill)
+
+    def pickup_skill(self):
+        """Publish a skill pickup request event."""
+        # Player will try to pickup the items in a circle around it
+        pick_up_sprite = arcade.SpriteCircle(
+            radius=self.item_pickup_radius,
+            color=(255, 0, 0, 0),
+        )  # transparent circular sprite to define the hitbox
+        pick_up_sprite.center_x = self.center_x
+        pick_up_sprite.center_y = self.center_y
+        pick_up_event = PickupRequestEvent(
+            self.skills,  # send skill manager
+            pick_up_sprite,
+        )
+        self.notify_observers(pick_up_event)
 
     def set_movement_keys(self, forward, backward, left, right):
         """Bind keys to the movement logic."""
