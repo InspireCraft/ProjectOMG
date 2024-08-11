@@ -1,7 +1,6 @@
 import arcade
 import os
 
-from pytest import Item
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
@@ -34,7 +33,9 @@ class GameWindow(arcade.Window):
         self.observer: Observer = None
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
-        self.pickupables: arcade.SpriteList = None  # items that can be pickedup from the ground
+        self.pickupables: arcade.SpriteList = (
+            None  # items that can be pickedup from the ground
+        )
         self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
@@ -74,9 +75,15 @@ class GameWindow(arcade.Window):
             screen_height=SCREEN_HEIGHT,
         )
         # Add projectile types
-        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 150, 10))
-        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, IceShardFactory, 250, 20))
-        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 250, 120))
+        self.pickupables.append(
+            Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 150, 10)
+        )
+        self.pickupables.append(
+            Pickupable(COIN_IMAGE_PATH, 0.5, IceShardFactory, 250, 20)
+        )
+        self.pickupables.append(
+            Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 250, 120)
+        )
 
     @property
     def skill_icons(self):
@@ -85,7 +92,8 @@ class GameWindow(arcade.Window):
         # For example "skill_acquired event" can trigger an update when necessary
         if self.player:
             return [
-                arcade.load_texture(projectile_type.image_file) for projectile_type in self.player.skills
+                arcade.load_texture(projectile_type.image_file)
+                for projectile_type in self.player.skills
             ]
         else:
             return None
@@ -127,19 +135,18 @@ class GameWindow(arcade.Window):
         4) Remove the picked up item from the ground.
         """
         collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
-            event.entity_pickup_sprite,
-            self.pickupables
+            event.entity_pickup_sprite, self.pickupables
         )
         if len(collided_sprites) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
-                event.entity_pickup_sprite,
-                collided_sprites
+                event.entity_pickup_sprite, collided_sprites
             )[0]
             item_to_add = collided_sprites[0]
             item_manager = event.entity
             item_manager.add_item(closes_pickupable.item)
-            item_to_add.remove_from_sprite_lists()  # remove reference to the pickupables list
+            # remove reference to the pickupables list
+            item_to_add.remove_from_sprite_lists()
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
