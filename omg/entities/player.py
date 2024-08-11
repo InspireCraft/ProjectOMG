@@ -49,7 +49,9 @@ class Player(ObservableSprite):
         self.mana_regen_cooldown = 0
 
         # Skills
-        self.skills: CircularBuffer[Type[ProjectileFactory]] = CircularBuffer(N_SKILLS_MAX)
+        self.skills: CircularBuffer[Type[ProjectileFactory]] = (
+            CircularBuffer(N_SKILLS_MAX)
+        )
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -177,7 +179,10 @@ class CircularBuffer(Generic[T]):
 
     def add(self, item: T):
         """Add item to the buffer. If the buffer is full, replace an item."""
-        self.index = (self.index + 1) % self.max_size if self.current_size == self.max_size else self.current_size
+        if self.current_size == self.max_size:
+            self.index = (self.index + 1) % self.max_size
+        else:
+            self.index = self.current_size
         self.buffer[self.index] = item
         if self.current_size < self.max_size:
             self.current_size += 1
