@@ -67,14 +67,15 @@ class GameWindow(arcade.Window):
             screen_height=SCREEN_HEIGHT,
         )
         # Add projectile types
-        self.player.add_projectile(FireballFactory)
-        self.player.add_projectile(IceShardFactory)
+        self.player.add_skill(FireballFactory)
+        self.player.add_skill(IceShardFactory)
+        self.player.add_skill(FireballFactory)
 
         # Load skill icons
         self._load_skill_icons()
 
     def _load_skill_icons(self):
-        for projectile_type in self.player.projectile_types:
+        for projectile_type in self.player.skills:
             icon_texture = arcade.load_texture(projectile_type.image_file)
             self.skill_icons.append(icon_texture)
 
@@ -116,7 +117,7 @@ class GameWindow(arcade.Window):
         for i, icon in enumerate(self.skill_icons):
             x = self.icon_margin + i * (self.icon_size + self.icon_margin)
             y = self.icon_margin
-            if i == self.player.current_projectile_index:
+            if i == self.player.skills.get_current_index():
                 arcade.draw_rectangle_outline(
                     x + self.icon_size // 2,
                     y + self.icon_size // 2,
