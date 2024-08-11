@@ -1,5 +1,8 @@
 import arcade
 import os
+
+from pytest import Item
+from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
 from omg.entities.projectile import (
@@ -9,7 +12,7 @@ from omg.entities.projectile import (
 from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
-from omg.entities.events import ProjectileShotEvent
+from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 
 
 SCREEN_WIDTH = 800
@@ -20,6 +23,8 @@ ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
 )
 
+COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
+
 
 class GameWindow(arcade.Window):
     """Main game window."""
@@ -29,11 +34,11 @@ class GameWindow(arcade.Window):
         self.observer: Observer = None
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
+        self.pickupables: arcade.SpriteList = None  # items that can be pickedup from the ground
         self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
-        self.skill_icons = []
         self.icon_scale = 0.1
         self.icon_margin = 10
         self.icon_size = 64
@@ -42,6 +47,7 @@ class GameWindow(arcade.Window):
         """Reset the game state."""
         self.observer = Observer()
         self.observer.register_handler("projectile_shot", self._on_projectile_shot)
+        self.observer.register_handler("pickup_request", self._on_pickup_request)
         self.player = Player(
             name="Hero",
             char_class="Wizard",
@@ -53,6 +59,7 @@ class GameWindow(arcade.Window):
 
         # Create obstacles
         self.obstacles = arcade.SpriteList()
+        self.pickupables = arcade.SpriteList(use_spatial_hash=True)
         self.projectiles = arcade.SpriteList()
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
@@ -67,12 +74,21 @@ class GameWindow(arcade.Window):
             screen_height=SCREEN_HEIGHT,
         )
         # Add projectile types
-        self.player.add_skill(FireballFactory)
-        self.player.add_skill(IceShardFactory)
-        self.player.add_skill(FireballFactory)
+        self.pickupables.append(Pickupable(FireballFactory, COIN_IMAGE_PATH, 150, 10, scale=0.5))
+        self.pickupables.append(Pickupable(IceShardFactory, COIN_IMAGE_PATH, 250, 20, scale=0.5))
+        self.pickupables.append(Pickupable(FireballFactory, COIN_IMAGE_PATH, 250, 120, scale=0.5))
 
-        # Load skill icons
-        self._load_skill_icons()
+    @property
+    def skill_icons(self):
+        """Define self.skill_icons."""
+        # TODO: refactor skill_icons logic if causes a performance bottleneck
+        # For example "skill_acquired event" can trigger an update when necessary
+        if self.player:
+            return [
+                arcade.load_texture(projectile_type.image_file) for projectile_type in self.player.skills
+            ]
+        else:
+            return None
 
     def _load_skill_icons(self):
         for projectile_type in self.player.skills:
@@ -85,6 +101,7 @@ class GameWindow(arcade.Window):
         self.player.draw()
         self.obstacles.draw()
         self.projectiles.draw()
+        self.pickupables.draw()
         self._draw_ui()
 
     def update(self, delta_time):
@@ -97,6 +114,29 @@ class GameWindow(arcade.Window):
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
+
+    def _on_pickup_request(self, event: PickupRequestEvent):
+        """Handles pickup request of an entity.
+
+        Handling logic:
+        1) Checks pickupables in the environment with the current posiiton of the entity
+           requesting a pickup.
+        2) Pickup area is indicated with the hitbox of the event.entity_pickup_sprite
+           so collision check can be used.
+        3) Out of all the collisions, let the entity pick up the closest object.
+        4) Remove the picked up item from the ground.
+        """
+        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+            event.entity_pickup_sprite,
+            self.pickupables
+        )
+        if len(collided_sprites) >= 1:
+            # Item is at pick up range
+            closes_pickupable, _ = arcade.get_closest_sprite(event.entity_pickup_sprite, self.pickupables)
+            item_to_add = collided_sprites[0]
+            item_manager = event.entity
+            item_manager.add_item(closes_pickupable.item)
+            item_to_add.remove_from_sprite_lists() # remove reference to the pickupable
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
