@@ -13,9 +13,9 @@ class Pickupable(arcade.Sprite, Generic[T]):
     """
 
     def __init__(
-        self, item: T, image_file: str, center_x: float, center_y: float, **kwargs
+        self, image_file: str, scale: float, item: T, center_x: float, center_y: float, **kwargs
     ):
-        super().__init__(image_file, center_x=center_x, center_y=center_y, **kwargs)
+        super().__init__(image_file, scale=scale, center_x=center_x, center_y=center_y, **kwargs)
         self.item = item
 
     def get_item(self) -> T:

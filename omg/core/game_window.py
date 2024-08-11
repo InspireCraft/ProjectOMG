@@ -74,9 +74,9 @@ class GameWindow(arcade.Window):
             screen_height=SCREEN_HEIGHT,
         )
         # Add projectile types
-        self.pickupables.append(Pickupable(FireballFactory, COIN_IMAGE_PATH, 150, 10, scale=0.5))
-        self.pickupables.append(Pickupable(IceShardFactory, COIN_IMAGE_PATH, 250, 20, scale=0.5))
-        self.pickupables.append(Pickupable(FireballFactory, COIN_IMAGE_PATH, 250, 120, scale=0.5))
+        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 150, 10))
+        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, IceShardFactory, 250, 20))
+        self.pickupables.append(Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 250, 120))
 
     @property
     def skill_icons(self):
@@ -132,11 +132,14 @@ class GameWindow(arcade.Window):
         )
         if len(collided_sprites) >= 1:
             # Item is at pick up range
-            closes_pickupable, _ = arcade.get_closest_sprite(event.entity_pickup_sprite, self.pickupables)
+            closes_pickupable: Pickupable = arcade.get_closest_sprite(
+                event.entity_pickup_sprite,
+                collided_sprites
+            )[0]
             item_to_add = collided_sprites[0]
             item_manager = event.entity
             item_manager.add_item(closes_pickupable.item)
-            item_to_add.remove_from_sprite_lists() # remove reference to the pickupable
+            item_to_add.remove_from_sprite_lists()  # remove reference to the pickupables list
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""

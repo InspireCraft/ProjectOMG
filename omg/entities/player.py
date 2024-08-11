@@ -116,7 +116,7 @@ class Player(ObservableSprite):
         # Player will try to pickup the items in a circle around it
         pick_up_sprite = arcade.SpriteCircle(
             radius=self.item_pickup_radius,
-            color=(255, 0, 0, 0),
+            color=arcade.color.RED,
         )  # transparent circular sprite to define the hitbox
         pick_up_sprite.center_x = self.center_x
         pick_up_sprite.center_y = self.center_y
