@@ -1,8 +1,26 @@
 from abc import ABC, abstractmethod
 from typing import Generic, Iterator, List, TypeVar
+import arcade
 
 # Define a type variable T
-T = TypeVar('T')
+T = TypeVar("T")
+
+
+class Pickupable(arcade.Sprite, Generic[T]):
+    """Class to represent objects which are pickupable from the environment.
+
+    It holds an item which is to be delivered to an entity when it is picked up.
+    """
+
+    def __init__(
+        self, item: T, image_file: str, center_x: float, center_y: float, **kwargs
+    ):
+        super().__init__(image_file, center_x=center_x, center_y=center_y, **kwargs)
+        self.item = item
+
+    def get_item(self) -> T:
+        """Return the item stored in the pickupable sprite."""
+        return self.item
 
 
 class ItemManager(ABC):
