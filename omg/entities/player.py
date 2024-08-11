@@ -1,11 +1,13 @@
 import arcade
-from typing import List, Type
+from typing import Generic, List, TypeVar, Type, Iterator
 from omg.mechanics import movement
 from omg.entities.projectile import ProjectileFactory, ProjectileShotEvent
 from omg.structural.observer import ObservableSprite
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
+N_SKILLS_MAX = 5
+T = TypeVar('T')  # Define a type variable
 
 
 class Player(ObservableSprite):
@@ -168,3 +170,63 @@ class Player(ObservableSprite):
             mana_bar_height,
             arcade.color.LIGHT_BLUE,
         )
+
+
+class CircularBuffer(Generic[T]):
+    """Circular buffer to hold a determined size of items."""
+
+    def __init__(self, max_size):
+        self.buffer: List[T] = [None] * max_size  # Initialize with max size
+        self.max_size = max_size
+        self.current_size = 0
+        self.index = 0
+
+    def add(self, item: T):
+        """Add item to the buffer. If the buffer is full, replace an item."""
+        self.index = (self.index + 1) % self.max_size if self.current_size == self.max_size else self.current_size
+        self.buffer[self.index] = item
+        if self.current_size < self.max_size:
+            self.current_size += 1
+
+    def get_current(self) -> T:
+        """Get the current item with respect to the current index."""
+        if self.current_size == 0:
+            return None
+        return self.buffer[self.index]
+
+    def get_current_index(self) -> int:
+        """Return the current index."""
+        return self.index
+
+    def get_next(self) -> T:
+        """Get next item with respect to the current index. Update the index."""
+        if self.current_size == 0:
+            return None
+        self.index = (self.index + 1) % self.current_size
+        return self.buffer[self.index]
+
+    def get_prev(self) -> T:
+        """Get previous item with respect to the current index. Update the index."""
+        if self.current_size == 0:
+            return None
+        self.index = (self.index - 1) % self.current_size
+        return self.buffer[self.index]
+
+    def set_next(self):
+        """Shift current index to the next item."""
+        if self.current_size == 0:
+            return
+        self.index = (self.index + 1) % self.current_size
+
+    def set_prev(self):
+        """Shift current index to the previous item."""
+        if self.current_size == 0:
+            return
+        self.index = (self.index - 1) % self.current_size
+
+    def __iter__(self) -> Iterator[T]:
+        """Iterate over the buffer from the start to the valid range."""
+        start = 0
+        end = self.current_size
+        for i in range(start, end):
+            yield self.buffer[i % self.max_size]
