@@ -5,11 +5,11 @@ from omg.entities.obstacle import Obstacle
 from omg.entities.projectile import (
     FireballFactory,
     IceShardFactory,
-    ProjectileShotEvent,
 )
 from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
+from omg.entities.events import ProjectileShotEvent
 
 
 SCREEN_WIDTH = 800
