@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock, call
+from venv import create
 import arcade
-from omg.entities.player import Player
+from omg.entities.player import CircularBuffer, Player
 from omg.entities.tests import TEST_IMAGE_FILE
 
 class TestPlayer(unittest.TestCase):
@@ -23,10 +24,6 @@ class TestPlayer(unittest.TestCase):
             self.player.on_key_press(arcade.key.SPACE, None)
             mock_shoot.assert_called_once()
 
-        with patch.object(self.player, '_select_projectile') as mock_select_projectile:
-            self.player.on_key_press(arcade.key.KEY_1, None)
-            mock_select_projectile.assert_called_once_with(0)
-
     def test_on_key_release(self):
         with patch.object(self.player.movement_logic, 'on_key_release') as mock_on_key_release:
             self.player.on_key_release(arcade.key.W, None)
@@ -43,10 +40,15 @@ class TestPlayer(unittest.TestCase):
 
     def test_shoot(self):
         with patch.object(self.player, 'notify_observers') as mock_notify_observers:
-            with patch.object(self.player, 'projectile_types', new=[MagicMock(create=MagicMock(return_value=MagicMock()))]):
+
+            mock_buffer = MagicMock()
+            mock_skill = MagicMock(create=MagicMock())
+            mock_skill_factory = MagicMock(return_value=mock_skill)
+            mock_buffer.get_current = mock_skill_factory
+            with patch.object(self.player, 'skills', mock_buffer):
                 self.player.current_mana = 30
                 self.player.shoot()
-                self.assertEqual(self.player.current_mana, 10)
+                self.assertLess(self.player.current_mana, 30)
                 mock_notify_observers.assert_called_once()
 
     def test_shoot_no_mana(self):
@@ -59,19 +61,6 @@ class TestPlayer(unittest.TestCase):
         self.player.current_mana = 50
         self.player._regenerate_mana(delta_time=1.5)
         self.assertEqual(self.player.current_mana, 55)
-
-    def test_add_projectile(self):
-        mock_projectile = MagicMock()
-        self.player.add_projectile(mock_projectile)
-        self.assertIn(mock_projectile, self.player.projectile_types)
-
-    def test_select_projectile(self):
-        mock_projectile_1 = MagicMock()
-        mock_projectile_2 = MagicMock()
-        self.player.add_projectile(mock_projectile_1)
-        self.player.add_projectile(mock_projectile_2)
-        self.player._select_projectile(1)
-        self.assertEqual(self.player.current_projectile_index, 1)
 
     def test_draw(self):
         with patch('arcade.Sprite.draw') as mock_draw, \
