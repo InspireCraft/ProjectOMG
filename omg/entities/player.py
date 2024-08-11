@@ -48,9 +48,8 @@ class Player(ObservableSprite):
         self.mana_regen_rate = 5  # Mana regenerated per second
         self.mana_regen_cooldown = 0
 
-        # Projectile types
-        self.projectile_types: List[Type[ProjectileFactory]] = []
-        self.current_projectile_index = 0
+        # Skills
+        self.skills: CircularBuffer[Type[ProjectileFactory]] = CircularBuffer(N_SKILLS_MAX)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -58,10 +57,10 @@ class Player(ObservableSprite):
 
         if key == arcade.key.SPACE:
             self.shoot()
-        elif key == arcade.key.KEY_1:
-            self._select_projectile(0)
-        elif key == arcade.key.KEY_2:
-            self._select_projectile(1)
+        elif key == arcade.key.Q:
+            self.skills.set_prev()
+        elif key == arcade.key.E:
+            self.skills.set_next()
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -83,11 +82,11 @@ class Player(ObservableSprite):
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
-        if not self.projectile_types or self.current_mana < 20:
+        if self.skills.current_size == 0 or self.current_mana < 20:
             return
 
         self.current_mana -= 20
-        selected_skill = self.projectile_types[self.current_projectile_index]
+        selected_skill = self.skills.get_current()
         projectile = selected_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
@@ -103,14 +102,9 @@ class Player(ObservableSprite):
                 self.current_mana = self.max_mana
             self.mana_regen_cooldown = 0
 
-    # TODO: rename as skill
-    def add_projectile(self, projectile: Type[ProjectileFactory]):
-        """Add projectile factory to the player."""
-        self.projectile_types.append(projectile)
-
-    def _select_projectile(self, index):
-        if 0 <= index < len(self.projectile_types):
-            self.current_projectile_index = index
+    def add_skill(self, skill: Type[ProjectileFactory]):
+        """Add skill to the player."""
+        self.skills.add(skill)
 
     def set_movement_keys(self, forward, backward, left, right):
         """Bind keys to the movement logic."""
