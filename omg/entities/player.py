@@ -89,6 +89,10 @@ class Player(ObservableSprite):
             )
         )
         self._regenerate_mana(delta_time)
+        if len(self.to_be_combined_skill_cash) == 2:
+            print(f"combination = {self.to_be_combined_skill_cash}")
+            self.to_be_combined_skill_cash = []
+            print(f"after comb = {self.to_be_combined_skill_cash}")
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
