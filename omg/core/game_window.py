@@ -41,7 +41,8 @@ class GameWindow(arcade.Window):
         self.mouse_x = 0
         self.mouse_y = 0
         self.icon_scale = 0.1
-        self.icon_margin = 10
+        self.icon_margin_x = 10
+        self.icon_margin_y = 75
         self.icon_size = 64
 
     def setup(self):
@@ -165,8 +166,8 @@ class GameWindow(arcade.Window):
 
     def _draw_ui(self):
         for i, icon in enumerate(self.skill_icons):
-            x = self.icon_margin + i * (self.icon_size + self.icon_margin)
-            y = self.icon_margin
+            x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
+            y = SCREEN_HEIGHT - self.icon_margin_y
             if i == self.player.skills.get_current_index():
                 arcade.draw_rectangle_outline(
                     x + self.icon_size // 2,
