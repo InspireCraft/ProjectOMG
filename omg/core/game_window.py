@@ -36,6 +36,8 @@ class GameWindow(arcade.Window):
         self.pickupables: arcade.SpriteList = (
             None  # items that can be pickedup from the ground
         )
+        self.skill_slot_d: arcade.Sprite = None  # Skill slot D
+        self.skill_slot_f: arcade.Sprite = None  # SKill slot F
         self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
@@ -68,6 +70,21 @@ class GameWindow(arcade.Window):
         obstacle.center_x = 400
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
+        
+        # Create skill slots
+        # Skill slot D
+        scale_factor_d = 0.4
+        skill_slot_d_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
+        self.skill_slot_d = arcade.Sprite(skill_slot_d_img, scale=scale_factor_d)
+        self.skill_slot_d.center_x = self.skill_slot_d.width // 2
+        self.skill_slot_d.center_y = self.skill_slot_d.height // 2
+        
+        # Skill slot F
+        scale_factor_f = 0.4
+        skill_slot_f_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
+        self.skill_slot_f = arcade.Sprite(skill_slot_f_img, scale=scale_factor_f)
+        self.skill_slot_f.center_x = self.skill_slot_d.center_x + self.skill_slot_f.width
+        self.skill_slot_f.center_y = self.skill_slot_f.height // 2
 
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
@@ -165,6 +182,7 @@ class GameWindow(arcade.Window):
         self.mouse_y = y
 
     def _draw_ui(self):
+        # Draw picked up skills to top left corner
         for i, icon in enumerate(self.skill_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = SCREEN_HEIGHT - self.icon_margin_y
@@ -184,6 +202,10 @@ class GameWindow(arcade.Window):
                 self.icon_size,
                 icon,
             )
+            
+        # Draw usable skill slots to bottom left corner
+        self.skill_slot_d.draw()
+        self.skill_slot_f.draw()
 
 
 def main():
