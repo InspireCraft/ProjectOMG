@@ -5,8 +5,8 @@ from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
 from omg.entities.projectile import (
-    FireballFactory,
-    IceShardFactory,
+    FireElementFactory,
+    IceElementFactory,
 )
 from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
@@ -85,6 +85,8 @@ class GameWindow(arcade.Window):
         self.skill_slot_f = arcade.Sprite(skill_slot_f_img, scale=scale_factor_f)
         self.skill_slot_f.center_x = self.skill_slot_d.center_x + self.skill_slot_f.width
         self.skill_slot_f.center_y = self.skill_slot_f.height // 2
+        
+        
 
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
@@ -94,13 +96,13 @@ class GameWindow(arcade.Window):
         )
         # Add projectile types
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 150, 10)
+            Pickupable(COIN_IMAGE_PATH, 0.5, FireElementFactory, 150, 10)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, IceShardFactory, 250, 20)
+            Pickupable(COIN_IMAGE_PATH, 0.5, IceElementFactory, 250, 20)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, FireballFactory, 250, 120)
+            Pickupable(COIN_IMAGE_PATH, 0.5, FireElementFactory, 250, 120)
         )
 
     @property
@@ -202,10 +204,28 @@ class GameWindow(arcade.Window):
                 self.icon_size,
                 icon,
             )
-            
+              
+        
         # Draw usable skill slots to bottom left corner
         self.skill_slot_d.draw()
         self.skill_slot_f.draw()
+        
+        # Draw combined skill icons
+        if self.player.skills_in_slots_d_f[0] != None:
+            scale_factor_d = 0.4
+            skill_d_img = os.path.join(ASSET_DIR, "skills", f"{self.player.skills_in_slots_d_f[0]}.png")
+            skill_d = arcade.Sprite(skill_d_img, scale=scale_factor_d)
+            skill_d.center_x = skill_d.width // 2
+            skill_d.center_y = skill_d.height // 2
+            skill_d.draw()
+           
+        if self.player.skills_in_slots_d_f[1] != None:
+            scale_factor_f = 0.4
+            skill_f_img = os.path.join(ASSET_DIR, "skills", f"{self.player.skills_in_slots_d_f[1]}.png")
+            skill_f = arcade.Sprite(skill_f_img, scale=scale_factor_f)
+            skill_f.center_x = skill_f.width // 2 + skill_f.width
+            skill_f.center_y = skill_f.height // 2
+            skill_f.draw()
 
 
 def main():

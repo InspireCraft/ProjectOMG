@@ -4,6 +4,12 @@ from typing import TypeVar, Type
 import arcade.key
 from omg.mechanics import movement
 from omg.entities.projectile import ProjectileFactory
+from omg.entities.projectile import (
+    FireIceFactory,
+    IceFireFactory,
+    FireFireFactory,
+    IceIceFactory
+)
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
@@ -76,6 +82,21 @@ class Player(ObservableSprite):
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
+    
+    #TODO: The below function is useless    
+    def select_projectile(self, skill_name):
+        if skill_name == "FireFire":
+            skill = FireFireFactory()
+            return skill.create()
+        elif skill_name == "FireIce":
+            skill = FireIceFactory()
+            return skill.create()
+        elif skill_name == "IceFire":
+            skill = IceFireFactory()
+            return skill.create()
+        else:
+            skill = IceIceFactory()
+            return skill.create()
         
     def update_skill_slots(self, new_skill):
         """Update skill slots D and F after combining a skill."""
@@ -97,9 +118,10 @@ class Player(ObservableSprite):
         )
         self._regenerate_mana(delta_time)
         
-        # Combine skills
+        # Update combined skills
         if len(self.to_be_combined_skill_cash) == 2:
             new_skill = "".join(self.to_be_combined_skill_cash[::])
+            new_skill = new_skill.replace("ElementFactory", "")
             self.update_skill_slots(new_skill)
             self.to_be_combined_skill_cash = []
 

@@ -37,11 +37,10 @@ class ProjectileFactory(ABC):
         """Create and return a Projectile instance."""
         pass
 
-
-class FireballFactory(ProjectileFactory):
+class FireElementFactory(ProjectileFactory):
     """Convenience class to create Fireball Projectile."""
 
-    image_file = os.path.join(ASSET_DIR, "skills", "fireball.PNG")
+    image_file = os.path.join(ASSET_DIR, "skills", "elements", "fire.PNG")
     scale = 0.05
     damage = 25
     speed = 5
@@ -61,10 +60,99 @@ class FireballFactory(ProjectileFactory):
         )
 
 
-class IceShardFactory(ProjectileFactory):
+class IceElementFactory(ProjectileFactory):
     """Convenience class to create IceShard Projectile."""
 
-    image_file = os.path.join(ASSET_DIR, "skills", "ice_shard.PNG")
+    image_file = os.path.join(ASSET_DIR, "skills", "elements", "ice.PNG")
+    scale = 0.05
+    damage = 15
+    speed = 7
+
+    @classmethod
+    def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create an IceShard projectile."""
+        return Projectile(
+            name=cls.__name__,
+            image_file=cls.image_file,
+            scale=cls.scale,
+            damage=cls.damage,
+            init_px=init_px,
+            init_py=init_py,
+            speed=cls.speed,
+            angle=angle,
+        )
+        
+class IceFireFactory(ProjectileFactory):
+    """Convenience class to create IceShard Projectile."""
+
+    image_file = os.path.join(ASSET_DIR, "skills", "IceFire.PNG")
+    scale = 0.05
+    damage = 15
+    speed = 7
+
+    @classmethod
+    def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create an IceShard projectile."""
+        return Projectile(
+            name=cls.__name__,
+            image_file=cls.image_file,
+            scale=cls.scale,
+            damage=cls.damage,
+            init_px=init_px,
+            init_py=init_py,
+            speed=cls.speed,
+            angle=angle,
+        )     
+
+class IceIceFactory(ProjectileFactory):
+    """Convenience class to create IceShard Projectile."""
+
+    image_file = os.path.join(ASSET_DIR, "skills", "IceIce.PNG")
+    scale = 0.05
+    damage = 15
+    speed = 7
+
+    @classmethod
+    def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create an IceShard projectile."""
+        return Projectile(
+            name=cls.__name__,
+            image_file=cls.image_file,
+            scale=cls.scale,
+            damage=cls.damage,
+            init_px=init_px,
+            init_py=init_py,
+            speed=cls.speed,
+            angle=angle,
+        )     
+
+        
+class FireIceFactory(ProjectileFactory):
+    """Convenience class to create IceShard Projectile."""
+
+    image_file = os.path.join(ASSET_DIR, "skills", "FireIce.PNG")
+    scale = 0.05
+    damage = 15
+    speed = 7
+
+    @classmethod
+    def create(cls, init_px, init_py, angle) -> Projectile:
+        """Create an IceShard projectile."""
+        return Projectile(
+            name=cls.__name__,
+            image_file=cls.image_file,
+            scale=cls.scale,
+            damage=cls.damage,
+            init_px=init_px,
+            init_py=init_py,
+            speed=cls.speed,
+            angle=angle,
+        )
+
+class FireFireFactory(ProjectileFactory):
+    """Convenience class to create IceShard Projectile."""
+
+    image_file = os.path.join(ASSET_DIR, "skills", "FireFire.PNG")
     scale = 0.05
     damage = 15
     speed = 7
