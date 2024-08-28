@@ -1,5 +1,7 @@
 import arcade
 from typing import TypeVar, Type
+
+import arcade.key
 from omg.mechanics import movement
 from omg.entities.projectile import ProjectileFactory
 from omg.structural.observer import ObservableSprite
@@ -58,6 +60,8 @@ class Player(ObservableSprite):
         """Called whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
 
+        if key == arcade.key.Z:
+            self.shoot()
         if key == arcade.key.SPACE:
             self.shoot()
         elif key == arcade.key.Q:
