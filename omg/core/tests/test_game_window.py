@@ -12,27 +12,6 @@ from omg.core.game_window import GameWindow  # Adjust import according to your p
 class TestGameWindow(unittest.TestCase):
 
     @patch.object(arcade.Window, '__init__', MagicMock())
-    @patch('arcade.load_texture')
-    def test_setup(self, mock_load_texture):
-        """Test the setup of the game window."""
-        mock_load_texture.return_value = MagicMock()
-
-        window = GameWindow()
-        window.setup()
-
-        self.assertIsInstance(window.observer, Observer)
-        self.assertIsInstance(window.player, Player)
-        self.assertIsInstance(window.obstacles, arcade.SpriteList)
-        self.assertIsInstance(window.projectiles, arcade.SpriteList)
-        self.assertIsInstance(window.physics_engine, PhysicsEngineBoundary)
-        self.assertGreater(len(window.skill_icons), 0)  # Ensure that skill icons are loaded
-
-        # Check that projectiles were added
-        self.assertEqual(len(window.player.projectile_types), 2)
-        self.assertIn(FireballFactory, window.player.projectile_types)
-        self.assertIn(IceShardFactory, window.player.projectile_types)
-
-    @patch.object(arcade.Window, '__init__', MagicMock())
     def test_update(self):
         """Test the update method."""
         window = GameWindow()

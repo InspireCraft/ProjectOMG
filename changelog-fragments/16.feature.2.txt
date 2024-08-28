@@ -1,0 +1,2 @@
+Player can pick up skills from the environment using CircularBuffer which implements ItemManager interface.
+This is done by publishing a pick-up request to the GameWindow and gamewindow resolving the request.

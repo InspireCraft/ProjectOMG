@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from omg.structural.observer import Event
 import arcade
 import math
 import os
@@ -27,16 +26,10 @@ class Projectile(arcade.Sprite):
         self.change_y = self.speed * math.sin(angle_rad)
 
 
-class ProjectileShotEvent(Event):
-    """Event triggered when a projectile is shot."""
-
-    def __init__(self, projectile: Projectile):
-        super().__init__("projectile_shot")
-        self.projectile = projectile
-
-
 class ProjectileFactory(ABC):
     """Abstract class for Projectile creating factories."""
+
+    image_file: str
 
     @classmethod
     @abstractmethod

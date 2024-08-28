@@ -1,0 +1,1 @@
+Pickupable and ItemManager classes are introduced to handle interaction between the environment and the player.

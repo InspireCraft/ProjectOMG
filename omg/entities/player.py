@@ -1,11 +1,15 @@
 import arcade
-from typing import List, Type
+from typing import TypeVar, Type
 from omg.mechanics import movement
-from omg.entities.projectile import ProjectileFactory, ProjectileShotEvent
+from omg.entities.projectile import ProjectileFactory
 from omg.structural.observer import ObservableSprite
+from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.items import CircularBuffer
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
+N_SKILLS_MAX = 5
+T = TypeVar("T")  # Define a type variable
 
 
 class Player(ObservableSprite):
@@ -46,9 +50,9 @@ class Player(ObservableSprite):
         self.mana_regen_rate = 5  # Mana regenerated per second
         self.mana_regen_cooldown = 0
 
-        # Projectile types
-        self.projectile_types: List[Type[ProjectileFactory]] = []
-        self.current_projectile_index = 0
+        # Skills
+        self.skills = SkillManager(N_SKILLS_MAX)
+        self.item_pickup_radius = 5
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -56,10 +60,12 @@ class Player(ObservableSprite):
 
         if key == arcade.key.SPACE:
             self.shoot()
-        elif key == arcade.key.KEY_1:
-            self._select_projectile(0)
-        elif key == arcade.key.KEY_2:
-            self._select_projectile(1)
+        elif key == arcade.key.Q:
+            self.skills.set_prev()
+        elif key == arcade.key.E:
+            self.skills.set_next()
+        elif key == arcade.key.F:
+            self.pickup_skill()
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -81,11 +87,11 @@ class Player(ObservableSprite):
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
-        if not self.projectile_types or self.current_mana < 20:
+        if self.skills.current_size == 0 or self.current_mana < 20:
             return
 
         self.current_mana -= 20
-        selected_skill = self.projectile_types[self.current_projectile_index]
+        selected_skill = self.skills.get_current()
         projectile = selected_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
@@ -101,14 +107,24 @@ class Player(ObservableSprite):
                 self.current_mana = self.max_mana
             self.mana_regen_cooldown = 0
 
-    # TODO: rename as skill
-    def add_projectile(self, projectile: Type[ProjectileFactory]):
-        """Add projectile factory to the player."""
-        self.projectile_types.append(projectile)
+    def add_skill(self, skill: Type[ProjectileFactory]):
+        """Add skill to the player."""
+        self.skills.add_item(skill)
 
-    def _select_projectile(self, index):
-        if 0 <= index < len(self.projectile_types):
-            self.current_projectile_index = index
+    def pickup_skill(self):
+        """Publish a skill pickup request event."""
+        # Player will try to pickup the items in a circle around it
+        pick_up_sprite = arcade.SpriteCircle(
+            radius=self.item_pickup_radius,
+            color=arcade.color.RED,
+        )  # transparent circular sprite to define the hitbox
+        pick_up_sprite.center_x = self.center_x
+        pick_up_sprite.center_y = self.center_y
+        pick_up_event = PickupRequestEvent(
+            self.skills,  # send skill manager
+            pick_up_sprite,
+        )
+        self.notify_observers(pick_up_event)
 
     def set_movement_keys(self, forward, backward, left, right):
         """Bind keys to the movement logic."""
@@ -168,3 +184,9 @@ class Player(ObservableSprite):
             mana_bar_height,
             arcade.color.LIGHT_BLUE,
         )
+
+
+class SkillManager(CircularBuffer[ProjectileFactory]):
+    """Manages skills of an entity."""
+
+    pass
