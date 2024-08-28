@@ -55,7 +55,8 @@ class Player(ObservableSprite):
         # Skills
         self.skills = SkillManager(N_SKILLS_MAX)
         self.item_pickup_radius = 5
-        self.to_be_combined_skill_cash = []
+        self.to_be_combined_skill_cash = []  # Initialize an empty skill_cash
+        self.skills_in_slots_d_f = [None, None]  # Initialize D and F slots as None
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -75,6 +76,12 @@ class Player(ObservableSprite):
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
+        
+    def update_skill_slots(self, new_skill):
+        """Update skill slots D and F after combining a skill."""
+        self.skills_in_slots_d_f.insert(0, new_skill)
+        self.skills_in_slots_d_f.pop()
+            
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
@@ -89,10 +96,12 @@ class Player(ObservableSprite):
             )
         )
         self._regenerate_mana(delta_time)
+        
+        # Combine skills
         if len(self.to_be_combined_skill_cash) == 2:
-            print(f"combination = {self.to_be_combined_skill_cash}")
+            new_skill = "".join(self.to_be_combined_skill_cash[::])
+            self.update_skill_slots(new_skill)
             self.to_be_combined_skill_cash = []
-            print(f"after comb = {self.to_be_combined_skill_cash}")
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
