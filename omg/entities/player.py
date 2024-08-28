@@ -55,6 +55,7 @@ class Player(ObservableSprite):
         # Skills
         self.skills = SkillManager(N_SKILLS_MAX)
         self.item_pickup_radius = 5
+        self.to_be_combined_skill_cash = []
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
@@ -63,7 +64,7 @@ class Player(ObservableSprite):
         if key == arcade.key.Z:
             self.shoot()
         if key == arcade.key.SPACE:
-            self.shoot()
+            self.to_be_combined_skill_cash.append(self.skills.get_current().__name__)
         elif key == arcade.key.Q:
             self.skills.set_prev()
         elif key == arcade.key.E:
