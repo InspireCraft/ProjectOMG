@@ -63,14 +63,26 @@ class Player(ObservableSprite):
         self.item_pickup_radius = 5
         self.to_be_combined_skill_cash = []  # Initialize an empty skill_cash
         self.skills_in_slots_d_f = [None, None]  # Initialize D and F slots as None
+        
+        # Combined skill dictionary
+        self.combined_skill_dict = {
+            "FireFire" : FireFireFactory(),
+            "FireIce"  : FireIceFactory(),
+            "IceFire"  : IceFireFactory(),
+            "IceIce"   : IceIceFactory(),
+        }
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
 
-        if key == arcade.key.Z:
-            self.shoot()
-        if key == arcade.key.SPACE:
+        if key == arcade.key.H:
+            skill_name = self.skills_in_slots_d_f[0]
+            self.shoot(skill_name)
+        elif key == arcade.key.J:
+            skill_name = self.skills_in_slots_d_f[1]
+            self.shoot(skill_name)
+        elif key == arcade.key.SPACE:
             self.to_be_combined_skill_cash.append(self.skills.get_current().__name__)
         elif key == arcade.key.Q:
             self.skills.set_prev()
@@ -125,13 +137,13 @@ class Player(ObservableSprite):
             self.update_skill_slots(new_skill)
             self.to_be_combined_skill_cash = []
 
-    def shoot(self):
+    def shoot(self, skill_name):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
-        if self.skills.current_size == 0 or self.current_mana < 20:
+        if skill_name == None or self.current_mana < 20:
             return
 
         self.current_mana -= 20
-        selected_skill = self.skills.get_current()
+        selected_skill = self.combined_skill_dict[skill_name]
         projectile = selected_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
