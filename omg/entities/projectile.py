@@ -67,6 +67,7 @@ class IceElementFactory(ProjectileFactory):
     scale = 0.05
     damage = 15
     speed = 7
+    mana_cost = 20
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
@@ -89,6 +90,7 @@ class IceFireFactory(ProjectileFactory):
     scale = 0.05
     damage = 15
     speed = 7
+    mana_cost = 20
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
@@ -111,6 +113,7 @@ class IceIceFactory(ProjectileFactory):
     scale = 0.05
     damage = 15
     speed = 7
+    mana_cost = 20
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
@@ -134,6 +137,7 @@ class FireIceFactory(ProjectileFactory):
     scale = 0.05
     damage = 15
     speed = 7
+    mana_cost = 20
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:
@@ -156,6 +160,7 @@ class FireFireFactory(ProjectileFactory):
     scale = 0.05
     damage = 15
     speed = 7
+    mana_cost = 20
 
     @classmethod
     def create(cls, init_px, init_py, angle) -> Projectile:

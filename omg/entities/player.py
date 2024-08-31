@@ -118,10 +118,11 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
-        if skill_name == None or self.current_mana < 20:
+        mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
+        if skill_name == None or self.current_mana < mana_cost:
             return
 
-        self.current_mana -= 20
+        self.current_mana -= mana_cost
         selected_skill = COMBINED_ELEMENT_DICTIONARY[skill_name]
         projectile = selected_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
