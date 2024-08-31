@@ -37,6 +37,7 @@ class ProjectileFactory(ABC):
         """Create and return a Projectile instance."""
         pass
 
+
 class FireElementFactory(ProjectileFactory):
     """Convenience class to create Fireball Projectile."""
 

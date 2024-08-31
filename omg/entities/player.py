@@ -19,6 +19,7 @@ class Player(ObservableSprite):
     """Controllable player logic."""
 
     def __init__(self, name, char_class, image_file, scale, initial_angle=0):
+        """Initialize Player instance."""
         super().__init__(image_file, scale)
         self.name = name
         self.char_class = char_class
@@ -56,11 +57,13 @@ class Player(ObservableSprite):
         # Skills
         self.element = SkillManager(N_SKILLS_MAX)
         self.item_pickup_radius = 5
-        self.to_be_combined_element_cash = []  # Initialize an empty element_cash
-        self.skills_in_slots_d_f = [None, None]  # Initialize D and F slots as None
+        # Initialize an empty element_cash
+        self.to_be_combined_element_cash = []
+        # Initialize D and F slots as None
+        self.skills_in_slots_d_f = [None, None]
 
     def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed."""
+        """Call whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
 
         if key == arcade.key.H:
@@ -70,7 +73,9 @@ class Player(ObservableSprite):
             skill_name = self.skills_in_slots_d_f[1]
             self.shoot(skill_name)
         elif key == arcade.key.SPACE:
-            self.to_be_combined_element_cash.append(self.element.get_current().__name__)
+            self.to_be_combined_element_cash.append(
+                self.element.get_current().__name__
+                )
         elif key == arcade.key.Q:
             self.element.set_prev()
         elif key == arcade.key.E:
@@ -79,14 +84,13 @@ class Player(ObservableSprite):
             self.pickup_element()
 
     def on_key_release(self, key, modifiers):
-        """Called when the user releases a key."""
+        """Call when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
-        
+
     def update_skill_slots(self, new_skill):
         """Update skill slots D and F after combining a skill."""
         self.skills_in_slots_d_f.insert(0, new_skill)
         self.skills_in_slots_d_f.pop()
-            
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
@@ -101,25 +105,25 @@ class Player(ObservableSprite):
             )
         )
         self._regenerate_mana(delta_time)
-        
+
         # Update combined elements
         if len(self.to_be_combined_element_cash) == 2:
             # Get the name of the skill after combining elements
             new_skill = "".join(self.to_be_combined_element_cash[::])
-            
+
             # Remove "ElementFactory"
             new_skill = new_skill.replace("ElementFactory", "")
-            
+
             # Update D and F skill slots
             self.update_skill_slots(new_skill)
-            
+
             # Empty the element cash
             self.to_be_combined_element_cash = []
 
     def shoot(self, skill_name):
-        """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
+        """Shoot a projectile and inform the observers."""
         mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
-        if skill_name == None or self.current_mana < mana_cost:
+        if skill_name is None or self.current_mana < mana_cost:
             return
 
         self.current_mana -= mana_cost
@@ -208,7 +212,9 @@ class Player(ObservableSprite):
             mana_bar_height,
             arcade.color.DARK_BLUE,
         )
-        current_mana_width = mana_bar_width * (self.current_mana / self.max_mana)
+        current_mana_width = mana_bar_width * (
+            self.current_mana / self.max_mana
+            )
         arcade.draw_rectangle_filled(
             mana_bar_x - (mana_bar_width - current_mana_width) / 2,
             mana_bar_y,
