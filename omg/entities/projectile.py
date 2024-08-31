@@ -170,3 +170,10 @@ class FireFireFactory(ProjectileFactory):
             speed=cls.speed,
             angle=angle,
         )
+        
+COMBINED_ELEMENT_DICTIONARY = {
+            "FireFire" : FireFireFactory(),
+            "FireIce"  : FireIceFactory(),
+            "IceFire"  : IceFireFactory(),
+            "IceIce"   : IceIceFactory(),
+        }
