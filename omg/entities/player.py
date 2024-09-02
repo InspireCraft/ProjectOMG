@@ -87,7 +87,7 @@ class Player(ObservableSprite):
         """Call when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
 
-    def _update_crafted_skill_slots(self, new_skill):
+    def _update_crafted_skill_slots(self, new_skill: str):
         """Update crafetd skill slots after combining elements."""
         self.crafted_skill_slots.insert(0, new_skill)
         self.crafted_skill_slots.pop()
@@ -120,7 +120,7 @@ class Player(ObservableSprite):
             # Empty the element cash
             self.to_be_combined_element_cash = []
 
-    def shoot(self, skill_name):
+    def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
         mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
         if skill_name is None or self.current_mana < mana_cost:
