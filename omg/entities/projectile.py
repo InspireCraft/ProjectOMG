@@ -83,7 +83,8 @@ class IceElementFactory(ProjectileFactory):
             speed=cls.speed,
             angle=angle,
         )
-        
+
+
 class IceFireFactory(ProjectileFactory):
     """Convenience class to create IceShard Projectile."""
 
@@ -105,7 +106,8 @@ class IceFireFactory(ProjectileFactory):
             init_py=init_py,
             speed=cls.speed,
             angle=angle,
-        )     
+        )
+
 
 class IceIceFactory(ProjectileFactory):
     """Convenience class to create IceShard Projectile."""
@@ -128,9 +130,9 @@ class IceIceFactory(ProjectileFactory):
             init_py=init_py,
             speed=cls.speed,
             angle=angle,
-        )     
+        )
 
-        
+
 class FireIceFactory(ProjectileFactory):
     """Convenience class to create IceShard Projectile."""
 
@@ -154,6 +156,7 @@ class FireIceFactory(ProjectileFactory):
             angle=angle,
         )
 
+
 class FireFireFactory(ProjectileFactory):
     """Convenience class to create IceShard Projectile."""
 
@@ -176,10 +179,11 @@ class FireFireFactory(ProjectileFactory):
             speed=cls.speed,
             angle=angle,
         )
-        
+
+
 COMBINED_ELEMENT_DICTIONARY = {
-            "FireFire" : FireFireFactory(),
-            "FireIce"  : FireIceFactory(),
-            "IceFire"  : IceFireFactory(),
-            "IceIce"   : IceIceFactory(),
-        }
+    "FireFire": FireFireFactory(),
+    "FireIce": FireIceFactory(),
+    "IceFire": IceFireFactory(),
+    "IceIce": IceIceFactory(),
+}

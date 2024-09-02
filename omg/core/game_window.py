@@ -70,7 +70,7 @@ class GameWindow(arcade.Window):
         obstacle.center_x = 400
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
-        
+
         # Create crafetd skill slots
         # Skill slot 1
         scale_factor_1 = 0.4
@@ -78,15 +78,15 @@ class GameWindow(arcade.Window):
         self.skill_slot_1 = arcade.Sprite(skill_slot_1_img, scale=scale_factor_1)
         self.skill_slot_1.center_x = self.skill_slot_1.width // 2
         self.skill_slot_1.center_y = self.skill_slot_1.height // 2
-        
+
         # Skill slot 2
         scale_factor_2 = 0.4
         skill_slot_2_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
         self.skill_slot_2 = arcade.Sprite(skill_slot_2_img, scale=scale_factor_2)
-        self.skill_slot_2.center_x = self.skill_slot_1.center_x + self.skill_slot_2.width
+        self.skill_slot_2.center_x = self.skill_slot_1.center_x + \
+            self.skill_slot_2.width
         self.skill_slot_2.center_y = self.skill_slot_2.height // 2
-        
-        
+
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
             walls=self.obstacles,
@@ -203,25 +203,32 @@ class GameWindow(arcade.Window):
                 self.icon_size,
                 icon,
             )
-        
+
         # Draw combined skill icons
-        if self.player.crafted_skill_slots[0] != None:
+        if self.player.crafted_skill_slots[0] is None:
             scale_factor_crafted_skill_1 = 0.3
-            skill_1_img = os.path.join(ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[0]}.png")
+            skill_1_img = os.path.join(
+                ASSET_DIR,
+                "skills",
+                f"{self.player.crafted_skill_slots[0]}.png"
+            )
             skill_1 = arcade.Sprite(skill_1_img, scale=scale_factor_crafted_skill_1)
             skill_1.center_x = skill_1.width // 2
             skill_1.center_y = skill_1.height // 2
             skill_1.draw()
-           
-        if self.player.crafted_skill_slots[1] != None:
+
+        if self.player.crafted_skill_slots[1] is None:
             scale_factor_crafted_skill_2 = 0.3
-            skill_2_img = os.path.join(ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[1]}.png")
+            skill_2_img = os.path.join(
+                ASSET_DIR,
+                "skills",
+                f"{self.player.crafted_skill_slots[1]}.png"
+            )
             skill_2 = arcade.Sprite(skill_2_img, scale=scale_factor_crafted_skill_2)
             skill_2.center_x = skill_2.width // 2 + skill_2.width
             skill_2.center_y = skill_2.height // 2
             skill_2.draw()
-            
-                
+
         # Draw usable skill slots to bottom left corner
         self.skill_slot_1.draw()
         self.skill_slot_2.draw()

@@ -75,7 +75,7 @@ class Player(ObservableSprite):
         elif key == arcade.key.SPACE:
             self.to_be_combined_element_cash.append(
                 self.element.get_current().__name__
-                )
+            )
         elif key == arcade.key.Q:
             self.element.set_prev()
         elif key == arcade.key.E:
@@ -214,7 +214,7 @@ class Player(ObservableSprite):
         )
         current_mana_width = mana_bar_width * (
             self.current_mana / self.max_mana
-            )
+        )
         arcade.draw_rectangle_filled(
             mana_bar_x - (mana_bar_width - current_mana_width) / 2,
             mana_bar_y,
