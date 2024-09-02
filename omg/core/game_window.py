@@ -36,8 +36,8 @@ class GameWindow(arcade.Window):
         self.pickupables: arcade.SpriteList = (
             None  # items that can be pickedup from the ground
         )
-        self.skill_slot_d: arcade.Sprite = None  # Skill slot D
-        self.skill_slot_f: arcade.Sprite = None  # SKill slot F
+        self.skill_slot_1: arcade.Sprite = None  # Skill slot D
+        self.skill_slot_2: arcade.Sprite = None  # SKill slot F
         self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
@@ -71,20 +71,20 @@ class GameWindow(arcade.Window):
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
         
-        # Create skill slots
-        # Skill slot D
-        scale_factor_d = 0.4
-        skill_slot_d_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
-        self.skill_slot_d = arcade.Sprite(skill_slot_d_img, scale=scale_factor_d)
-        self.skill_slot_d.center_x = self.skill_slot_d.width // 2
-        self.skill_slot_d.center_y = self.skill_slot_d.height // 2
+        # Create crafetd skill slots
+        # Skill slot 1
+        scale_factor_1 = 0.4
+        skill_slot_1_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
+        self.skill_slot_1 = arcade.Sprite(skill_slot_1_img, scale=scale_factor_1)
+        self.skill_slot_1.center_x = self.skill_slot_1.width // 2
+        self.skill_slot_1.center_y = self.skill_slot_1.height // 2
         
-        # Skill slot F
-        scale_factor_f = 0.4
-        skill_slot_f_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
-        self.skill_slot_f = arcade.Sprite(skill_slot_f_img, scale=scale_factor_f)
-        self.skill_slot_f.center_x = self.skill_slot_d.center_x + self.skill_slot_f.width
-        self.skill_slot_f.center_y = self.skill_slot_f.height // 2
+        # Skill slot 2
+        scale_factor_2 = 0.4
+        skill_slot_2_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
+        self.skill_slot_2 = arcade.Sprite(skill_slot_2_img, scale=scale_factor_2)
+        self.skill_slot_2.center_x = self.skill_slot_1.center_x + self.skill_slot_2.width
+        self.skill_slot_2.center_y = self.skill_slot_2.height // 2
         
         
 
@@ -224,8 +224,8 @@ class GameWindow(arcade.Window):
             
                 
         # Draw usable skill slots to bottom left corner
-        self.skill_slot_d.draw()
-        self.skill_slot_f.draw()
+        self.skill_slot_1.draw()
+        self.skill_slot_2.draw()
 
 
 def main():
