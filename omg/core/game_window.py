@@ -71,7 +71,7 @@ class GameWindow(arcade.Window):
         obstacle.center_y = 300
         self.obstacles.append(obstacle)
 
-        # Create crafetd skill slots
+        # Create crafted skill slots
         # Skill slot 1
         scale_factor_1 = 0.4
         skill_slot_1_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
@@ -183,7 +183,7 @@ class GameWindow(arcade.Window):
         self.mouse_y = y
 
     def _draw_ui(self):
-        # Draw picked up skills to top left corner
+        # Draw picked up elements to top left corner
         for i, icon in enumerate(self.skill_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = SCREEN_HEIGHT - self.icon_margin_y
