@@ -57,8 +57,8 @@ class Player(ObservableSprite):
         # Skills
         self.element = SkillManager(N_SKILLS_MAX)
         self.item_pickup_radius = 5
-        # Initialize an empty element_cash
-        self.to_be_combined_element_cash = []
+        # Initialize an empty element_buffer
+        self.to_be_combined_element_buffer = []
         # Initialize D and F slots as None
         self.crafted_skill_slots = [None, None]
 
@@ -73,7 +73,7 @@ class Player(ObservableSprite):
             skill_name = self.crafted_skill_slots[1]
             self.shoot(skill_name)
         elif key == arcade.key.SPACE:
-            self.to_be_combined_element_cash.append(
+            self.to_be_combined_element_buffer.append(
                 self.element.get_current().__name__
             )
         elif key == arcade.key.Q:
@@ -107,9 +107,9 @@ class Player(ObservableSprite):
         self._regenerate_mana(delta_time)
 
         # Update combined elements
-        if len(self.to_be_combined_element_cash) == 2:
+        if len(self.to_be_combined_element_buffer) == 2:
             # Get the name of the skill after combining elements
-            new_skill = "".join(self.to_be_combined_element_cash[::])
+            new_skill = "".join(self.to_be_combined_element_buffer[::])
 
             # Remove "ElementFactory" from the element name
             new_skill = new_skill.replace("ElementFactory", "")
@@ -118,7 +118,7 @@ class Player(ObservableSprite):
             self._update_crafted_skill_slots(new_skill)
 
             # Empty the element cash
-            self.to_be_combined_element_cash = []
+            self.to_be_combined_element_buffer = []
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
