@@ -36,8 +36,8 @@ class GameWindow(arcade.Window):
         self.pickupables: arcade.SpriteList = (
             None  # items that can be pickedup from the ground
         )
-        self.skill_slot_1: arcade.Sprite = None  # Skill slot D
-        self.skill_slot_2: arcade.Sprite = None  # SKill slot F
+        self.skill_slot_1: arcade.Sprite = None  # Skill slot 1
+        self.skill_slot_2: arcade.Sprite = None  # SKill slot 2
         self.projectiles = None
         self.physics_engine = None
         self.mouse_x = 0
