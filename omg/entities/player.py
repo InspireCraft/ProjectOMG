@@ -87,8 +87,8 @@ class Player(ObservableSprite):
         """Call when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
 
-    def update_skill_slots(self, new_skill):
-        """Update skill slots D and F after combining a skill."""
+    def _update_crafted_skill_slots(self, new_skill):
+        """Update crafetd skill slots after combining elements."""
         self.crafted_skill_slots.insert(0, new_skill)
         self.crafted_skill_slots.pop()
 
@@ -111,11 +111,11 @@ class Player(ObservableSprite):
             # Get the name of the skill after combining elements
             new_skill = "".join(self.to_be_combined_element_cash[::])
 
-            # Remove "ElementFactory"
+            # Remove "ElementFactory" from the element name
             new_skill = new_skill.replace("ElementFactory", "")
 
-            # Update D and F skill slots
-            self.update_skill_slots(new_skill)
+            # Update crafted skill slots
+            self._update_crafted_skill_slots(new_skill)
 
             # Empty the element cash
             self.to_be_combined_element_cash = []
