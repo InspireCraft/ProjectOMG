@@ -88,9 +88,11 @@ class Player(ObservableSprite):
         self.movement_logic.on_key_release(key, modifiers)
 
     def _update_crafted_skill_slots(self, new_skill: str):
-        """Update crafetd skill slots after combining elements."""
-        self.crafted_skill_slots.insert(0, new_skill)
-        self.crafted_skill_slots.pop()
+        """Update crafted skill slots after combining elements."""
+        # self.crafted_skill_slots.insert(0, new_skill)
+        # self.crafted_skill_slots.pop()
+        self.crafted_skill_slots[1] = self.crafted_skill_slots[0]
+        self.crafted_skill_slots[0] = new_skill
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""

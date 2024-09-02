@@ -205,7 +205,7 @@ class GameWindow(arcade.Window):
             )
 
         # Draw combined skill icons
-        if self.player.crafted_skill_slots[0] is None:
+        if self.player.crafted_skill_slots[0] is not None:
             scale_factor_crafted_skill_1 = 0.3
             skill_1_img = os.path.join(
                 ASSET_DIR,
@@ -217,7 +217,7 @@ class GameWindow(arcade.Window):
             skill_1.center_y = skill_1.height // 2
             skill_1.draw()
 
-        if self.player.crafted_skill_slots[1] is None:
+        if self.player.crafted_skill_slots[1] is not None:
             scale_factor_crafted_skill_2 = 0.3
             skill_2_img = os.path.join(
                 ASSET_DIR,
