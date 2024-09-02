@@ -206,17 +206,17 @@ class GameWindow(arcade.Window):
             )
         
         # Draw combined skill icons
-        if self.player.skills_in_slots_d_f[0] != None:
+        if self.player.crafted_skill_slots[0] != None:
             scale_factor_d = 0.3
-            skill_d_img = os.path.join(ASSET_DIR, "skills", f"{self.player.skills_in_slots_d_f[0]}.png")
+            skill_d_img = os.path.join(ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[0]}.png")
             skill_d = arcade.Sprite(skill_d_img, scale=scale_factor_d)
             skill_d.center_x = skill_d.width // 2
             skill_d.center_y = skill_d.height // 2
             skill_d.draw()
            
-        if self.player.skills_in_slots_d_f[1] != None:
+        if self.player.crafted_skill_slots[1] != None:
             scale_factor_f = 0.3
-            skill_f_img = os.path.join(ASSET_DIR, "skills", f"{self.player.skills_in_slots_d_f[1]}.png")
+            skill_f_img = os.path.join(ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[1]}.png")
             skill_f = arcade.Sprite(skill_f_img, scale=scale_factor_f)
             skill_f.center_x = skill_f.width // 2 + skill_f.width
             skill_f.center_y = skill_f.height // 2

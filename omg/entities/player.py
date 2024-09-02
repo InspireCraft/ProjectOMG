@@ -60,17 +60,17 @@ class Player(ObservableSprite):
         # Initialize an empty element_cash
         self.to_be_combined_element_cash = []
         # Initialize D and F slots as None
-        self.skills_in_slots_d_f = [None, None]
+        self.crafted_skill_slots = [None, None]
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
 
         if key == arcade.key.H:
-            skill_name = self.skills_in_slots_d_f[0]
+            skill_name = self.crafted_skill_slots[0]
             self.shoot(skill_name)
         elif key == arcade.key.J:
-            skill_name = self.skills_in_slots_d_f[1]
+            skill_name = self.crafted_skill_slots[1]
             self.shoot(skill_name)
         elif key == arcade.key.SPACE:
             self.to_be_combined_element_cash.append(
@@ -89,8 +89,8 @@ class Player(ObservableSprite):
 
     def update_skill_slots(self, new_skill):
         """Update skill slots D and F after combining a skill."""
-        self.skills_in_slots_d_f.insert(0, new_skill)
-        self.skills_in_slots_d_f.pop()
+        self.crafted_skill_slots.insert(0, new_skill)
+        self.crafted_skill_slots.pop()
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
