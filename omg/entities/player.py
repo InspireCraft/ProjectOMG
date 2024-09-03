@@ -8,6 +8,7 @@ from omg.entities.projectile import COMBINED_ELEMENT_DICTIONARY
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
+from omg.entities.projectile import CraftingSkillFactory
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
@@ -58,9 +59,9 @@ class Player(ObservableSprite):
         self.element = SkillManager(N_SKILLS_MAX)
         self.item_pickup_radius = 5
         # Initialize an empty element_buffer
-        self.to_be_combined_element_buffer = []
+        self.to_be_combined_element_buffer: list[str] = []
         # Initialize crafted skill slots as None
-        self.crafted_skill_slots = [None, None]
+        self.crafted_skill_slots: list[str] = [None, None]
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
@@ -122,13 +123,18 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
-        mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
+        # mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
+        crafted_skill = CraftingSkillFactory()
+        crafted_skill._set_skill_attributes(skill_name)
+
+        mana_cost = crafted_skill.mana_cost
         if skill_name is None or self.current_mana < mana_cost:
             return
 
         self.current_mana -= mana_cost
-        selected_skill = COMBINED_ELEMENT_DICTIONARY[skill_name]
-        projectile = selected_skill.create(
+        # selected_skill = COMBINED_ELEMENT_DICTIONARY[skill_name]
+        # projectile = selected_skill.create(
+        projectile = crafted_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
 

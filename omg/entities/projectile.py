@@ -69,6 +69,34 @@ class ProjectileFactory(ABC):
             angle=angle,
         )
 
+my_dict = {
+    "FireFire":{
+        "image_file": os.path.join(ASSET_DIR, "skills", "FireFire.PNG"),
+        "scale": 0.05,
+        "damage": 15,
+        "speed": 7,
+        "mana_cost": 20
+    }
+}
+
+class CraftingSkillFactory(ProjectileFactory):
+    """Class to combine elements to craft a skill."""
+    
+    @classmethod
+    def _set_skill_attributes(cls, skill_name: str):
+        """Set the class attributes based on the skill_name."""
+        cls.image_file = my_dict[skill_name]["image_file"]
+        cls.scale = my_dict[skill_name]["scale"]
+        cls.damage = my_dict[skill_name]["damage"]
+        cls.speed = my_dict[skill_name]["speed"]
+        cls.mana_cost = my_dict[skill_name]["mana_cost"]
+    
+    image_file = None
+    scale = None
+    damage = None
+    speed = None
+    mana_cost = None
+    
 
 class IceFireFactory(ProjectileFactory):
     """Convenience class to create Ice-spear Projectile."""
