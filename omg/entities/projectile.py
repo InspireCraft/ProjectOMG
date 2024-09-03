@@ -3,9 +3,9 @@ from typing import Dict
 import arcade
 import math
 import os
+import json
 
-ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
-
+JSON_DIR = os.path.join(os.path.dirname(__file__), "CombinedSkills.JSON")
 
 # TODO: add source as the projectiles are emitted now
 class Projectile(arcade.Sprite):
@@ -69,15 +69,8 @@ class ProjectileFactory(ABC):
             angle=angle,
         )
 
-my_dict = {
-    "FireFire":{
-        "image_file": os.path.join(ASSET_DIR, "skills", "FireFire.PNG"),
-        "scale": 0.05,
-        "damage": 15,
-        "speed": 7,
-        "mana_cost": 20
-    }
-}
+with open(JSON_DIR, "r") as file:
+    combined_skill_dictionary: Dict[str,Dict] = json.load(file)
 
 class CraftingSkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
@@ -85,62 +78,14 @@ class CraftingSkillFactory(ProjectileFactory):
     @classmethod
     def _set_skill_attributes(cls, skill_name: str):
         """Set the class attributes based on the skill_name."""
-        cls.image_file = my_dict[skill_name]["image_file"]
-        cls.scale = my_dict[skill_name]["scale"]
-        cls.damage = my_dict[skill_name]["damage"]
-        cls.speed = my_dict[skill_name]["speed"]
-        cls.mana_cost = my_dict[skill_name]["mana_cost"]
+        cls.image_file = combined_skill_dictionary[skill_name]["image_file"]
+        cls.scale = combined_skill_dictionary[skill_name]["scale"]
+        cls.damage = combined_skill_dictionary[skill_name]["damage"]
+        cls.speed = combined_skill_dictionary[skill_name]["speed"]
+        cls.mana_cost = combined_skill_dictionary[skill_name]["mana_cost"]
     
     image_file = None
     scale = None
     damage = None
     speed = None
     mana_cost = None
-    
-
-class IceFireFactory(ProjectileFactory):
-    """Convenience class to create Ice-spear Projectile."""
-
-    image_file = os.path.join(ASSET_DIR, "skills", "IceFire.PNG")
-    scale = 0.05
-    damage = 15
-    speed = 7
-    mana_cost = 20
-
-
-class IceIceFactory(ProjectileFactory):
-    """Convenience class to create IceShard Projectile."""
-
-    image_file = os.path.join(ASSET_DIR, "skills", "IceIce.PNG")
-    scale = 0.05
-    damage = 15
-    speed = 7
-    mana_cost = 20
-
-
-class FireIceFactory(ProjectileFactory):
-    """Convenience class to create Cold-fireball Projectile."""
-
-    image_file = os.path.join(ASSET_DIR, "skills", "FireIce.PNG")
-    scale = 0.05
-    damage = 15
-    speed = 7
-    mana_cost = 20
-
-
-class FireFireFactory(ProjectileFactory):
-    """Convenience class to create Fireball Projectile."""
-
-    image_file = os.path.join(ASSET_DIR, "skills", "FireFire.PNG")
-    scale = 0.05
-    damage = 15
-    speed = 7
-    mana_cost = 20
-
-
-COMBINED_ELEMENT_DICTIONARY: Dict[str, ProjectileFactory] = {
-    "FireFire": FireFireFactory(),
-    "FireIce": FireIceFactory(),
-    "IceFire": IceFireFactory(),
-    "IceIce": IceIceFactory(),
-}

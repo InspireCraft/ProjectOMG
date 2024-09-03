@@ -4,7 +4,6 @@ from typing import TypeVar, Type
 import arcade.key
 from omg.mechanics import movement
 from omg.entities.projectile import ProjectileFactory
-from omg.entities.projectile import COMBINED_ELEMENT_DICTIONARY
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
@@ -62,6 +61,7 @@ class Player(ObservableSprite):
         self.to_be_combined_element_buffer: list[str] = []
         # Initialize crafted skill slots as None
         self.crafted_skill_slots: list[str] = [None, None]
+        self.crafted_skill = CraftingSkillFactory()
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
@@ -123,18 +123,14 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
-        # mana_cost = COMBINED_ELEMENT_DICTIONARY[skill_name].mana_cost
-        crafted_skill = CraftingSkillFactory()
-        crafted_skill._set_skill_attributes(skill_name)
-
-        mana_cost = crafted_skill.mana_cost
+        
+        self.crafted_skill._set_skill_attributes(skill_name)
+        mana_cost = self.crafted_skill.mana_cost
         if skill_name is None or self.current_mana < mana_cost:
             return
 
         self.current_mana -= mana_cost
-        # selected_skill = COMBINED_ELEMENT_DICTIONARY[skill_name]
-        # projectile = selected_skill.create(
-        projectile = crafted_skill.create(
+        projectile = self.crafted_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.angle
         )
 
