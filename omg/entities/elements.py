@@ -22,17 +22,19 @@ def to_dotdict(d):
     return d
 
 ELEMENTS = {
-    "fire": {
+    "FIRE": {
+        "name": "Fire",
         "image_file": os.path.join(ASSET_DIR, "skills", "elements", "fire.PNG"), 
         "scale": 0.05
     },
-    "ice": {
-        "img_file": os.path.join(ASSET_DIR, "skills", "elements", "ice.PNG"), 
+    "ICE": {
+        "name": "Ice",
+        "image_file": os.path.join(ASSET_DIR, "skills", "elements", "ice.PNG"), 
         "scale": 0.05
     }
 }
 
 # Convert nested dictionaries to DotDict instances
-elements = to_dotdict(elements)
+ELEMENTS = to_dotdict(ELEMENTS)
 
     
