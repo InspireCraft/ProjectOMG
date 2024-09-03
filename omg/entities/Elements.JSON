@@ -1,0 +1,12 @@
+{
+    "FIRE": {
+        "name": "Fire",
+        "image_file": "omg/assets/images/skills/elements/fire.PNG",
+        "scale": 0.05
+    },
+    "ICE": {
+        "name": "Ice",
+        "image_file": "omg/assets/images/skills/elements/ice.PNG",
+        "scale": 0.05
+    }
+}

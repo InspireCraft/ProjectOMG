@@ -1,40 +1,35 @@
-from abc import ABC, abstractmethod
-import arcade
-import math
 import os
+import json
+from typing import Dict
 
-ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
+ELEMENTS_JSON_DIR = os.path.join(os.path.dirname(__file__), "Elements.JSON")
+
 
 class DotDict(dict):
+    """Convert dictionary to a format to call attributes with dot notation."""
+
     def __getattr__(self, attr):
+        """Get dictionary item as attribute.Convert nested dictionaries to DotDict."""
         value = self.get(attr)
         if isinstance(value, dict):
             value = DotDict(value)
         return value
 
     def __setattr__(self, attr, value):
+        """Set a dictionary item using attribute assignment syntax."""
         self[attr] = value
 
+
 # Recursively convert the dictionary and all its nested dictionaries to DotDict
-def to_dotdict(d):
+def to_dotdict(d: dict) -> DotDict:
+    """Convert dictionary and its nested ones to DotDict."""
     if isinstance(d, dict):
         return DotDict({k: to_dotdict(v) for k, v in d.items()})
     return d
 
-ELEMENTS = {
-    "FIRE": {
-        "name": "Fire",
-        "image_file": os.path.join(ASSET_DIR, "skills", "elements", "fire.PNG"), 
-        "scale": 0.05
-    },
-    "ICE": {
-        "name": "Ice",
-        "image_file": os.path.join(ASSET_DIR, "skills", "elements", "ice.PNG"), 
-        "scale": 0.05
-    }
-}
+
+with open(ELEMENTS_JSON_DIR, "r") as file:
+    ELEMENTS: Dict[str, Dict] = json.load(file)
 
 # Convert nested dictionaries to DotDict instances
 ELEMENTS = to_dotdict(ELEMENTS)
-
-    
