@@ -7,6 +7,7 @@ import json
 
 JSON_DIR = os.path.join(os.path.dirname(__file__), "CraftedSkills.JSON")
 
+
 # TODO: add source as the projectiles are emitted now
 class Projectile(arcade.Sprite):
     """Projectile logic."""
@@ -33,26 +34,31 @@ class ProjectileFactory(ABC):
     @property
     @abstractmethod
     def image_file(self) -> str:
+        """Hold corresponding image file location."""
         pass
 
     @property
     @abstractmethod
     def scale(self) -> float:
+        """Hold scale value for the image."""
         pass
 
     @property
     @abstractmethod
     def damage(self) -> float:
+        """Hold damage value for the skill."""
         pass
 
     @property
     @abstractmethod
     def speed(self) -> float:
+        """Hold the traverse speed of the skill."""
         pass
 
     @property
     @abstractmethod
     def mana_cost(self) -> float:
+        """Hold the mana cost of the skill."""
         pass
 
     @classmethod
@@ -69,12 +75,14 @@ class ProjectileFactory(ABC):
             angle=angle,
         )
 
+
 with open(JSON_DIR, "r") as file:
-    crafted_skill_dictionary: Dict[str,Dict] = json.load(file)
+    crafted_skill_dictionary: Dict[str, Dict] = json.load(file)
+
 
 class CraftingSkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
-    
+
     @classmethod
     def _set_skill_attributes(cls, skill_name: str):
         """Set the class attributes based on the skill_name."""
@@ -83,7 +91,7 @@ class CraftingSkillFactory(ProjectileFactory):
         cls.damage = crafted_skill_dictionary[skill_name]["damage"]
         cls.speed = crafted_skill_dictionary[skill_name]["speed"]
         cls.mana_cost = crafted_skill_dictionary[skill_name]["mana_cost"]
-    
+
     image_file = None
     scale = None
     damage = None
