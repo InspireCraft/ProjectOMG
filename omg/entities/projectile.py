@@ -5,7 +5,7 @@ import math
 import os
 import json
 
-JSON_DIR = os.path.join(os.path.dirname(__file__), "CraftedSkills.JSON")
+CRAFTED_SKILLS_JSON_DIR = os.path.join(os.path.dirname(__file__), "CraftedSkills.JSON")
 
 
 # TODO: add source as the projectiles are emitted now
@@ -76,7 +76,7 @@ class ProjectileFactory(ABC):
         )
 
 
-with open(JSON_DIR, "r") as file:
+with open(CRAFTED_SKILLS_JSON_DIR, "r") as file:
     crafted_skill_dictionary: Dict[str, Dict] = json.load(file)
 
 
