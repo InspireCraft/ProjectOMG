@@ -12,6 +12,7 @@ from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.elements import ELEMENTS
 
 
 SCREEN_WIDTH = 800
@@ -95,32 +96,32 @@ class GameWindow(arcade.Window):
         )
         # Add projectile types
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, FireElementFactory, 150, 10)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.fire, 150, 10)
         )
         self.pickupables.append(
             Pickupable(COIN_IMAGE_PATH, 0.5, IceElementFactory, 250, 20)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, FireElementFactory, 250, 120)
+            Pickupable(COIN_IMAGE_PATH, 0.5, IceElementFactory, 250, 120)
         )
 
     @property
-    def skill_icons(self):
-        """Define self.skill_icons."""
-        # TODO: refactor skill_icons logic if causes a performance bottleneck
-        # For example "skill_acquired event" can trigger an update when necessary
+    def element_icons(self):
+        """Define self.element_icons."""
+        # TODO: refactor element_icons logic if causes a performance bottleneck
+        # For example "element_acquired event" can trigger an update when necessary
         if self.player:
             return [
-                arcade.load_texture(projectile_type.image_file)
-                for projectile_type in self.player.element
+                arcade.load_texture(element_type.image_file)
+                for element_type in self.player.element
             ]
         else:
             return None
 
-    def _load_skill_icons(self):
-        for projectile_type in self.player.element:
-            icon_texture = arcade.load_texture(projectile_type.image_file)
-            self.skill_icons.append(icon_texture)
+    def _load_element_icons(self):
+        for element_type in self.player.element:
+            icon_texture = arcade.load_texture(element_type.image_file)
+            self.element_icons.append(icon_texture)
 
     def on_draw(self):
         """Drawing code."""
@@ -184,7 +185,7 @@ class GameWindow(arcade.Window):
 
     def _draw_ui(self):
         # Draw picked up elements to top left corner
-        for i, icon in enumerate(self.skill_icons):
+        for i, icon in enumerate(self.element_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = SCREEN_HEIGHT - self.icon_margin_y
             if i == self.player.element.get_current_index():

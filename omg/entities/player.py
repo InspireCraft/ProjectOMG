@@ -59,7 +59,7 @@ class Player(ObservableSprite):
         self.item_pickup_radius = 5
         # Initialize an empty element_buffer
         self.to_be_combined_element_buffer = []
-        # Initialize D and F slots as None
+        # Initialize crafted skill slots as None
         self.crafted_skill_slots = [None, None]
 
     def on_key_press(self, key, modifiers):
@@ -89,8 +89,6 @@ class Player(ObservableSprite):
 
     def _update_crafted_skill_slots(self, new_skill: str):
         """Update crafted skill slots after combining elements."""
-        # self.crafted_skill_slots.insert(0, new_skill)
-        # self.crafted_skill_slots.pop()
         self.crafted_skill_slots[1] = self.crafted_skill_slots[0]
         self.crafted_skill_slots[0] = new_skill
 
