@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 import arcade
 import math
 import os
@@ -181,7 +182,7 @@ class FireFireFactory(ProjectileFactory):
         )
 
 
-COMBINED_ELEMENT_DICTIONARY = {
+COMBINED_ELEMENT_DICTIONARY: Dict[str, ProjectileFactory] = {
     "FireFire": FireFireFactory(),
     "FireIce": FireIceFactory(),
     "IceFire": IceFireFactory(),

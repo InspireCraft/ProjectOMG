@@ -4,10 +4,7 @@ import os
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
-from omg.entities.projectile import (
-    FireElementFactory,
-    IceElementFactory,
-)
+
 from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
