@@ -5,7 +5,7 @@ import math
 import os
 import json
 
-JSON_DIR = os.path.join(os.path.dirname(__file__), "CombinedSkills.JSON")
+JSON_DIR = os.path.join(os.path.dirname(__file__), "CraftedSkills.JSON")
 
 # TODO: add source as the projectiles are emitted now
 class Projectile(arcade.Sprite):
@@ -70,7 +70,7 @@ class ProjectileFactory(ABC):
         )
 
 with open(JSON_DIR, "r") as file:
-    combined_skill_dictionary: Dict[str,Dict] = json.load(file)
+    crafted_skill_dictionary: Dict[str,Dict] = json.load(file)
 
 class CraftingSkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
@@ -78,11 +78,11 @@ class CraftingSkillFactory(ProjectileFactory):
     @classmethod
     def _set_skill_attributes(cls, skill_name: str):
         """Set the class attributes based on the skill_name."""
-        cls.image_file = combined_skill_dictionary[skill_name]["image_file"]
-        cls.scale = combined_skill_dictionary[skill_name]["scale"]
-        cls.damage = combined_skill_dictionary[skill_name]["damage"]
-        cls.speed = combined_skill_dictionary[skill_name]["speed"]
-        cls.mana_cost = combined_skill_dictionary[skill_name]["mana_cost"]
+        cls.image_file = crafted_skill_dictionary[skill_name]["image_file"]
+        cls.scale = crafted_skill_dictionary[skill_name]["scale"]
+        cls.damage = crafted_skill_dictionary[skill_name]["damage"]
+        cls.speed = crafted_skill_dictionary[skill_name]["speed"]
+        cls.mana_cost = crafted_skill_dictionary[skill_name]["mana_cost"]
     
     image_file = None
     scale = None
