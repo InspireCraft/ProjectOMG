@@ -96,13 +96,13 @@ class GameWindow(arcade.Window):
         )
         # Add projectile types
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.fire, 150, 10)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.FIRE, 150, 10)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, IceElementFactory, 250, 20)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.ICE, 250, 20)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, IceElementFactory, 250, 120)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.FIRE, 250, 120)
         )
 
     @property
