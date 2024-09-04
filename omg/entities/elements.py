@@ -21,7 +21,7 @@ class DotDict(dict):
 
 
 # Recursively convert the dictionary and all its nested dictionaries to DotDict
-def to_dotdict(d: dict) -> DotDict:
+def to_dotdict(d) -> DotDict:
     """Convert dictionary and its nested ones to DotDict."""
     if isinstance(d, dict):
         return DotDict({k: to_dotdict(v) for k, v in d.items()})
@@ -32,4 +32,4 @@ with open(ELEMENTS_JSON_DIR, "r") as file:
     ELEMENTS: Dict[str, Dict] = json.load(file)
 
 # Convert nested dictionaries to DotDict instances
-ELEMENTS = to_dotdict(ELEMENTS)
+ELEMENTS: DotDict[str, DotDict] = to_dotdict(ELEMENTS)
