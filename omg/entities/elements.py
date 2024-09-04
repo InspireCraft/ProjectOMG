@@ -8,9 +8,9 @@ ELEMENTS_JSON_DIR = os.path.join(os.path.dirname(__file__), "Elements.JSON")
 class DotDict(dict):
     """Convert dictionary to a format to call attributes with dot notation."""
 
-    def __getattr__(self, attr):
+    def __getattr__(self, key):
         """Get dictionary item as attribute.Convert nested dictionaries to DotDict."""
-        value = self.get(attr)
+        value = self.get(key, None)
         if isinstance(value, dict):
             value = DotDict(value)
         return value
