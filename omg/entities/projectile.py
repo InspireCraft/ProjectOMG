@@ -84,7 +84,7 @@ class SkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
 
     @classmethod
-    def _set_skill_attributes(cls, skill_name: str):
+    def set_skill_attributes(cls, skill_name: str):
         """Set the class attributes based on the skill_name."""
         cls.image_file = crafted_skill_dictionary[skill_name]["image_file"]
         cls.scale = crafted_skill_dictionary[skill_name]["scale"]
