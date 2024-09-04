@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Dict
 import arcade
 import math
@@ -59,7 +59,7 @@ with open(CRAFTED_SKILLS_JSON_DIR, "r") as file:
 
 class SkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
-    
+
     def __init__(self) -> None:
         self.name = None
         self.image_file = None
@@ -67,7 +67,7 @@ class SkillFactory(ProjectileFactory):
         self.damage = None
         self.speed = None
         self.mana_cost = None
-        
+
     def set_skill_attributes(self, skill_name: str):
         """Set the class attributes based on the skill_name."""
         self.name = skill_name

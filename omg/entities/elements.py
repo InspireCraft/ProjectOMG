@@ -25,4 +25,3 @@ with open(ELEMENTS_JSON_DIR, "r") as file:
 
 # Convert nested dictionaries to DotDict instances
 ELEMENTS: DotDict[str, DotDict] = DotDict(ELEMENTS)
-
