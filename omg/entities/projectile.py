@@ -31,47 +31,24 @@ class Projectile(arcade.Sprite):
 class ProjectileFactory(ABC):
     """Abstract base class for projectile factories."""
 
-    @property
-    @abstractmethod
-    def image_file(self) -> str:
-        """Hold corresponding image file location."""
-        pass
+    def __init__(self) -> None:
+        self.name: str = None
+        self.image_file: str = None
+        self.scale: float = None
+        self.damage: float = None
+        self.speed: float = None
+        self.mana_cost: float = None
 
-    @property
-    @abstractmethod
-    def scale(self) -> float:
-        """Hold scale value for the image."""
-        pass
-
-    @property
-    @abstractmethod
-    def damage(self) -> float:
-        """Hold damage value for the skill."""
-        pass
-
-    @property
-    @abstractmethod
-    def speed(self) -> float:
-        """Hold the traverse speed of the skill."""
-        pass
-
-    @property
-    @abstractmethod
-    def mana_cost(self) -> float:
-        """Hold the mana cost of the skill."""
-        pass
-
-    @classmethod
-    def create(cls, init_px, init_py, angle) -> Projectile:
+    def create(self, init_px, init_py, angle) -> Projectile:
         """Create a projectile with class-specific attributes."""
         return Projectile(
-            name=cls.__name__,
-            image_file=cls.image_file,
-            scale=cls.scale,
-            damage=cls.damage,
+            name=self.name,
+            image_file=self.image_file,
+            scale=self.scale,
+            damage=self.damage,
             init_px=init_px,
             init_py=init_py,
-            speed=cls.speed,
+            speed=self.speed,
             angle=angle,
         )
 
@@ -82,18 +59,20 @@ with open(CRAFTED_SKILLS_JSON_DIR, "r") as file:
 
 class SkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
-
-    @classmethod
-    def set_skill_attributes(cls, skill_name: str):
+    
+    def __init__(self) -> None:
+        self.name = None
+        self.image_file = None
+        self.scale = None
+        self.damage = None
+        self.speed = None
+        self.mana_cost = None
+        
+    def set_skill_attributes(self, skill_name: str):
         """Set the class attributes based on the skill_name."""
-        cls.image_file = crafted_skill_dictionary[skill_name]["image_file"]
-        cls.scale = crafted_skill_dictionary[skill_name]["scale"]
-        cls.damage = crafted_skill_dictionary[skill_name]["damage"]
-        cls.speed = crafted_skill_dictionary[skill_name]["speed"]
-        cls.mana_cost = crafted_skill_dictionary[skill_name]["mana_cost"]
-
-    image_file = None
-    scale = None
-    damage = None
-    speed = None
-    mana_cost = None
+        self.name = skill_name
+        self.image_file = crafted_skill_dictionary[skill_name]["image_file"]
+        self.scale = crafted_skill_dictionary[skill_name]["scale"]
+        self.damage = crafted_skill_dictionary[skill_name]["damage"]
+        self.speed = crafted_skill_dictionary[skill_name]["speed"]
+        self.mana_cost = crafted_skill_dictionary[skill_name]["mana_cost"]
