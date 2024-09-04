@@ -93,13 +93,13 @@ class GameWindow(arcade.Window):
         )
         # Add projectile types
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.FIRE, 150, 10)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.ICE, 250, 20)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20)
         )
         self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS.FIRE, 250, 120)
+            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
 
     @property
@@ -109,7 +109,7 @@ class GameWindow(arcade.Window):
         # For example "element_acquired event" can trigger an update when necessary
         if self.player:
             return [
-                arcade.load_texture(element_type.image_file)
+                arcade.load_texture(element_type["image_file"])
                 for element_type in self.player.element
             ]
         else:
@@ -117,7 +117,7 @@ class GameWindow(arcade.Window):
 
     def _load_element_icons(self):
         for element_type in self.player.element:
-            icon_texture = arcade.load_texture(element_type.image_file)
+            icon_texture = arcade.load_texture(element_type["image_file"])
             self.element_icons.append(icon_texture)
 
     def on_draw(self):
