@@ -3,11 +3,10 @@ from typing import TypeVar, Type
 
 import arcade.key
 from omg.mechanics import movement
-from omg.entities.projectile import ProjectileFactory
+from omg.entities.projectile import ProjectileFactory, SkillFactory, crafted_skill_dictionary
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
-from omg.entities.projectile import SkillFactory
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
@@ -121,7 +120,7 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
-        if skill_name:
+        if skill_name in crafted_skill_dictionary.keys():
             self.crafted_skill.set_skill_attributes(skill_name)
         else:
             return
