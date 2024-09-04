@@ -3,7 +3,11 @@ from typing import TypeVar, Type
 
 import arcade.key
 from omg.mechanics import movement
-from omg.entities.projectile import ProjectileFactory, SkillFactory, crafted_skill_dictionary
+from omg.entities.projectile import (
+    ProjectileFactory,
+    SkillFactory,
+    crafted_skill_dictionary
+)
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
@@ -124,7 +128,7 @@ class Player(ObservableSprite):
             self.crafted_skill.set_skill_attributes(skill_name)
         else:
             return
-        
+
         mana_cost = self.crafted_skill.mana_cost
         if self.current_mana < mana_cost:
             return
