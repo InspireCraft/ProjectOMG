@@ -112,13 +112,10 @@ class Player(ObservableSprite):
             # Get the name of the skill after combining elements
             new_skill = "".join(self.to_be_combined_element_buffer[::])
 
-            # Remove "ElementFactory" from the element name
-            new_skill = new_skill.replace("ElementFactory", "")
-
             # Update crafted skill slots
             self._update_crafted_skill_slots(new_skill)
 
-            # Empty the element cash
+            # Empty the element buffer
             self.to_be_combined_element_buffer = []
 
     def shoot(self, skill_name: str):
