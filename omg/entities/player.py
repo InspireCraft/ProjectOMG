@@ -120,9 +120,13 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
-        self.crafted_skill.set_skill_attributes(skill_name)
+        if skill_name:
+            self.crafted_skill.set_skill_attributes(skill_name)
+        else:
+            return
+        
         mana_cost = self.crafted_skill.mana_cost
-        if skill_name is None or self.current_mana < mana_cost:
+        if self.current_mana < mana_cost:
             return
 
         self.current_mana -= mana_cost
