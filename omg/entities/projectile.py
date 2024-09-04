@@ -71,8 +71,9 @@ class SkillFactory(ProjectileFactory):
     def set_skill_attributes(self, skill_name: str):
         """Set the class attributes based on the skill_name."""
         self.name = skill_name
-        self.image_file = crafted_skill_dictionary[skill_name]["image_file"]
-        self.scale = crafted_skill_dictionary[skill_name]["scale"]
-        self.damage = crafted_skill_dictionary[skill_name]["damage"]
-        self.speed = crafted_skill_dictionary[skill_name]["speed"]
-        self.mana_cost = crafted_skill_dictionary[skill_name]["mana_cost"]
+        current_skill = crafted_skill_dictionary.get(skill_name, None)
+        self.image_file = current_skill["image_file"]
+        self.scale = current_skill["scale"]
+        self.damage = current_skill["damage"]
+        self.speed = current_skill["speed"]
+        self.mana_cost = current_skill["mana_cost"]
