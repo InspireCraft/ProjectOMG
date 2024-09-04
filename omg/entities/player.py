@@ -7,7 +7,7 @@ from omg.entities.projectile import ProjectileFactory
 from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
-from omg.entities.projectile import CraftingSkillFactory
+from omg.entities.projectile import SkillFactory
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
@@ -61,7 +61,7 @@ class Player(ObservableSprite):
         self.to_be_combined_element_buffer: list[str] = []
         # Initialize crafted skill slots as None
         self.crafted_skill_slots: list[str] = [None, None]
-        self.crafted_skill = CraftingSkillFactory()
+        self.crafted_skill = SkillFactory()
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""

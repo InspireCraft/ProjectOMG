@@ -80,7 +80,7 @@ with open(CRAFTED_SKILLS_JSON_DIR, "r") as file:
     crafted_skill_dictionary: Dict[str, Dict] = json.load(file)
 
 
-class CraftingSkillFactory(ProjectileFactory):
+class SkillFactory(ProjectileFactory):
     """Class to combine elements to craft a skill."""
 
     @classmethod
