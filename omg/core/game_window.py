@@ -296,6 +296,7 @@ class PauseView(arcade.View):
 
     def on_draw(self):
         """Draw the game as is and the pause view extras"""
+        self.clear()
         game_view = self.game_window.views.get("game", None)
         if game_view:
             game_view.on_draw()
