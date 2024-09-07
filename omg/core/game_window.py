@@ -1,5 +1,8 @@
-import arcade
 import os
+from typing import Dict
+
+import arcade
+import arcade.key
 
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
@@ -23,6 +26,34 @@ ASSET_DIR = os.path.join(
 COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
 
 
+class GameWindow(arcade.Window):
+    """Main game window."""
+
+    def __init__(self, width: int, height: int, title: str):
+        super().__init__(width, height, title)
+        self.views: Dict[str, arcade.View] = None
+
+    def setup(self):
+        """Setup the game."""
+        self.views: Dict[str, arcade.View] = {}
+        self.views["game"] = GameView(window=self)
+        self.views["pause"] = PauseView(window=self)
+        self.binary_state = True  # TODO: Refactor later
+
+        self.views["game"].setup()
+        self.show_view(self.views["game"])
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.binary_state = not self.binary_state
+            if self.binary_state:
+                self.show_view(self.views["game"])
+            else:
+                self.show_view(self.views["pause"])
+
+
+
+
 class GameView(arcade.View):
     """Main game view."""
 
@@ -44,9 +75,14 @@ class GameView(arcade.View):
         self.icon_margin_x = 10
         self.icon_margin_y = 75
         self.icon_size = 64
+        self.active_keys = None
+        self.flag = True
 
     def setup(self):
         """Reset the game state."""
+        self.active_keys = {}
+        self.flag = True
+
         self.observer = Observer()
         self.observer.register_handler("projectile_shot", self._on_projectile_shot)
         self.observer.register_handler("pickup_request", self._on_pickup_request)
@@ -168,17 +204,35 @@ class GameView(arcade.View):
     def on_key_press(self, key, modifiers):
         """Key press logic."""
         # Delegate the input
+        # TODO: keys which are modifiers are pressed and released differntly CTRL is (65307, 18) when pressed, (65307, 16) when released
+        new_key = (key, modifiers)
+        self.active_keys[new_key] = True
         self.player.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
         # Delegate the input
+        key_to_delete = (key, modifiers)
         self.player.on_key_release(key, modifiers)
+
+        if self.flag:
+            # TODO: Clean this logic
+            try:
+                self.active_keys.pop(key_to_delete)
+            except KeyError:
+                pass
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Adds mouse functionality to the game."""
         self.mouse_x = x
         self.mouse_y = y
+
+    def on_hide_view(self):
+        self.flag = False
+        for key_tuple in self.active_keys.keys():
+            self.on_key_release(*key_tuple)
+        self.flag = True
+
 
     def _draw_ui(self):
         # Draw picked up elements to top left corner
@@ -230,6 +284,43 @@ class GameView(arcade.View):
         # Draw usable skill slots to bottom left corner
         self.skill_slot_1.draw()
         self.skill_slot_2.draw()
+
+
+class PauseView(arcade.View):
+    """Pause screen of the game."""
+
+    def __init__(self, window: GameWindow):
+        super().__init__(window)
+        self.game_window = window # Add additional reference for type-hinting
+
+
+    def on_draw(self):
+        """Draw the game as is and the pause view extras"""
+        game_view = self.game_window.views.get("game", None)
+        if game_view:
+            game_view.on_draw()
+
+        arcade.draw_text("PAUSED", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+
+        # Show tip to return or reset
+        arcade.draw_text("Press Esc. to return",
+                         SCREEN_WIDTH / 2,
+                         SCREEN_HEIGHT / 2,
+                         arcade.color.WHITE,
+                         font_size=20,
+                         anchor_x="center")
+        arcade.draw_text("Press Q to quit",
+                         SCREEN_WIDTH / 2,
+                         SCREEN_HEIGHT / 2 - 30,
+                         arcade.color.WHITE,
+                         font_size=20,
+                         anchor_x="center")
+
+    def on_key_release(self, key: int, modifiers: int):
+
+        if key == arcade.key.Q:
+            arcade.exit()
 
 
 def main():

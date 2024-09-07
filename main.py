@@ -1,6 +1,6 @@
 import arcade
 import logging
-from omg.core.game_window import GameView, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE
+from omg.core.game_window import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, GameWindow
 
 
 def main():
@@ -9,10 +9,8 @@ def main():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    start_view = GameView(window=window)
-    window.show_view(start_view)
-    start_view.setup()
+    window = GameWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window.setup()
     arcade.run()
 
 
