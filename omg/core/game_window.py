@@ -23,11 +23,11 @@ ASSET_DIR = os.path.join(
 COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
 
 
-class GameWindow(arcade.Window):
-    """Main game window."""
+class GameView(arcade.View):
+    """Main game view."""
 
-    def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    def __init__(self, window: arcade.Window = None):
+        super().__init__(window)
         self.observer: Observer = None
         self.player: Player = None
         self.obstacles: arcade.SpriteList = None
@@ -234,8 +234,10 @@ class GameWindow(arcade.Window):
 
 def main():
     """Main application code."""
-    window = GameWindow()
-    window.setup()
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    start_view = GameView()
+    window.show_view(start_view)
+    start_view.setup()
     arcade.run()
 
 
