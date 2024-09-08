@@ -216,7 +216,7 @@ class PauseView(arcade.View):
         super().__init__(window)
         self._view_to_draw: arcade.View = None
 
-    def update_view_to_draw(self, new_view):
+    def update_view_to_draw(self, new_view: arcade.View):
         """Update the View to be drawn in the pause state."""
         self._view_to_draw = new_view
 
