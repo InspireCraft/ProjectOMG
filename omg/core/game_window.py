@@ -38,33 +38,35 @@ class GameWindow(arcade.Window):
 
     def __init__(self, width: int, height: int, title: str):
         super().__init__(width, height, title)
-        self.views: Dict[str, arcade.View] = None
+        self._views: Dict[str, arcade.View] = None
 
     def setup(self):
         """Setup the game."""
-        self.views: Dict[str, arcade.View] = {}
-        self.views[self.GAME_VIEW_KEY] = GameView(window=self)
-        self.views[self.PAUSE_VIEW_KEY] = PauseView(window=self)
-        self.binary_state = True  # TODO: Refactor later
+        self._views: Dict[str, arcade.View] = {}
+        self._views[self.GAME_VIEW_KEY] = GameView(window=self)
+        self._views[self.PAUSE_VIEW_KEY] = PauseView(window=self)
+        self._view_state = True  # Binary state to track the active state
 
         self._game_view.setup()
-        self.show_view(self.views[self.GAME_VIEW_KEY])
+        self.show_view(self._game_view)
 
     @property
     def _game_view(self) -> GameView:
-        """Define self._game_view which always refers to a View in self.views."""
-        return self.views.get(self.GAME_VIEW_KEY, None)
+        """Define self._game_view which always refers to a View in self._views."""
+        return self._views.get(self.GAME_VIEW_KEY, None)
 
     @property
     def _pause_view(self) -> PauseView:
-        """Define self._pause_view which always refers to a View in self.views."""
-        return self.views.get(self.PAUSE_VIEW_KEY, None)
+        """Define self._pause_view which always refers to a View in self._views."""
+        return self._views.get(self.PAUSE_VIEW_KEY, None)
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
         if key == arcade.key.ESCAPE:
-            self.binary_state = not self.binary_state
-            if self.binary_state:
+            # NOTE: This logic needs a refactor when the number of views exceeds
+            # 2.
+            self._view_state = not self._view_state
+            if self._view_state:
                 self.show_view(self._game_view)
             else:
                 self.show_view(self.views["pause"])
