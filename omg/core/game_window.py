@@ -44,14 +44,13 @@ class GameWindow(arcade.Window):
         self.show_view(self.views["game"])
 
     def on_key_press(self, key, modifiers):
+        """Key press logic."""
         if key == arcade.key.ESCAPE:
             self.binary_state = not self.binary_state
             if self.binary_state:
                 self.show_view(self.views["game"])
             else:
                 self.show_view(self.views["pause"])
-
-
 
 
 class GameView(arcade.View):
@@ -75,8 +74,7 @@ class GameView(arcade.View):
         self.icon_margin_x = 10
         self.icon_margin_y = 75
         self.icon_size = 64
-        self.active_keys = None
-        self.flag = True
+        self.active_keys: Dict[tuple, bool] = None
 
     def setup(self):
         """Reset the game state."""
@@ -203,24 +201,15 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
+        self.active_keys[(key, modifiers)] = True  # mark the key as `active`
         # Delegate the input
-        # TODO: keys which are modifiers are pressed and released differntly CTRL is (65307, 18) when pressed, (65307, 16) when released
-        new_key = (key, modifiers)
-        self.active_keys[new_key] = True
         self.player.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
+        self.active_keys[(key, modifiers)] = False  # mark the key as `not active`
         # Delegate the input
-        key_to_delete = (key, modifiers)
         self.player.on_key_release(key, modifiers)
-
-        if self.flag:
-            # TODO: Clean this logic
-            try:
-                self.active_keys.pop(key_to_delete)
-            except KeyError:
-                pass
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Adds mouse functionality to the game."""
@@ -228,11 +217,20 @@ class GameView(arcade.View):
         self.mouse_y = y
 
     def on_hide_view(self):
-        self.flag = False
-        for key_tuple in self.active_keys.keys():
-            self.on_key_release(*key_tuple)
-        self.flag = True
+        """Hide view callback function.
 
+        Callback logic: 1 - Some of the pressed keys might not have their
+        corresponding `key_release` logic called when the view has been changed.
+        Those callbacks are called before the view is changed.
+        """
+        for (key_tuple, is_active) in self.active_keys.items():
+            # NOTE: keys which are also modifiers are pressed and released
+            # differently. CTRL is (65507, 18) when pressed, (65507, 16) when
+            # released. A more detailed check for those keys might be necessary
+            # in future if those are actively used.
+            if is_active:
+                self.on_key_release(*key_tuple)
+        self.active_keys = {}  # reset the dictionary
 
     def _draw_ui(self):
         # Draw picked up elements to top left corner
@@ -291,11 +289,10 @@ class PauseView(arcade.View):
 
     def __init__(self, window: GameWindow):
         super().__init__(window)
-        self.game_window = window # Add additional reference for type-hinting
-
+        self.game_window = window  # Add additional reference for type-hinting
 
     def on_draw(self):
-        """Draw the game as is and the pause view extras"""
+        """Draw the game as is and the pause view extras."""
         self.clear()
         game_view = self.game_window.views.get("game", None)
         if game_view:
@@ -318,8 +315,8 @@ class PauseView(arcade.View):
                          font_size=20,
                          anchor_x="center")
 
-    def on_key_release(self, key: int, modifiers: int):
-
+    def on_key_release(self, key, modifiers):
+        """Key release logic."""
         if key == arcade.key.Q:
             arcade.exit()
 
