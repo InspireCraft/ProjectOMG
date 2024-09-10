@@ -1,5 +1,5 @@
 import arcade
-from typing import TypeVar, Type
+from typing import TypeVar
 
 import arcade.key
 from omg.mechanics import movement
