@@ -14,7 +14,7 @@ from omg.entities.items import CircularBuffer
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
-N_SKILLS_MAX = 5
+N_ELEMENTS_MAX = 5
 T = TypeVar("T")  # Define a type variable
 
 
@@ -58,7 +58,7 @@ class Player(ObservableSprite):
         self.mana_regen_cooldown = 0
 
         # Skills
-        self.element = SkillManager(N_SKILLS_MAX)
+        self.element = ElementManager(N_ELEMENTS_MAX)
         self.item_pickup_radius = 5
         # Initialize an empty element_buffer
         self.to_be_combined_element_buffer: list[str] = []
@@ -150,10 +150,6 @@ class Player(ObservableSprite):
                 self.current_mana = self.max_mana
             self.mana_regen_cooldown = 0
 
-    def add_skill(self, element: Type[ProjectileFactory]):
-        """Add skill to the player."""
-        self.element.add_item(element)
-
     def pickup_element(self):
         """Publish a skill pickup request event."""
         # Player will try to pickup the items in a circle around it
@@ -231,7 +227,7 @@ class Player(ObservableSprite):
         )
 
 
-class SkillManager(CircularBuffer[ProjectileFactory]):
+class ElementManager(CircularBuffer[ProjectileFactory]):
     """Manages skills of an entity."""
 
     pass
