@@ -77,9 +77,10 @@ class Player(ObservableSprite):
             skill_name = self.crafted_skill_slots[1]
             self.shoot(skill_name)
         elif key == arcade.key.SPACE:
-            if self.element.get_current():
+            current_element = self.element.get_current()
+            if current_element:
                 self.to_be_combined_element_buffer.append(
-                    self.element.get_current()["name"]
+                    current_element["name"]
                 )
         elif key == arcade.key.Q:
             self.element.set_prev()
