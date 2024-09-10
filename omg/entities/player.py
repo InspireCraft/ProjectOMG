@@ -4,7 +4,6 @@ from typing import TypeVar, Type
 import arcade.key
 from omg.mechanics import movement
 from omg.entities.projectile import (
-    ProjectileFactory,
     SkillFactory,
     crafted_skill_dictionary
 )
