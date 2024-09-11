@@ -57,7 +57,7 @@ class Player(ObservableSprite):
         self.mana_regen_cooldown = 0
 
         # Skills
-        self.element = ElementManager(N_ELEMENTS_MAX)
+        self.elements = ElementManager(N_ELEMENTS_MAX)
         self.item_pickup_radius = 5
         # Initialize an empty element_buffer
         self.to_be_combined_element_buffer: list[str] = []
@@ -76,15 +76,15 @@ class Player(ObservableSprite):
             skill_name = self.crafted_skill_slots[1]
             self.shoot(skill_name)
         elif key == arcade.key.SPACE:
-            current_element = self.element.get_current()
+            current_element = self.elements.get_current()
             if current_element:
                 self.to_be_combined_element_buffer.append(
                     current_element["name"]
                 )
         elif key == arcade.key.Q:
-            self.element.set_prev()
+            self.elements.set_prev()
         elif key == arcade.key.E:
-            self.element.set_next()
+            self.elements.set_next()
         elif key == arcade.key.F:
             self.pickup_element()
 
@@ -159,7 +159,7 @@ class Player(ObservableSprite):
         pick_up_sprite.center_x = self.center_x
         pick_up_sprite.center_y = self.center_y
         pick_up_event = PickupRequestEvent(
-            self.element,  # send skill manager
+            self.elements,  # send skill manager
             pick_up_sprite,
         )
         self.notify_observers(pick_up_event)

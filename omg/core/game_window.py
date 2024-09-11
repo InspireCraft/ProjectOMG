@@ -110,13 +110,13 @@ class GameWindow(arcade.Window):
         if self.player:
             return [
                 arcade.load_texture(element_type["image_file"])
-                for element_type in self.player.element
+                for element_type in self.player.elements
             ]
         else:
             return None
 
     def _load_element_icons(self):
-        for element_type in self.player.element:
+        for element_type in self.player.elements:
             icon_texture = arcade.load_texture(element_type["image_file"])
             self.element_icons.append(icon_texture)
 
@@ -185,7 +185,7 @@ class GameWindow(arcade.Window):
         for i, icon in enumerate(self.element_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = SCREEN_HEIGHT - self.icon_margin_y
-            if i == self.player.element.get_current_index():
+            if i == self.player.elements.get_current_index():
                 arcade.draw_rectangle_outline(
                     x + self.icon_size // 2,
                     y + self.icon_size // 2,
