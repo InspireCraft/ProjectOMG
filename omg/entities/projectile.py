@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict
+from typing import Dict, Union
 import arcade
 import math
 import os
@@ -68,12 +68,10 @@ class SkillFactory(ProjectileFactory):
         self.speed = None
         self.mana_cost = None
 
-    def set_skill_attributes(self, skill_name: str):
+    def set_skill_attributes(self, skill_attributes: Dict[str, Union[str, float]]):
         """Set the class attributes based on the skill_name."""
-        self.name = skill_name
-        current_skill = crafted_skill_dictionary.get(skill_name, None)
-        self.image_file = current_skill["image_file"]
-        self.scale = current_skill["scale"]
-        self.damage = current_skill["damage"]
-        self.speed = current_skill["speed"]
-        self.mana_cost = current_skill["mana_cost"]
+        self.image_file = skill_attributes["image_file"]
+        self.scale = skill_attributes["scale"]
+        self.damage = skill_attributes["damage"]
+        self.speed = skill_attributes["speed"]
+        self.mana_cost = skill_attributes["mana_cost"]

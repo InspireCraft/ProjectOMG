@@ -124,8 +124,9 @@ class Player(ObservableSprite):
 
     def shoot(self, skill_name: str):
         """Shoot a projectile and inform the observers."""
-        if skill_name in crafted_skill_dictionary.keys():
-            self.crafted_skill.set_skill_attributes(skill_name)
+        skill_attributes: dict = crafted_skill_dictionary.get(skill_name, None)
+        if skill_attributes:
+            self.crafted_skill.set_skill_attributes(skill_attributes)
         else:
             return
 
