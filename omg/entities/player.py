@@ -6,17 +6,23 @@ from omg.structural.observer import ObservableSprite
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
 
+from omg.mechanics.animations import Animations
+import os
+
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
 N_SKILLS_MAX = 5
 T = TypeVar("T")  # Define a type variable
 
+ASSET_DIR = os.path.join(
+    os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
+)
 
 class Player(ObservableSprite):
     """Controllable player logic."""
 
-    def __init__(self, name, char_class, image_file, scale, initial_angle=0):
-        super().__init__(image_file, scale)
+    def __init__(self, name, char_class, char_scale, initial_angle=0):
+        super().__init__(scale=char_scale,)
         self.name = name
         self.char_class = char_class
         self.center_x = 100
@@ -24,6 +30,16 @@ class Player(ObservableSprite):
         self.change_x = 0
         self.change_y = 0
         self.angle = initial_angle  # Set initial angle here
+        # self.texture = arcade.load_texture(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites", "Walk_Down0.png")),
+        # self.texture = arcade.load_texture(str(ASSET_DIR) + "/characters/demo_archer/sprites/Walk_Down0.png"),
+
+        # Animations
+        self.animation_logic = Animations(
+            slash_key=arcade.key.KEY_1,
+            cast_key=arcade.key.KEY_2,
+            thrust_key=arcade.key.KEY_3,
+            shoot_key=arcade.key.KEY_4,
+        )
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -32,12 +48,12 @@ class Player(ObservableSprite):
             left=arcade.key.A,
             right=arcade.key.D,
         )
-        self.movement_logic = movement.MouseDirected(
-            forward=arcade.key.W,
-            backward=arcade.key.S,
-            left=arcade.key.A,
-            right=arcade.key.D,
-        )
+        # self.movement_logic = movement.MouseDirected(
+        #     forward=arcade.key.W,
+        #     backward=arcade.key.S,
+        #     left=arcade.key.A,
+        #     right=arcade.key.D,
+        # )
         self.mov_speed_lr = MOVEMENT_SPEED_SIDE
         self.mov_speed_ud = MOVEMENT_SPEED_FORWARD
         # Health
@@ -57,6 +73,7 @@ class Player(ObservableSprite):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
+        self.animation_logic.on_key_press(key, modifiers)
 
         if key == arcade.key.SPACE:
             self.shoot()
@@ -70,9 +87,11 @@ class Player(ObservableSprite):
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
+        self.animation_logic.on_key_release(key, modifiers)
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
+        self.movement_logic.action_finished = self.animation_logic.action_finished
         (self.change_x, self.change_y, self.angle) = (
             self.movement_logic.calculate_player_state(
                 self.center_x,
@@ -83,7 +102,10 @@ class Player(ObservableSprite):
                 self.mov_speed_ud,
             )
         )
+        self.movement_logic._calculate_displacement_directions()
+        self.texture = self.animation_logic.update(delta_time, player_change_x=self.change_x, player_change_y=self.change_y)
         self._regenerate_mana(delta_time)
+        print([self.change_x, self.change_y])
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
