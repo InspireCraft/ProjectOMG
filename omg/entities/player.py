@@ -5,10 +5,7 @@ import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
-from omg.entities.projectile import (
-    SkillFactory,
-    crafted_skill_dictionary
-)
+from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement
 from omg.structural.observer import ObservableSprite
 
@@ -79,9 +76,7 @@ class Player(ObservableSprite):
         elif key == arcade.key.SPACE:
             current_element = self.elements.get_current()
             if current_element:
-                self.to_be_combined_element_buffer.append(
-                    current_element["name"]
-                )
+                self.to_be_combined_element_buffer.append(current_element["name"])
         elif key == arcade.key.Q:
             self.elements.set_prev()
         elif key == arcade.key.E:
@@ -216,9 +211,7 @@ class Player(ObservableSprite):
             mana_bar_height,
             arcade.color.DARK_BLUE,
         )
-        current_mana_width = mana_bar_width * (
-            self.current_mana / self.max_mana
-        )
+        current_mana_width = mana_bar_width * (self.current_mana / self.max_mana)
         arcade.draw_rectangle_filled(
             mana_bar_x - (mana_bar_width - current_mana_width) / 2,
             mana_bar_y,
@@ -228,7 +221,7 @@ class Player(ObservableSprite):
         )
 
 
-class ElementManager(CircularBuffer[Dict[str, Union[str,float]]]):
+class ElementManager(CircularBuffer[Dict[str, Union[str, float]]]):
     """Manages skills of an entity."""
 
     pass
