@@ -1,5 +1,6 @@
 {
     "FireFire": {
+        "name": "Fireball",
         "image_file": "omg/assets/images/skills/FireFire.PNG",
         "scale": 0.05,
         "damage": 15,
@@ -7,6 +8,7 @@
         "mana_cost": 20
     },
     "IceIce": {
+        "name": "Iceshard",
         "image_file": "omg/assets/images/skills/IceIce.PNG",
         "scale": 0.05,
         "damage": 15,
@@ -14,6 +16,7 @@
         "mana_cost": 20
     },
     "IceFire": {
+        "name": "FlamingIce",
         "image_file": "omg/assets/images/skills/IceFire.PNG",
         "scale": 0.05,
         "damage": 15,
@@ -21,6 +24,7 @@
         "mana_cost": 20
     },
     "FireIce": {
+        "name": "ColdFire",
         "image_file": "omg/assets/images/skills/FireIce.PNG",
         "scale": 0.05,
         "damage": 15,

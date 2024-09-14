@@ -69,7 +69,8 @@ class SkillFactory(ProjectileFactory):
         self.mana_cost = None
 
     def set_skill_attributes(self, skill_attributes: Dict[str, Union[str, float]]):
-        """Set the class attributes based on the skill_name."""
+        """Set the skill attributes."""
+        self.name = skill_attributes["name"]
         self.image_file = skill_attributes["image_file"]
         self.scale = skill_attributes["scale"]
         self.damage = skill_attributes["damage"]
