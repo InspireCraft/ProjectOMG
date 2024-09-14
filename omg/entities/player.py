@@ -1,15 +1,16 @@
-import arcade
-from typing import TypeVar
+from typing import Dict, TypeVar, Union
 
+import arcade
 import arcade.key
-from omg.mechanics import movement
+
+from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.items import CircularBuffer
 from omg.entities.projectile import (
     SkillFactory,
     crafted_skill_dictionary
 )
+from omg.mechanics import movement
 from omg.structural.observer import ObservableSprite
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
-from omg.entities.items import CircularBuffer
 
 MOVEMENT_SPEED_FORWARD = 1
 MOVEMENT_SPEED_SIDE = 1
@@ -227,7 +228,7 @@ class Player(ObservableSprite):
         )
 
 
-class ElementManager(CircularBuffer[ProjectileFactory]):
+class ElementManager(CircularBuffer[Dict[str, Union[str,float]]]):
     """Manages skills of an entity."""
 
     pass
