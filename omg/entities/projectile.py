@@ -1,9 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from typing import Dict, Union
 import arcade
 import math
 import os
+import json
 
-ASSET_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "images")
+CRAFTED_SKILLS_JSON_DIR = os.path.join(os.path.dirname(__file__), "CraftedSkills.JSON")
 
 
 # TODO: add source as the projectiles are emitted now
@@ -27,58 +29,50 @@ class Projectile(arcade.Sprite):
 
 
 class ProjectileFactory(ABC):
-    """Abstract class for Projectile creating factories."""
+    """Abstract base class for projectile factories."""
 
-    image_file: str
+    def __init__(self) -> None:
+        self.name: str = None
+        self.image_file: str = None
+        self.scale: float = None
+        self.damage: float = None
+        self.speed: float = None
+        self.mana_cost: float = None
 
-    @classmethod
-    @abstractmethod
-    def create(cls, init_px: float, init_py: float, angle: float) -> Projectile:
-        """Create and return a Projectile instance."""
-        pass
-
-
-class FireballFactory(ProjectileFactory):
-    """Convenience class to create Fireball Projectile."""
-
-    image_file = os.path.join(ASSET_DIR, "skills", "fireball.PNG")
-    scale = 0.05
-    damage = 25
-    speed = 5
-
-    @classmethod
-    def create(cls, init_px, init_py, angle) -> Projectile:
-        """Create a Fireball projectile."""
+    def create(self, init_px, init_py, angle) -> Projectile:
+        """Create a projectile with class-specific attributes."""
         return Projectile(
-            name=cls.__name__,
-            image_file=cls.image_file,
-            scale=cls.scale,
-            damage=cls.damage,
+            name=self.name,
+            image_file=self.image_file,
+            scale=self.scale,
+            damage=self.damage,
             init_px=init_px,
             init_py=init_py,
-            speed=cls.speed,
+            speed=self.speed,
             angle=angle,
         )
 
 
-class IceShardFactory(ProjectileFactory):
-    """Convenience class to create IceShard Projectile."""
+with open(CRAFTED_SKILLS_JSON_DIR, "r") as file:
+    crafted_skill_dictionary: Dict[str, Dict] = json.load(file)
 
-    image_file = os.path.join(ASSET_DIR, "skills", "ice_shard.PNG")
-    scale = 0.05
-    damage = 15
-    speed = 7
 
-    @classmethod
-    def create(cls, init_px, init_py, angle) -> Projectile:
-        """Create an IceShard projectile."""
-        return Projectile(
-            name=cls.__name__,
-            image_file=cls.image_file,
-            scale=cls.scale,
-            damage=cls.damage,
-            init_px=init_px,
-            init_py=init_py,
-            speed=cls.speed,
-            angle=angle,
-        )
+class SkillFactory(ProjectileFactory):
+    """Class to combine elements to craft a skill."""
+
+    def __init__(self) -> None:
+        self.name = None
+        self.image_file = None
+        self.scale = None
+        self.damage = None
+        self.speed = None
+        self.mana_cost = None
+
+    def set_skill_attributes(self, skill_attributes: Dict[str, Union[str, float]]):
+        """Set the skill attributes."""
+        self.name = skill_attributes["name"]
+        self.image_file = skill_attributes["image_file"]
+        self.scale = skill_attributes["scale"]
+        self.damage = skill_attributes["damage"]
+        self.speed = skill_attributes["speed"]
+        self.mana_cost = skill_attributes["mana_cost"]

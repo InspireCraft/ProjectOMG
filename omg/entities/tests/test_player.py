@@ -21,7 +21,7 @@ class TestPlayer(unittest.TestCase):
             mock_on_key_press.assert_called_once_with(arcade.key.W, None)
 
         with patch.object(self.player, 'shoot') as mock_shoot:
-            self.player.on_key_press(arcade.key.SPACE, None)
+            self.player.on_key_press(arcade.key.H, None)
             mock_shoot.assert_called_once()
 
     def test_on_key_release(self):

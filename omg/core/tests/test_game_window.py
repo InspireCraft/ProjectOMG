@@ -4,7 +4,7 @@ import arcade
 import logging
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
-from omg.entities.projectile import FireballFactory, IceShardFactory, ProjectileShotEvent
+from omg.entities.events import ProjectileShotEvent
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
 from omg.core.game_window import GameWindow  # Adjust import according to your project structure
