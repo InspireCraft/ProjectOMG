@@ -109,7 +109,7 @@ class GameView(arcade.View):
 
         # Pickup button image
         self.pickup_button_image = os.path.join(ASSET_DIR, "pickup_button", "F.png")
-        self.pickup_button_image_scale = 0.3
+        self.pickup_button_image_scale = 0.1
 
     @property
     def element_icons(self):
