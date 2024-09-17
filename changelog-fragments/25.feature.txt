@@ -1,0 +1,1 @@
+Add pickup button image visualization when the player is close enough to a pickupable object.
