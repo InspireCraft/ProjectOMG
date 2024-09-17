@@ -137,7 +137,7 @@ class GameView(arcade.View):
         self.projectiles.draw()
         self.pickupables.draw()
         self._draw_ui()
-        self.draw_pickup_button()
+        self._draw_pickup_button()
 
     def update(self, delta_time):
         """Main update window."""
@@ -156,15 +156,25 @@ class GameView(arcade.View):
         )
         return collided_sprites
 
-    def draw_pickup_button(self):
+    def _draw_pickup_button(self):
         collided_pickupables = self._check_collision_between_player_and_pickupable()
         if len(collided_pickupables) >= 1:
             for pickupable in collided_pickupables:
-                diff_x = pickupable.center_x - self.player.center_x
-                diff_y = pickupable.center_y - self.player.center_y
-                button = arcade.Sprite(self.pickup_button_image, scale=self.pickup_button_image_scale)
+                # Get button image
+                button = arcade.Sprite(
+                    self.pickup_button_image,
+                    scale=self.pickup_button_image_scale
+                )
+
+                # Calculate directional vector between player and pickupable
+                diff_x: float = pickupable.center_x - self.player.center_x
+                diff_y: float = pickupable.center_y - self.player.center_y
+
+                # Place button image at the mirror reflection of player wrt pickupable
                 button.center_x = pickupable.center_x + diff_x
                 button.center_y = pickupable.center_y + diff_y
+
+                # Draw the button image
                 button.draw()
         else:
             return
