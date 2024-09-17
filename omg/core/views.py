@@ -107,6 +107,10 @@ class GameView(arcade.View):
             Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
 
+        # Pickup button image
+        self.pickup_button_image = os.path.join(ASSET_DIR, "pickup_button", "F.png")
+        self.pickup_button_image_scale = 0.3
+
     @property
     def element_icons(self):
         """Define self.element_icons."""
@@ -133,6 +137,7 @@ class GameView(arcade.View):
         self.projectiles.draw()
         self.pickupables.draw()
         self._draw_ui()
+        self.draw_pickup_button()
 
     def update(self, delta_time):
         """Main update window."""
@@ -145,6 +150,25 @@ class GameView(arcade.View):
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
 
+    def _check_collision_between_player_and_pickupable(self):
+        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+            self.player, self.pickupables
+        )
+        return collided_sprites
+
+    def draw_pickup_button(self):
+        collided_pickupables = self._check_collision_between_player_and_pickupable()
+        if len(collided_pickupables) >= 1:
+            for pickupable in collided_pickupables:
+                diff_x = pickupable.center_x - self.player.center_x
+                diff_y = pickupable.center_y - self.player.center_y
+                button = arcade.Sprite(self.pickup_button_image, scale=self.pickup_button_image_scale)
+                button.center_x = pickupable.center_x + diff_x
+                button.center_y = pickupable.center_y + diff_y
+                button.draw()
+        else:
+            return
+
     def _on_pickup_request(self, event: PickupRequestEvent):
         """Handles pickup request of an entity.
 
@@ -156,9 +180,10 @@ class GameView(arcade.View):
         3) Out of all the collisions, let the entity pick up the closest object.
         4) Remove the picked up item from the ground.
         """
-        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
-            event.entity_pickup_sprite, self.pickupables
-        )
+        # collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+        #     event.entity_pickup_sprite, self.pickupables
+        # )
+        collided_sprites = self._check_collision_between_player_and_pickupable()
         if len(collided_sprites) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
