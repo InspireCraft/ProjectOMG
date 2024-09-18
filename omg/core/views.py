@@ -117,12 +117,13 @@ class GameView(arcade.View):
 
         # Set button text attributes
         pickup_key_text: str = "F"
-        pickup_key_text_font: int = 14
+        pickup_key_text_font: int = 18
         self.text_object: arcade.Text = arcade.Text(
             pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
         )
+        height_offset = (pickup_key_text_font // 10) * (pickup_key_text_font % 10 + 1)
         self.text_width = self.text_object.content_width
-        self.text_height = self.text_object.content_height
+        self.text_height = self.text_object.content_height - height_offset
 
     @property
     def element_icons(self):
