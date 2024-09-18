@@ -113,12 +113,12 @@ class GameView(arcade.View):
         self.pickup_grey_background = os.path.join(
             ASSET_DIR, "pickup_button", "grey_background.png"
         )
-        self.pickup_grey_background_image_scale = 0.3
+        self.pickup_grey_background_image_scale: float = 0.3
 
         # Set button text attributes
-        pickup_key_text = "F"
-        pickup_key_text_font = 14
-        self.text_object = arcade.Text(
+        pickup_key_text: str = "F"
+        pickup_key_text_font: int = 14
+        self.text_object: arcade.Text = arcade.Text(
             pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
         )
         self.text_width = self.text_object.content_width
