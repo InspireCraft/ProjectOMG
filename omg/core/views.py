@@ -170,33 +170,45 @@ class GameView(arcade.View):
         )
         return collided_sprites
 
+    def _get_greybackground_cordinates(self, pickupable: Pickupable):
+        # Calculate directional vector between player and pickupable
+        diff_x: float = pickupable.center_x - self.player.center_x
+        diff_y: float = pickupable.center_y - self.player.center_y
+
+        return pickupable.center_x + diff_x, pickupable.center_y + diff_y
+
+    def _draw_grey_background(self, pickupable: Pickupable) -> arcade.Sprite:
+        # Get grey_background image
+        grey_background = arcade.Sprite(
+            self.pickup_grey_background,
+            scale=self.pickup_grey_background_image_scale,
+        )
+
+        # Place backgnd image at the mirror reflection of player wrt pickupable
+        x, y = self._get_greybackground_cordinates(pickupable)
+        grey_background.center_x = x
+        grey_background.center_y = y
+
+        # Draw the grey background
+        grey_background.draw()
+        return grey_background
+
+    def _draw_text_on_grey_background(self, grey_background):
+        # Calculate initial cordinates of text
+        self.text_object.x = grey_background.center_x - self.text_width / 2
+        self.text_object.y = grey_background.center_y - self.text_height / 2
+
+        # Draw the text on the grey background
+        self.text_object.draw()
+
     def _draw_pickup_button(self):
         collided_pickupables = self._check_collision_between_player_and_pickupable()
         if len(collided_pickupables) >= 1:
             for pickupable in collided_pickupables:
-                # Get button image
-                grey_background = arcade.Sprite(
-                    self.pickup_grey_background,
-                    scale=self.pickup_grey_background_image_scale,
-                )
-
-                # Calculate directional vector between player and pickupable
-                diff_x: float = pickupable.center_x - self.player.center_x
-                diff_y: float = pickupable.center_y - self.player.center_y
-
-                # Place button image at the mirror reflection of player wrt pickupable
-                grey_background.center_x = pickupable.center_x + diff_x
-                grey_background.center_y = pickupable.center_y + diff_y
-
-                # Draw the grey background
-                grey_background.draw()
-
-                # Calculate the position to place the text
-                self.text_object.x = grey_background.center_x - self.text_width / 2
-                self.text_object.y = grey_background.center_y - self.text_height / 2
-
-                # Draw the text on the grey background
-                self.text_object.draw()
+                # Draw grey_background
+                grey_background = self._draw_grey_background(pickupable)
+                # Draw the text on the grey_background
+                self._draw_text_on_grey_background(grey_background)
         else:
             return
 
