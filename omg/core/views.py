@@ -86,8 +86,9 @@ class GameView(arcade.View):
         scale_factor_2 = 0.4
         skill_slot_2_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
         self.skill_slot_2 = arcade.Sprite(skill_slot_2_img, scale=scale_factor_2)
-        self.skill_slot_2.center_x = self.skill_slot_1.center_x + \
-            self.skill_slot_2.width
+        self.skill_slot_2.center_x = (
+            self.skill_slot_1.center_x + self.skill_slot_2.width
+        )
         self.skill_slot_2.center_y = self.skill_slot_2.height // 2
 
         self.physics_engine = PhysicsEngineBoundary(
@@ -109,13 +110,17 @@ class GameView(arcade.View):
 
         # Pickup button image
         # Set grey_background
-        self.pickup_grey_background = os.path.join(ASSET_DIR, "pickup_button", "grey_background.png")
+        self.pickup_grey_background = os.path.join(
+            ASSET_DIR, "pickup_button", "grey_background.png"
+        )
         self.pickup_grey_background_image_scale = 0.3
 
         # Set button text attributes
         pickup_key_text = "F"
         pickup_key_text_font = 14
-        self.text_object = arcade.Text(pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font)
+        self.text_object = arcade.Text(
+            pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
+        )
         self.text_width = self.text_object.content_width
         self.text_height = self.text_object.content_height
 
@@ -171,7 +176,7 @@ class GameView(arcade.View):
                 # Get button image
                 grey_background = arcade.Sprite(
                     self.pickup_grey_background,
-                    scale=self.pickup_grey_background_image_scale
+                    scale=self.pickup_grey_background_image_scale,
                 )
 
                 # Calculate directional vector between player and pickupable
@@ -244,7 +249,7 @@ class GameView(arcade.View):
         corresponding `key_release` logic called when the view has been changed.
         Those callbacks are called before the view is changed.
         """
-        for (key_tuple, is_active) in self.active_keys.items():
+        for key_tuple, is_active in self.active_keys.items():
             # NOTE: keys which are also modifiers are pressed and released
             # differently. CTRL is (65507, 18) when pressed, (65507, 16) when
             # released. A more detailed check for those keys might be necessary
@@ -279,9 +284,7 @@ class GameView(arcade.View):
         if self.player.crafted_skill_slots[0] is not None:
             scale_factor_crafted_skill_1 = 0.3
             skill_1_img = os.path.join(
-                ASSET_DIR,
-                "skills",
-                f"{self.player.crafted_skill_slots[0]}.png"
+                ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[0]}.png"
             )
             skill_1 = arcade.Sprite(skill_1_img, scale=scale_factor_crafted_skill_1)
             skill_1.center_x = skill_1.width // 2
@@ -291,9 +294,7 @@ class GameView(arcade.View):
         if self.player.crafted_skill_slots[1] is not None:
             scale_factor_crafted_skill_2 = 0.3
             skill_2_img = os.path.join(
-                ASSET_DIR,
-                "skills",
-                f"{self.player.crafted_skill_slots[1]}.png"
+                ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[1]}.png"
             )
             skill_2 = arcade.Sprite(skill_2_img, scale=scale_factor_crafted_skill_2)
             skill_2.center_x = skill_2.width // 2 + skill_2.width
@@ -323,22 +324,32 @@ class PauseView(arcade.View):
             self._view_to_draw.on_draw()
 
         # Draw the Pause text on the given View as overlay
-        arcade.draw_text("PAUSED", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text(
+            "PAUSED",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 + 50,
+            arcade.color.WHITE,
+            font_size=50,
+            anchor_x="center",
+        )
 
         # Show tip to return or reset
-        arcade.draw_text("Press Esc. to return",
-                         SCREEN_WIDTH / 2,
-                         SCREEN_HEIGHT / 2,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
-        arcade.draw_text("Press Q to quit",
-                         SCREEN_WIDTH / 2,
-                         SCREEN_HEIGHT / 2 - 30,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
+        arcade.draw_text(
+            "Press Esc. to return",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
+        arcade.draw_text(
+            "Press Q to quit",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 - 30,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
