@@ -108,8 +108,16 @@ class GameView(arcade.View):
         )
 
         # Pickup button image
-        self.pickup_button_image = os.path.join(ASSET_DIR, "pickup_button", "F.png")
-        self.pickup_button_image_scale = 0.1
+        # Set grey_background
+        self.pickup_grey_background = os.path.join(ASSET_DIR, "pickup_button", "grey_background.png")
+        self.pickup_grey_background_image_scale = 0.3
+
+        # Set button text attributes
+        pickup_key_text = "F"
+        pickup_key_text_font = 14
+        self.text_object = arcade.Text(pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font)
+        self.text_width = self.text_object.content_width
+        self.text_height = self.text_object.content_height
 
     @property
     def element_icons(self):
@@ -161,9 +169,9 @@ class GameView(arcade.View):
         if len(collided_pickupables) >= 1:
             for pickupable in collided_pickupables:
                 # Get button image
-                button = arcade.Sprite(
-                    self.pickup_button_image,
-                    scale=self.pickup_button_image_scale
+                grey_background = arcade.Sprite(
+                    self.pickup_grey_background,
+                    scale=self.pickup_grey_background_image_scale
                 )
 
                 # Calculate directional vector between player and pickupable
@@ -171,11 +179,18 @@ class GameView(arcade.View):
                 diff_y: float = pickupable.center_y - self.player.center_y
 
                 # Place button image at the mirror reflection of player wrt pickupable
-                button.center_x = pickupable.center_x + diff_x
-                button.center_y = pickupable.center_y + diff_y
+                grey_background.center_x = pickupable.center_x + diff_x
+                grey_background.center_y = pickupable.center_y + diff_y
 
-                # Draw the button image
-                button.draw()
+                # Draw the grey background
+                grey_background.draw()
+
+                # Calculate the position to place the text
+                self.text_object.x = grey_background.center_x - self.text_width / 2
+                self.text_object.y = grey_background.center_y - self.text_height / 2
+
+                # Draw the text on the grey background
+                self.text_object.draw()
         else:
             return
 
