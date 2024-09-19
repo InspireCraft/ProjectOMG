@@ -46,6 +46,7 @@ class GameView(arcade.View):
         self.icon_margin_y = 75
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
+        self.collided_pickupables : list[Pickupable]
 
     def setup(self):
         """Reset the game state."""
@@ -151,7 +152,7 @@ class GameView(arcade.View):
         self.projectiles.draw()
         self.pickupables.draw()
         self._draw_ui()
-        self._draw_pickup_button()
+        self._draw_pickup_icon()
 
     def update(self, delta_time):
         """Main update window."""
@@ -160,55 +161,54 @@ class GameView(arcade.View):
         self.physics_engine.update()
         self.projectiles.update()
         handle_projectile_collisions(self.projectiles, self.obstacles)
+        self._check_collision_between_player_and_pickupable()
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
 
     def _check_collision_between_player_and_pickupable(self):
-        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+        self.collided_pickupables: list[Pickupable] = arcade.check_for_collision_with_list(
             self.player, self.pickupables
         )
-        return collided_sprites
 
-    def _get_greybackground_cordinates(self, pickupable: Pickupable):
+    def _get_pickup_button_cordinates(self, pickupable: Pickupable):
         # Calculate directional vector between player and pickupable
         diff_x: float = pickupable.center_x - self.player.center_x
         diff_y: float = pickupable.center_y - self.player.center_y
 
         return pickupable.center_x + diff_x, pickupable.center_y + diff_y
 
-    def _draw_grey_background(self, pickupable: Pickupable) -> arcade.Sprite:
-        # Get grey_background image
-        grey_background = arcade.Sprite(
+    def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
+        # Get pickup_button image
+        pickup_button = arcade.Sprite(
             self.pickup_grey_background,
             scale=self.pickup_grey_background_image_scale,
         )
 
-        # Place backgnd image at the mirror reflection of player wrt pickupable
-        x, y = self._get_greybackground_cordinates(pickupable)
-        grey_background.center_x = x
-        grey_background.center_y = y
+        # Place button image at the mirror reflection of player wrt pickupable
+        x, y = self._get_pickup_button_cordinates(pickupable)
+        pickup_button.center_x = x
+        pickup_button.center_y = y
 
         # Draw the grey background
-        grey_background.draw()
-        return grey_background
+        pickup_button.draw()
+        return pickup_button
 
-    def _draw_text_on_grey_background(self, grey_background):
+    def _draw_text_on_pickup_button(self, pickup_button):
         # Calculate initial cordinates of text
-        self.text_object.x = grey_background.center_x - self.text_width / 2
-        self.text_object.y = grey_background.center_y - self.text_height / 2
+        self.text_object.x = pickup_button.center_x - self.text_width / 2
+        self.text_object.y = pickup_button.center_y - self.text_height / 2
 
         # Draw the text on the grey background
         self.text_object.draw()
 
-    def _draw_pickup_button(self):
-        collided_pickupables = self._check_collision_between_player_and_pickupable()
-        if len(collided_pickupables) >= 1:
-            for pickupable in collided_pickupables:
+    def _draw_pickup_icon(self):
+        if len(self.collided_pickupables) >= 1:
+            for pickupable in self.collided_pickupables:
                 # Draw grey_background
-                grey_background = self._draw_grey_background(pickupable)
+                grey_background = self._draw_pickup_button(pickupable)
                 # Draw the text on the grey_background
-                self._draw_text_on_grey_background(grey_background)
+                self._draw_text_on_pickup_button(grey_background)
         else:
             return
 
@@ -226,13 +226,12 @@ class GameView(arcade.View):
         # collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
         #     event.entity_pickup_sprite, self.pickupables
         # )
-        collided_sprites = self._check_collision_between_player_and_pickupable()
-        if len(collided_sprites) >= 1:
+        if len(self.collided_pickupables) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
-                event.entity_pickup_sprite, collided_sprites
+                event.entity_pickup_sprite, self.collided_pickupables
             )[0]
-            item_to_add = collided_sprites[0]
+            item_to_add = self.collided_pickupables[0]
             item_manager = event.entity
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
