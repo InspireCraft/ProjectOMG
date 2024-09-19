@@ -47,6 +47,7 @@ class GameView(arcade.View):
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
         self.collided_pickupables: list[Pickupable]
+        self.pickup_button: arcade.Sprite = None
 
     def setup(self):
         """Reset the game state."""
@@ -109,12 +110,18 @@ class GameView(arcade.View):
             Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
 
-        # Pickup button image
-        # Set grey_background
-        self.pickup_button = os.path.join(
-            ASSET_DIR, "pickup_button", "grey_background.png"
+        self.text_width, self.text_height = self._set_pickup_button_texture()
+
+    def _set_pickup_button_texture(
+        self,
+        pickup_button_dir: os.path = os.path.join(ASSET_DIR, "pickup_button", "grey_background.png"),
+        pickup_button_image_scale: float = 0.3
+    ):
+        # Set pickup_button
+        self.pickup_button = arcade.Sprite(
+            pickup_button_dir,
+            scale=pickup_button_image_scale,
         )
-        self.pickup_button_image_scale: float = 0.3
 
         # Set button text attributes
         pickup_key_text: str = [k for k, v in arcade.key.__dict__.items() if v == self.player.pickup_button_key][0]
@@ -122,9 +129,12 @@ class GameView(arcade.View):
         self.text_object: arcade.Text = arcade.Text(
             pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
         )
+
         height_offset = (pickup_key_text_font // 10) * (pickup_key_text_font % 10 + 1)
-        self.text_width = self.text_object.content_width
-        self.text_height = self.text_object.content_height - height_offset
+        text_width = self.text_object.content_width
+        text_height = self.text_object.content_height - height_offset
+
+        return text_width, text_height
 
     @property
     def element_icons(self):
@@ -179,25 +189,18 @@ class GameView(arcade.View):
         return pickupable.center_x + diff_x, pickupable.center_y + diff_y
 
     def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
-        # Get pickup_button image
-        pickup_button = arcade.Sprite(
-            self.pickup_button,
-            scale=self.pickup_button_image_scale,
-        )
-
         # Place button image at the mirror reflection of player wrt pickupable
         x, y = self._get_pickup_button_cordinates(pickupable)
-        pickup_button.center_x = x
-        pickup_button.center_y = y
+        self.pickup_button.center_x = x
+        self.pickup_button.center_y = y
 
         # Draw the grey background
-        pickup_button.draw()
-        return pickup_button
+        self.pickup_button.draw()
 
-    def _draw_text_on_pickup_button(self, pickup_button):
+    def _draw_text_on_pickup_button(self):
         # Calculate initial cordinates of text
-        self.text_object.x = pickup_button.center_x - self.text_width / 2
-        self.text_object.y = pickup_button.center_y - self.text_height / 2
+        self.text_object.x = self.pickup_button.center_x - self.text_width / 2
+        self.text_object.y = self.pickup_button.center_y - self.text_height / 2
 
         # Draw the text on the grey background
         self.text_object.draw()
@@ -206,9 +209,9 @@ class GameView(arcade.View):
         if len(self.collided_pickupables) >= 1:
             for pickupable in self.collided_pickupables:
                 # Draw grey_background
-                grey_background = self._draw_pickup_button(pickupable)
+                self._draw_pickup_button(pickupable)
                 # Draw the text on the grey_background
-                self._draw_text_on_pickup_button(grey_background)
+                self._draw_text_on_pickup_button()
         else:
             return
 
