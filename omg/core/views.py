@@ -46,7 +46,7 @@ class GameView(arcade.View):
         self.icon_margin_y = 75
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
-        self.collided_pickupables : list[Pickupable]
+        self.collided_pickupables: list[Pickupable]
 
     def setup(self):
         """Reset the game state."""
@@ -111,13 +111,13 @@ class GameView(arcade.View):
 
         # Pickup button image
         # Set grey_background
-        self.pickup_grey_background = os.path.join(
+        self.pickup_button = os.path.join(
             ASSET_DIR, "pickup_button", "grey_background.png"
         )
-        self.pickup_grey_background_image_scale: float = 0.3
+        self.pickup_button_image_scale: float = 0.3
 
         # Set button text attributes
-        pickup_key_text: str = "F"
+        pickup_key_text: str = [k for k, v in arcade.key.__dict__.items() if v == self.player.pickup_button_key][0]
         pickup_key_text_font: int = 18
         self.text_object: arcade.Text = arcade.Text(
             pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
@@ -181,8 +181,8 @@ class GameView(arcade.View):
     def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
         # Get pickup_button image
         pickup_button = arcade.Sprite(
-            self.pickup_grey_background,
-            scale=self.pickup_grey_background_image_scale,
+            self.pickup_button,
+            scale=self.pickup_button_image_scale,
         )
 
         # Place button image at the mirror reflection of player wrt pickupable

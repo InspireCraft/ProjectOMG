@@ -2,6 +2,7 @@ from typing import Dict, TypeVar, Union
 
 import arcade
 import arcade.key
+import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
@@ -28,6 +29,9 @@ class Player(ObservableSprite):
         self.change_x = 0
         self.change_y = 0
         self.angle = initial_angle  # Set initial angle here
+
+        # Initialize pickup button key
+        self.pickup_button_key = arcade.key.F
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -81,7 +85,7 @@ class Player(ObservableSprite):
             self.elements.set_prev()
         elif key == arcade.key.E:
             self.elements.set_next()
-        elif key == arcade.key.F:
+        elif key == self.pickup_button_key:
             self.pickup_element()
 
     def on_key_release(self, key, modifiers):
