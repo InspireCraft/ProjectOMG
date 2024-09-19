@@ -115,8 +115,10 @@ class GameView(arcade.View):
 
     def _set_pickup_button_icon(
         self,
-        pickup_button_dir: os.path = os.path.join(ASSET_DIR, "pickup_button", "button_background.png"),
-        pickup_button_image_scale: float = 0.3
+        pickup_button_dir: os.path = os.path.join(
+            ASSET_DIR, "pickup_button", "button_background.png"
+        ),
+        pickup_button_image_scale: float = 0.3,
     ):
         # Set pickup_button
         self.pickup_button = arcade.Sprite(
@@ -125,7 +127,11 @@ class GameView(arcade.View):
         )
 
         # Set button text attributes
-        pickup_key_text: str = [k for k, v in arcade.key.__dict__.items() if v == self.player.pickup_button_key][0]
+        pickup_key_text: str = [
+            k
+            for k, v in arcade.key.__dict__.items()
+            if v == self.player.pickup_button_key
+        ][0]
         pickup_key_text_font: int = 18
         self.text_object: arcade.Text = arcade.Text(
             pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
@@ -178,8 +184,8 @@ class GameView(arcade.View):
         self.projectiles.append(event.projectile)
 
     def _check_collision_between_player_and_pickupable(self):
-        self.collided_pickupables: list[Pickupable] = arcade.check_for_collision_with_list(
-            self.player, self.pickupables
+        self.collided_pickupables: list[Pickupable] = (
+            arcade.check_for_collision_with_list(self.player, self.pickupables)
         )
 
     def _get_pickup_button_cordinates(self, pickupable: Pickupable):
