@@ -188,7 +188,7 @@ class GameView(arcade.View):
             arcade.check_for_collision_with_list(self.player, self.pickupables)
         )
 
-    def _get_pickup_button_cordinates(self, pickupable: Pickupable):
+    def _get_pickup_button_coordinates(self, pickupable: Pickupable):
         # Calculate directional vector between player and pickupable
         diff_x: float = pickupable.center_x - self.player.center_x
         diff_y: float = pickupable.center_y - self.player.center_y
@@ -197,7 +197,7 @@ class GameView(arcade.View):
 
     def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
         # Place button image at the mirror reflection of player wrt pickupable
-        x, y = self._get_pickup_button_cordinates(pickupable)
+        x, y = self._get_pickup_button_coordinates(pickupable)
         self.pickup_button.center_x = x
         self.pickup_button.center_y = y
 
@@ -205,7 +205,7 @@ class GameView(arcade.View):
         self.pickup_button.draw()
 
     def _draw_text_on_pickup_button(self):
-        # Calculate initial cordinates of text
+        # Calculate initial coordinates of text
         self.text_object.x = self.pickup_button.center_x - self.text_width / 2
         self.text_object.y = self.pickup_button.center_y - self.text_height / 2
 
