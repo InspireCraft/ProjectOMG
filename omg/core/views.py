@@ -110,9 +110,10 @@ class GameView(arcade.View):
             Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
 
-        self.text_width, self.text_height = self._set_pickup_button_texture()
+        # Set up pickup button icon
+        self.text_width, self.text_height = self._set_pickup_button_icon()
 
-    def _set_pickup_button_texture(
+    def _set_pickup_button_icon(
         self,
         pickup_button_dir: os.path = os.path.join(ASSET_DIR, "pickup_button", "button_background.png"),
         pickup_button_image_scale: float = 0.3
