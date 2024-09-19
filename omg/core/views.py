@@ -114,7 +114,7 @@ class GameView(arcade.View):
 
     def _set_pickup_button_texture(
         self,
-        pickup_button_dir: os.path = os.path.join(ASSET_DIR, "pickup_button", "grey_background.png"),
+        pickup_button_dir: os.path = os.path.join(ASSET_DIR, "pickup_button", "button_background.png"),
         pickup_button_image_scale: float = 0.3
     ):
         # Set pickup_button
@@ -194,7 +194,7 @@ class GameView(arcade.View):
         self.pickup_button.center_x = x
         self.pickup_button.center_y = y
 
-        # Draw the grey background
+        # Draw the button background
         self.pickup_button.draw()
 
     def _draw_text_on_pickup_button(self):
@@ -202,15 +202,15 @@ class GameView(arcade.View):
         self.text_object.x = self.pickup_button.center_x - self.text_width / 2
         self.text_object.y = self.pickup_button.center_y - self.text_height / 2
 
-        # Draw the text on the grey background
+        # Draw the text on the button background
         self.text_object.draw()
 
     def _draw_pickup_icon(self):
         if len(self.collided_pickupables) >= 1:
             for pickupable in self.collided_pickupables:
-                # Draw grey_background
+                # Draw button background
                 self._draw_pickup_button(pickupable)
-                # Draw the text on the grey_background
+                # Draw the text on the button background
                 self._draw_text_on_pickup_button()
         else:
             return
