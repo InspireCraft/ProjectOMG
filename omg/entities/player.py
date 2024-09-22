@@ -30,7 +30,7 @@ class Player(ObservableSprite):
         self.angle = initial_angle  # Set initial angle here
 
         # Initialize pickup button key
-        self.pickup_button_key = arcade.key.F
+        self._pickup_button_key = arcade.key.F
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -65,6 +65,15 @@ class Player(ObservableSprite):
         # Initialize crafted skill slots as None
         self.crafted_skill_slots: list[str] = [None, None]
         self.crafted_skill = SkillFactory()
+
+    @property
+    def pickup_button_key(self):
+        return self._pickup_button_key
+
+    @pickup_button_key.setter
+    def pickup_button_key(self, new_key):
+        self._pickup_button_key = new_key
+        # Notify observers or update any related attributes here if needed
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""

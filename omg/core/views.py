@@ -2,6 +2,11 @@ import os.path
 from typing import Dict
 
 import arcade
+import arcade.key
+import arcade.key
+import arcade.key
+import arcade.key
+import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import Pickupable
@@ -48,6 +53,7 @@ class GameView(arcade.View):
         self.active_keys: Dict[tuple, bool] = None
         self.collided_pickupables: list[Pickupable]
         self.pickup_button: arcade.Sprite = None
+        # self.text_object: arcade.Text = None
 
     def setup(self):
         """Reset the game state."""
@@ -111,9 +117,44 @@ class GameView(arcade.View):
         )
 
         # Set up pickup button icon
-        self.text_width, self.text_height = self._set_pickup_button_icon()
+        self.pickup_button = self._set_pickup_button()
+        self.pickup_key_text_font: int = 24
+        self.text_object = arcade.Text(
+                "F",
+                0,
+                0,
+                arcade.color.BLACK,
+                self.pickup_key_text_font,
+            )
+        # Set initial text
+        self.update_pickup_text()
+        height_offset = (self.pickup_key_text_font // 10) * (
+            self.pickup_key_text_font % 10 + 1
+        )
+        self.text_width = self.text_object.content_width
+        self.text_height = self.text_object.content_height - height_offset
 
-    def _set_pickup_button_icon(
+    def get_pickup_key_text(self):
+        return [
+            k
+            for k, v in arcade.key.__dict__.items()
+            if v == self.player.pickup_button_key
+        ][0]
+
+    @property
+    def pickup_button_key(self):
+        return self.player.pickup_button_key
+
+    @pickup_button_key.setter
+    def pickup_button_key(self, value):
+        print("TRIGGERED")
+        self.player.pickup_button_key = value  # Update Player's key
+        self.update_pickup_text()  # Automatically update the text object
+
+    def update_pickup_text(self):
+        self.text_object.text = self.get_pickup_key_text()
+
+    def _set_pickup_button(
         self,
         pickup_button_dir: os.path = os.path.join(
             ASSET_DIR, "pickup_button", "button_background.png"
@@ -121,27 +162,10 @@ class GameView(arcade.View):
         pickup_button_image_scale: float = 0.3,
     ):
         # Set pickup_button
-        self.pickup_button = arcade.Sprite(
+        return arcade.Sprite(
             pickup_button_dir,
             scale=pickup_button_image_scale,
         )
-
-        # Set button text attributes
-        pickup_key_text: str = [
-            k
-            for k, v in arcade.key.__dict__.items()
-            if v == self.player.pickup_button_key
-        ][0]
-        pickup_key_text_font: int = 18
-        self.text_object: arcade.Text = arcade.Text(
-            pickup_key_text, 0, 0, arcade.color.BLACK, pickup_key_text_font
-        )
-
-        height_offset = (pickup_key_text_font // 10) * (pickup_key_text_font % 10 + 1)
-        text_width = self.text_object.content_width
-        text_height = self.text_object.content_height - height_offset
-
-        return text_width, text_height
 
     @property
     def element_icons(self):
