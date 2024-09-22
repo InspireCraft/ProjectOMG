@@ -68,6 +68,7 @@ class Player(ObservableSprite):
 
     @property
     def pickup_button_key(self):
+        """Define self.player.pickup_button_key."""
         return self._pickup_button_key
 
     @pickup_button_key.setter
