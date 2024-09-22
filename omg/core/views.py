@@ -135,11 +135,7 @@ class GameView(arcade.View):
         self.text_height = self.text_object.content_height - height_offset
 
     def get_pickup_key_text(self):
-        return [
-            k
-            for k, v in arcade.key.__dict__.items()
-            if v == self.player.pickup_button_key
-        ][0]
+        return chr(self.player.pickup_button_key).capitalize()
 
     @property
     def pickup_button_key(self):
