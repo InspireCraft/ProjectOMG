@@ -1,0 +1,1 @@
+set self.player.on_key_change attribute to self.update_pickup_button_text method to enable simultaneous update of pickup button text

@@ -1,0 +1,2 @@
+Make text_object.text dependend on self.player.pickup_button_key
+Update the method of getting the chr value of arcade.key
