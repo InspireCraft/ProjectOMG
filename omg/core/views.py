@@ -3,7 +3,6 @@ from typing import Dict
 
 import arcade
 import arcade.key
-import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import Pickupable
