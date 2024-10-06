@@ -3,6 +3,7 @@ from typing import Dict
 
 import arcade
 import arcade.key
+import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import Pickupable
@@ -116,38 +117,25 @@ class GameView(arcade.View):
         self.pickup_button = self._set_pickup_button()
         self.pickup_key_text_font: int = 24
         self.text_object = arcade.Text(
-            "F",
+            chr(self.player.pickup_button_key).capitalize(),
             0,
             0,
             arcade.color.BLACK,
             self.pickup_key_text_font,
         )
-        # Set initial text
-        self.update_pickup_text()
-
+        # # Set initial text
         height_offset = (self.pickup_key_text_font // 10) * (
             self.pickup_key_text_font % 10 + 1
         )
         self.text_width = self.text_object.content_width
         self.text_height = self.text_object.content_height - height_offset
 
-    def get_pickup_key_text(self):
-        """Convert arcade.key to corrsponding charachter."""
-        return chr(self.player.pickup_button_key).capitalize()
+        # Set player att to change text_object.text whenever the key changes
+        self.player.on_key_change = self.update_pickup_button_key_text
 
-    @property
-    def pickup_button_key(self):
-        """Define self.player.pickup_button_key."""
-        return self.player.pickup_button_key
-
-    @pickup_button_key.setter
-    def pickup_button_key(self, value):
-        self.player.pickup_button_key = value  # Update Player's key
-        self.update_pickup_text()  # Automatically update the text object
-
-    def update_pickup_text(self):
-        """Update the text on the pickup_button_key."""
-        self.text_object.text = self.get_pickup_key_text()
+    def update_pickup_button_key_text(self, new_key_text: str):
+        """Update text_object.text."""
+        self.text_object.text = new_key_text
 
     def _set_pickup_button(
         self,
@@ -265,6 +253,8 @@ class GameView(arcade.View):
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
             item_to_add.remove_from_sprite_lists()
+
+            self.player.pickup_button_key = arcade.key.G
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""

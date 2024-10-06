@@ -2,6 +2,7 @@ from typing import Dict, TypeVar, Union
 
 import arcade
 import arcade.key
+import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import CircularBuffer
@@ -72,9 +73,12 @@ class Player(ObservableSprite):
         return self._pickup_button_key
 
     @pickup_button_key.setter
-    def pickup_button_key(self, new_key):
+    def pickup_button_key(self, new_key: arcade.key):
         self._pickup_button_key = new_key
-        # Notify observers or update any related attributes here if needed
+        # Call a method to notify the game window of the change
+        if hasattr(self, "on_key_change"):
+            new_key_text = chr(new_key).capitalize()
+            self.on_key_change(new_key_text)
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
