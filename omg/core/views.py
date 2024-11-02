@@ -365,12 +365,7 @@ class GameView(arcade.View):
     def _center_camera_to_sprite(camera: arcade.Camera, sprite: arcade.Sprite):
         screen_center_x = sprite.center_x - (camera.viewport_width / 2)
         screen_center_y = sprite.center_y - (camera.viewport_height / 2)
-        # Don't let camera travel past 0
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
-        player_centered = screen_center_x, screen_center_y
+        player_centered = (screen_center_x, screen_center_y)
 
         camera.move_to(player_centered)
 
