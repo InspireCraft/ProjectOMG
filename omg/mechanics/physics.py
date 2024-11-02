@@ -4,7 +4,8 @@ import arcade
 class PhysicsEngineBoundary(arcade.PhysicsEngineSimple):
     """Physics engine to handle collisions and boundary checking."""
 
-    def __init__(self, player_sprite, walls, boundary_left, boundary_right, boundary_up, boundary_down):
+    def __init__(self, player_sprite, walls,
+                 boundary_left, boundary_right, boundary_up, boundary_down):
         super().__init__(player_sprite, walls)
         self.boundary_left = boundary_left
         self.boundary_right = boundary_right
