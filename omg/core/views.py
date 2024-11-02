@@ -36,13 +36,10 @@ class GameView(arcade.View):
         super().__init__(window)
         self.observer: Observer = None
         self.player: Player = None
-        self.obstacles: arcade.SpriteList = None
-        self.pickupables: arcade.SpriteList = (
-            None  # items that can be pickedup from the ground
-        )
+        self.scene: arcade.Scene = None
         self.skill_slot_1: arcade.Sprite = None  # Skill slot 1
-        self.skill_slot_2: arcade.Sprite = None  # SKill slot 2
-        self.projectiles = None
+        self.skill_slot_2: arcade.Sprite = None  # Skill slot 2
+        self.projectiles: arcade.SpriteList = None
         self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
@@ -75,17 +72,32 @@ class GameView(arcade.View):
         )
         self.player.add_observer(self.observer)
 
-        # Create obstacles
-        self.obstacles = arcade.SpriteList()
-        self.pickupables = arcade.SpriteList(use_spatial_hash=True)
-        self.projectiles = arcade.SpriteList()
+        # Create scene
+        self.scene = arcade.Scene()
+
+        # Add obstacles to the scene
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
         obstacle.center_x = 400
         obstacle.center_y = 300
-        self.obstacles.append(obstacle)
+        self.scene.add_sprite_list("Obstacles", use_spatial_hash=True)
+        self.scene.add_sprite("Obstacles", obstacle)
 
-        # Create crafted skill slots
+        # Add pickupables to the scene
+        self.scene.add_sprite_list_after(
+            name="Pickupables",
+            after="Obstacles",
+            use_spatial_hash=True,
+        )
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
+
+        # Create crafted skill slots (UI element)
+        self.projectiles = arcade.SpriteList()
         # Skill slot 1
         scale_factor_1 = 0.4
         skill_slot_1_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
@@ -102,21 +114,12 @@ class GameView(arcade.View):
         )
         self.skill_slot_2.center_y = self.skill_slot_2.height // 2
 
+        # Set up physics engine
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
-            walls=self.obstacles,
+            walls=self.scene["Obstacles"],
             screen_width=SCREEN_WIDTH,
             screen_height=SCREEN_HEIGHT,
-        )
-        # Add projectile types
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10)
-        )
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20)
-        )
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
 
         # Set up pickup button icon
@@ -170,29 +173,23 @@ class GameView(arcade.View):
         else:
             return None
 
-    def _load_element_icons(self):
-        for element_type in self.player.elements:
-            icon_texture = arcade.load_texture(element_type["image_file"])
-            self.element_icons.append(icon_texture)
-
     def on_draw(self):
         """Drawing code."""
         arcade.start_render()
         self.player.draw()
-        self.obstacles.draw()
+        self.scene.draw()
         self.projectiles.draw()
-        self.pickupables.draw()
         self._draw_ui()
         self._draw_pickup_icon()
 
     def update(self, delta_time):
         """Main update window."""
         self.player.update(self.mouse_x, self.mouse_y, delta_time)
-        self.obstacles.update()
+        self.scene.update()
         self.physics_engine.update()
         self.projectiles.update()
-        handle_projectile_collisions(self.projectiles, self.obstacles)
         self._check_collision_between_player_and_pickupable()
+        handle_projectile_collisions(self.projectiles, self.scene["Obstacles"])
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
@@ -251,10 +248,10 @@ class GameView(arcade.View):
         3) Out of all the collisions, let the entity pick up the closest object.
         4) Remove the picked up item from the ground.
         """
-        # collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
-        #     event.entity_pickup_sprite, self.pickupables
-        # )
-        if len(self.collided_pickupables) >= 1:
+        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+            event.entity_pickup_sprite, self.scene["Pickupables"]
+        )
+        if len(collided_sprites) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
                 event.entity_pickup_sprite, self.collided_pickupables
