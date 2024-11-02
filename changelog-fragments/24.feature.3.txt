@@ -1,0 +1,2 @@
+Debug option is enabled for `GameView` with `F1` control. It shows the relevant
+hitboxes and also other debug information such as the mouse and the player position.
