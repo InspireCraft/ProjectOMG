@@ -32,6 +32,8 @@ class GameView(arcade.View):
         self.observer: Observer = None
         self.player: Player = None
         self.scene: arcade.Scene = None
+        self.camera_sprite = None
+        self.camera_gui = None
         self.skill_slot_1: arcade.Sprite = None  # Skill slot 1
         self.skill_slot_2: arcade.Sprite = None  # Skill slot 2
         self.projectiles: arcade.SpriteList = None
@@ -85,6 +87,9 @@ class GameView(arcade.View):
         self.scene.add_sprite(
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
 
+        self.camera_sprite = arcade.Camera(window=self.window)
+        self.camera_gui = arcade.Camera(window=self.window)
+
         # Create crafted skill slots (UI element)
         self.projectiles = arcade.SpriteList()
         # Skill slot 1
@@ -125,10 +130,18 @@ class GameView(arcade.View):
 
     def on_draw(self):
         """Drawing code."""
-        arcade.start_render()
+        self.clear()
+
+        # Activate player camera to draw Sprites
+        # sprites outside of the player camera are not drawn
+        self.camera_sprite.use()
         self.player.draw()
         self.scene.draw()
         self.projectiles.draw()
+
+        # Activate GUI camera before drawing GUI elements
+        # This is to ensure GUI elements are drawn w.r.t the window
+        self.camera_gui.use()
         self._draw_ui()
 
     def update(self, delta_time):
@@ -138,6 +151,8 @@ class GameView(arcade.View):
         self.physics_engine.update()
         self.projectiles.update()
         handle_projectile_collisions(self.projectiles, self.scene["Obstacles"])
+        # Position the camera to the player
+        self._center_camera_to_sprite(self.camera_sprite, self.player)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
@@ -250,6 +265,19 @@ class GameView(arcade.View):
         # Draw usable skill slots to bottom left corner
         self.skill_slot_1.draw()
         self.skill_slot_2.draw()
+
+    @staticmethod
+    def _center_camera_to_sprite(camera: arcade.Camera, sprite: arcade.Sprite):
+        screen_center_x = sprite.center_x - (camera.viewport_width / 2)
+        screen_center_y = sprite.center_y - (camera.viewport_height / 2)
+        # Don't let camera travel past 0
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+        player_centered = screen_center_x, screen_center_y
+
+        camera.move_to(player_centered)
 
 
 class PauseView(arcade.View):
