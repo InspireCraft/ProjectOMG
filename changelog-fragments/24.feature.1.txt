@@ -1,0 +1,1 @@
+`arcade.Camera` is introduced to `GameView`. Camera allows creating maps larger than the player's field of view.
