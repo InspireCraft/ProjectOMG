@@ -56,6 +56,9 @@ class GameView(arcade.View):
         self.pickup_button: arcade.Sprite = None
         # self.text_object: arcade.Text = None
 
+        # Debug state
+        self.debug_mode: bool = False
+
     def setup(self):
         """Reset the game state."""
         self.active_keys = {}
@@ -193,11 +196,15 @@ class GameView(arcade.View):
         self.scene.draw()
         self.projectiles.draw()
 
+        if self.debug_mode:
+            self.scene.draw_hit_boxes(arcade.color.RED)
         # Activate GUI camera before drawing GUI elements
         # This is to ensure GUI elements are drawn w.r.t the window
         self.camera_gui.use()
         self._draw_ui()
         self._draw_pickup_icon()
+        if self.debug_mode:
+            self._draw_debug_info()
 
     def update(self, delta_time):
         """Main update window."""
@@ -294,6 +301,10 @@ class GameView(arcade.View):
         # Delegate the input
         self.player.on_key_press(key, modifiers)
 
+        # Debug mode toggle
+        if key == arcade.key.F1:
+            self.debug_mode = not self.debug_mode
+
     def on_key_release(self, key, modifiers):
         """Key release logic."""
         self.active_keys[(key, modifiers)] = False  # mark the key as `not active`
@@ -372,6 +383,31 @@ class GameView(arcade.View):
         # Draw usable skill slots to bottom left corner
         self.skill_slot_1.draw()
         self.skill_slot_2.draw()
+
+    def _draw_debug_info(self):
+        """Print debug text information on the screen."""
+        # TODO: change arcade.draw_text to arcade.Text for better performance
+        arcade.draw_text(
+            f"Mouse: ({self.mouse_x}, {self.mouse_y})",
+            101,
+            101,
+            arcade.color.WHITE,
+            font_size=20,
+        )
+        arcade.draw_text(
+            f"Player: ({self.player.center_x:.1f}, {self.player.center_y:.1f})",
+            101,
+            135,
+            arcade.color.WHITE,
+            font_size=20,
+        )
+        arcade.draw_text(
+            "Debug mode",
+            self.window.width - 250,
+            self.window.height - 50,
+            arcade.color.RED,
+            font_size=20,
+        )
 
     @staticmethod
     def _center_camera_to_sprite(camera: arcade.Camera, sprite: arcade.Sprite):
