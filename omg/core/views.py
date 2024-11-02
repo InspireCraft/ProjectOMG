@@ -43,7 +43,6 @@ class GameView(arcade.View):
         self.camera_gui = None
         self.skill_slot_1: arcade.Sprite = None  # Skill slot 1
         self.skill_slot_2: arcade.Sprite = None  # Skill slot 2
-        self.projectiles: arcade.SpriteList = None
         self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
@@ -103,11 +102,13 @@ class GameView(arcade.View):
         self.scene.add_sprite(
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
 
+        # Add projectiles to the scene
+        self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
+
         self.camera_sprite = arcade.Camera(window=self.window)
         self.camera_gui = arcade.Camera(window=self.window)
 
-        # Create crafted skill slots (UI element)
-        self.projectiles = arcade.SpriteList()
+        # GUI elements, these are not added to the scene
         # Skill slot 1
         scale_factor_1 = 0.4
         skill_slot_1_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
@@ -194,7 +195,6 @@ class GameView(arcade.View):
         self.camera_sprite.use()
         self.player.draw()
         self.scene.draw()
-        self.projectiles.draw()
 
         if self.debug_mode:
             self.scene.draw_hit_boxes(arcade.color.RED)
@@ -218,14 +218,13 @@ class GameView(arcade.View):
         self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
 
         self.physics_engine.update()
-        self.projectiles.update()
         self._check_collision_between_player_and_pickupable()
-        handle_projectile_collisions(self.projectiles, self.scene["Obstacles"])
+        handle_projectile_collisions(self.scene["Projectiles"], self.scene["Obstacles"])
         # Position the camera to the player
         self._center_camera_to_sprite(self.camera_sprite, self.player)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
-        self.projectiles.append(event.projectile)
+        self.scene["Projectiles"].append(event.projectile)
 
     def _check_collision_between_player_and_pickupable(self):
         self.collided_pickupables: list[Pickupable] = (
