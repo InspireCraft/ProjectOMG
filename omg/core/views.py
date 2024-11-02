@@ -19,8 +19,10 @@ ASSET_DIR = os.path.join(
 
 COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800  # Also defines player's POV
+SCREEN_HEIGHT = 600  # Also defines player's POV
+# player's coordinates are limited to -GAME_MAX_BOUNDS, GAME_MAX_BOUNDS
+GAME_MAX_BOUNDS = 10000
 SCREEN_TITLE = "2D Shooter RPG"
 
 
@@ -111,8 +113,10 @@ class GameView(arcade.View):
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
             walls=self.scene["Obstacles"],
-            screen_width=self.window.width,
-            screen_height=self.window.height,
+            boundary_left=-GAME_MAX_BOUNDS,
+            boundary_right=GAME_MAX_BOUNDS,
+            boundary_up=GAME_MAX_BOUNDS,
+            boundary_down=-GAME_MAX_BOUNDS,
         )
 
     @property
