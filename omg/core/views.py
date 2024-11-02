@@ -201,8 +201,15 @@ class GameView(arcade.View):
 
     def update(self, delta_time):
         """Main update window."""
-        self.player.update(self.mouse_x, self.mouse_y, delta_time)
+        # Mouse is tracked in the window coordinates, but the player logic needs
+        # the mouse in the camera coordinates. For example, if the player moves
         self.scene.update()
+        # to the right but mouse is kept constant, that is a mouse movement to
+        # the right as far as the player is concerned.
+        mouse_in_camera_x = self.mouse_x + self.camera_sprite.position[0]
+        mouse_in_camera_y = self.mouse_y + self.camera_sprite.position[1]
+        self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
+
         self.physics_engine.update()
         self.projectiles.update()
         self._check_collision_between_player_and_pickupable()
@@ -294,7 +301,12 @@ class GameView(arcade.View):
         self.player.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        """Adds mouse functionality to the game."""
+        """Adds mouse functionality to the game.
+
+        x: Current mouse x-position in the window ( 0<x<self.window.width).
+        y: Current mouse x-position in the window ( 0<x<self.window.height).
+
+        """
         self.mouse_x = x
         self.mouse_y = y
 
