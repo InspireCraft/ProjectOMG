@@ -247,7 +247,8 @@ class GameView(arcade.View):
             ]
 
             # Select the channel 0 frame buffer to draw on
-            # Specify the targets that create a shadow (draw them on channel0 framebuffer)
+            # Specify the targets that create a shadow
+            # (draw them on channel0 framebuffer)
             self.channel0.use()
             self.channel0.clear()
             self.scene.draw(shadow_sources)
