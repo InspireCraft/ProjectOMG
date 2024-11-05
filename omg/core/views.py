@@ -198,6 +198,7 @@ class GameView(arcade.View):
 
         if self.debug_mode:
             self.scene.draw_hit_boxes(arcade.color.RED)
+            self.player.draw_hit_box(arcade.color.RED)
         # Activate GUI camera before drawing GUI elements
         # This is to ensure GUI elements are drawn w.r.t the window
         self.camera_gui.use()
