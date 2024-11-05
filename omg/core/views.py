@@ -3,6 +3,7 @@ from typing import Dict
 
 import arcade
 import arcade.key
+from arcade.experimental import Shadertoy
 
 from omg.entities.events import (
     PickupRequestEvent,
@@ -31,6 +32,10 @@ SCREEN_HEIGHT = 600  # Also defines player's POV
 GAME_MAX_BOUNDS = 10000
 SCREEN_TITLE = "2D Shooter RPG"
 
+SHADER_DIR = os.path.join(
+    os.path.join(os.path.dirname(__file__), ".."), "shaders"
+)
+
 
 class GameView(arcade.View):
     """Main game view."""
@@ -53,6 +58,15 @@ class GameView(arcade.View):
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
         self.pickup_button: arcade.Sprite = None
+
+        # Framebuffers for shaders that enable raycasting
+        # TODO: move logic to a separate class,
+        # reference:https://api.arcade.academy/en/stable/tutorials/raycasting/index.html?
+        self.shadertoy = None
+        self.channel0 = None  # first framebuffer
+        self.channel1 = None  # second framebuffer
+        self._load_shader()
+        self.raycasting_mode: bool = False
 
         # Debug state
         self.debug_mode: bool = False
@@ -99,8 +113,7 @@ class GameView(arcade.View):
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10)
         )
         self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20)
-        )
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 420, 120))
         self.scene.add_sprite(
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
@@ -175,6 +188,25 @@ class GameView(arcade.View):
             pickup_button_dir,
             scale=pickup_button_image_scale,
         )
+    def _load_shader(self):
+
+        # Create the shader toy
+        raycasting_shader_path = os.path.join(SHADER_DIR, "raycasting.glsl")
+        window_size = self.window.get_size()
+        self.shadertoy = Shadertoy.create_from_file(window_size, raycasting_shader_path)
+
+        # Create the channels 0 and 1 frame buffers.
+        # Make the buffer the size of the window, with 4 channels (RGBA)
+        self.channel0 = self.shadertoy.ctx.framebuffer(
+            color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
+        )
+        self.channel1 = self.shadertoy.ctx.framebuffer(
+            color_attachments=[self.shadertoy.ctx.texture(window_size, components=4)]
+        )
+
+        # Assign the frame buffers to the channels
+        self.shadertoy.channel_0 = self.channel0.color_attachments[0]
+        self.shadertoy.channel_1 = self.channel1.color_attachments[0]
 
     @property
     def element_icons(self):
@@ -191,13 +223,67 @@ class GameView(arcade.View):
 
     def on_draw(self):
         """Drawing code."""
-        self.clear()
-
         # Activate player camera to draw Sprites
         # sprites outside of the player camera are not drawn
         self.camera_sprite.use()
-        self.player.draw()
-        self.scene.draw()
+
+        # Raycasting part
+        if self.raycasting_mode:
+            # TODO: encapsulate this logic in a separate class
+
+            # Raycasting is achieved by using Shaders. Shaders are programs that
+            # run on the GPU and the result is rendered to the screen. The
+            # shader is run for each pixel on the screen. The shader can read
+            # from textures (framebuffers) and write to the screen. The shader
+            # can also write to textures (framebuffers).
+
+            # Define which sprites are sources of shadows, which are affected by
+            # light etc
+            shadow_sources = ["Obstacles",]
+            affected_by_light = ["Projectiles", "Pickupables"]
+            not_affected_by_light = [
+                key for key in self.scene.name_mapping.keys()
+                if key not in affected_by_light
+            ]
+
+            # Select the channel 0 frame buffer to draw on
+            # Specify the targets that create a shadow (draw them on channel0 framebuffer)
+            self.channel0.use()
+            self.channel0.clear()
+            self.scene.draw(shadow_sources)
+
+            # Calculate the light position. We have to subtract the camera position
+            # from the player position to get screen-relative coordinates.
+            p = (
+                self.player.position[0] - self.camera_sprite.position[0],
+                self.player.position[1] - self.camera_sprite.position[1]
+            )
+
+            # Set the uniform data (data accessible in the shader)
+            self.shadertoy.program['lightPosition'] = p
+            self.shadertoy.program['lightSize'] = 300
+
+            # Select the channel 1 frame buffer to draw on
+            # Specify the targets that is affected by shadows (or light)
+            # Draw them on channel1 framebuffer
+            self.channel1.use()
+            self.channel1.clear()
+            self.scene.draw(affected_by_light)
+            # Select this window to draw on
+            self.window.use()
+            # Clear to background color
+            self.clear()
+
+            # Run the shader and render to the window
+            # self.scene.draw(affected_by_light)
+            self.shadertoy.render()
+            self.scene.draw(not_affected_by_light)
+            self.player.draw()
+        else:
+            # Default logic without raycasting
+            self.clear()
+            self.scene.draw()
+            self.player.draw()
 
         if self.debug_mode:
             self.scene.draw_hit_boxes(arcade.color.RED)
@@ -325,6 +411,10 @@ class GameView(arcade.View):
         # Debug mode toggle
         if key == arcade.key.F1:
             self.debug_mode = not self.debug_mode
+
+        # Raycasting toggle
+        if key == arcade.key.F2:
+            self.raycasting_mode = not self.raycasting_mode
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
