@@ -29,6 +29,7 @@ SCREEN_TITLE = "2D Shooter RPG"
 SHADER_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "shaders"
 )
+SHADER_LIGHT_SIZE=  300
 
 
 class GameView(arcade.View):
@@ -211,7 +212,7 @@ class GameView(arcade.View):
 
             # Set the uniform data (data accessible in the shader)
             self.shadertoy.program['lightPosition'] = p
-            self.shadertoy.program['lightSize'] = 300
+            self.shadertoy.program['lightSize'] = SHADER_LIGHT_SIZE
 
             # Select the channel 1 frame buffer to draw on
             # Specify the targets that is affected by shadows (or light)
@@ -225,7 +226,6 @@ class GameView(arcade.View):
             self.clear()
 
             # Run the shader and render to the window
-            # self.scene.draw(affected_by_light)
             self.shadertoy.render()
             self.scene.draw(not_affected_by_light)
             self.player.draw()
@@ -238,6 +238,7 @@ class GameView(arcade.View):
         if self.debug_mode:
             self.scene.draw_hit_boxes(arcade.color.RED)
             self.player.draw_hit_box(arcade.color.RED)
+
         # Activate GUI camera before drawing GUI elements
         # This is to ensure GUI elements are drawn w.r.t the window
         self.camera_gui.use()
