@@ -35,7 +35,7 @@ SCREEN_TITLE = "2D Shooter RPG"
 SHADER_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "shaders"
 )
-SHADER_LIGHT_SIZE=  300
+SHADER_LIGHT_SIZE = 300
 
 
 class GameView(arcade.View):
