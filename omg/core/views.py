@@ -209,11 +209,11 @@ class GameView(arcade.View):
 
     def update(self, delta_time):
         """Main update window."""
-        # Mouse is tracked in the window coordinates, but the player logic needs
-        # the mouse in the camera coordinates. For example, if the player moves
         self.scene.update()
-        # to the right but mouse is kept constant, that is a mouse movement to
-        # the right as far as the player is concerned.
+        # Mouse is tracked in the window coordinates, but the player logic needs
+        # the mouse in the camera coordinates. Thus, the mouse position relative
+        # to the window should be mapped to the mouse coordinates relative to
+        # the camera before passing it to the player.
         mouse_in_camera_x = self.mouse_x + self.camera_sprite.position[0]
         mouse_in_camera_y = self.mouse_y + self.camera_sprite.position[1]
         self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
