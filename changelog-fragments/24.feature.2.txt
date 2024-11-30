@@ -1,0 +1,1 @@
+`GameView` uses `arcade.Scene` to handle multiple `arcade.Spritelist` at once.
