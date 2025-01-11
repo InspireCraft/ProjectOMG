@@ -51,7 +51,6 @@ class GameView(arcade.View):
         self.icon_margin_y = 75
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
-        self.collided_pickupables: list[Pickupable]
         self.pickup_button: arcade.Sprite = None
         # self.text_object: arcade.Text = None
 
@@ -219,18 +218,12 @@ class GameView(arcade.View):
         self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
 
         self.physics_engine.update()
-        self._check_collision_between_player_and_pickupable()
         handle_projectile_collisions(self.scene["Projectiles"], self.scene["Obstacles"])
         # Position the camera to the player
         self._center_camera_to_sprite(self.camera_sprite, self.player)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.scene["Projectiles"].append(event.projectile)
-
-    def _check_collision_between_player_and_pickupable(self):
-        self.collided_pickupables: list[Pickupable] = (
-            arcade.check_for_collision_with_list(self.player, self.pickupables)
-        )
 
     def _get_pickup_button_coordinates(self, pickupable: Pickupable):
         # Calculate directional vector between player and pickupable
@@ -287,13 +280,13 @@ class GameView(arcade.View):
         if len(collided_sprites) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
-                event.entity_pickup_sprite, self.collided_pickupables
+                event.entity_pickup_sprite, collided_sprites
             )[0]
-            item_to_add = self.collided_pickupables[0]
+            item_to_add = closes_pickupable.item
             item_manager = event.entity
-            item_manager.add_item(closes_pickupable.item)
+            item_manager.add_item(item_to_add)
             # remove reference to the pickupables list
-            item_to_add.remove_from_sprite_lists()
+            closes_pickupable.remove_from_sprite_lists()
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
