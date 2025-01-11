@@ -24,8 +24,10 @@ ASSET_DIR = os.path.join(
 
 COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800  # Also defines player's POV
+SCREEN_HEIGHT = 600  # Also defines player's POV
+# player's coordinates are limited to -GAME_MAX_BOUNDS, GAME_MAX_BOUNDS
+GAME_MAX_BOUNDS = 10000
 SCREEN_TITLE = "2D Shooter RPG"
 
 
@@ -36,13 +38,11 @@ class GameView(arcade.View):
         super().__init__(window)
         self.observer: Observer = None
         self.player: Player = None
-        self.obstacles: arcade.SpriteList = None
-        self.pickupables: arcade.SpriteList = (
-            None  # items that can be pickedup from the ground
-        )
+        self.scene: arcade.Scene = None
+        self.camera_sprite = None
+        self.camera_gui = None
         self.skill_slot_1: arcade.Sprite = None  # Skill slot 1
-        self.skill_slot_2: arcade.Sprite = None  # SKill slot 2
-        self.projectiles = None
+        self.skill_slot_2: arcade.Sprite = None  # Skill slot 2
         self.physics_engine = None
         self.mouse_x = 0
         self.mouse_y = 0
@@ -51,9 +51,11 @@ class GameView(arcade.View):
         self.icon_margin_y = 75
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
-        self.collided_pickupables: list[Pickupable]
         self.pickup_button: arcade.Sprite = None
         # self.text_object: arcade.Text = None
+
+        # Debug state
+        self.debug_mode: bool = False
 
     def setup(self):
         """Reset the game state."""
@@ -75,17 +77,37 @@ class GameView(arcade.View):
         )
         self.player.add_observer(self.observer)
 
-        # Create obstacles
-        self.obstacles = arcade.SpriteList()
-        self.pickupables = arcade.SpriteList(use_spatial_hash=True)
-        self.projectiles = arcade.SpriteList()
+        # Create scene
+        self.scene = arcade.Scene()
+
+        # Add obstacles to the scene
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
         obstacle.center_x = 400
         obstacle.center_y = 300
-        self.obstacles.append(obstacle)
+        self.scene.add_sprite_list("Obstacles", use_spatial_hash=True)
+        self.scene.add_sprite("Obstacles", obstacle)
 
-        # Create crafted skill slots
+        # Add pickupables to the scene
+        self.scene.add_sprite_list_after(
+            name="Pickupables",
+            after="Obstacles",
+            use_spatial_hash=True,
+        )
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
+
+        # Add projectiles to the scene
+        self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
+
+        self.camera_sprite = arcade.Camera(window=self.window)
+        self.camera_gui = arcade.Camera(window=self.window)
+
+        # GUI elements, these are not added to the scene
         # Skill slot 1
         scale_factor_1 = 0.4
         skill_slot_1_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "D.png")
@@ -102,21 +124,14 @@ class GameView(arcade.View):
         )
         self.skill_slot_2.center_y = self.skill_slot_2.height // 2
 
+        # Set up physics engine
         self.physics_engine = PhysicsEngineBoundary(
             player_sprite=self.player,
-            walls=self.obstacles,
-            screen_width=SCREEN_WIDTH,
-            screen_height=SCREEN_HEIGHT,
-        )
-        # Add projectile types
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10)
-        )
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20)
-        )
-        self.pickupables.append(
-            Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
+            walls=self.scene["Obstacles"],
+            boundary_left=-GAME_MAX_BOUNDS,
+            boundary_right=GAME_MAX_BOUNDS,
+            boundary_up=GAME_MAX_BOUNDS,
+            boundary_down=-GAME_MAX_BOUNDS,
         )
 
         # Set up pickup button icon
@@ -170,37 +185,45 @@ class GameView(arcade.View):
         else:
             return None
 
-    def _load_element_icons(self):
-        for element_type in self.player.elements:
-            icon_texture = arcade.load_texture(element_type["image_file"])
-            self.element_icons.append(icon_texture)
-
     def on_draw(self):
         """Drawing code."""
-        arcade.start_render()
+        self.clear()
+
+        # Activate player camera to draw Sprites
+        # sprites outside of the player camera are not drawn
+        self.camera_sprite.use()
         self.player.draw()
-        self.obstacles.draw()
-        self.projectiles.draw()
-        self.pickupables.draw()
+        self.scene.draw()
+
+        if self.debug_mode:
+            self.scene.draw_hit_boxes(arcade.color.RED)
+            self.player.draw_hit_box(arcade.color.RED)
+        # Activate GUI camera before drawing GUI elements
+        # This is to ensure GUI elements are drawn w.r.t the window
+        self.camera_gui.use()
         self._draw_ui()
         self._draw_pickup_icon()
+        if self.debug_mode:
+            self._draw_debug_info()
 
     def update(self, delta_time):
         """Main update window."""
-        self.player.update(self.mouse_x, self.mouse_y, delta_time)
-        self.obstacles.update()
+        self.scene.update()
+        # Mouse is tracked in the window coordinates, but the player logic needs
+        # the mouse in the camera coordinates. Thus, the mouse position relative
+        # to the window should be mapped to the mouse coordinates relative to
+        # the camera before passing it to the player.
+        mouse_in_camera_x = self.mouse_x + self.camera_sprite.position[0]
+        mouse_in_camera_y = self.mouse_y + self.camera_sprite.position[1]
+        self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
+
         self.physics_engine.update()
-        self.projectiles.update()
-        handle_projectile_collisions(self.projectiles, self.obstacles)
-        self._check_collision_between_player_and_pickupable()
+        handle_projectile_collisions(self.scene["Projectiles"], self.scene["Obstacles"])
+        # Position the camera to the player
+        self._center_camera_to_sprite(self.camera_sprite, self.player)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
-        self.projectiles.append(event.projectile)
-
-    def _check_collision_between_player_and_pickupable(self):
-        self.collided_pickupables: list[Pickupable] = (
-            arcade.check_for_collision_with_list(self.player, self.pickupables)
-        )
+        self.scene["Projectiles"].append(event.projectile)
 
     def _get_pickup_button_coordinates(self, pickupable: Pickupable):
         # Calculate directional vector between player and pickupable
@@ -251,25 +274,29 @@ class GameView(arcade.View):
         3) Out of all the collisions, let the entity pick up the closest object.
         4) Remove the picked up item from the ground.
         """
-        # collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
-        #     event.entity_pickup_sprite, self.pickupables
-        # )
-        if len(self.collided_pickupables) >= 1:
+        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+            event.entity_pickup_sprite, self.scene["Pickupables"]
+        )
+        if len(collided_sprites) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
-                event.entity_pickup_sprite, self.collided_pickupables
+                event.entity_pickup_sprite, collided_sprites
             )[0]
-            item_to_add = self.collided_pickupables[0]
+            item_to_add = closes_pickupable.item
             item_manager = event.entity
-            item_manager.add_item(closes_pickupable.item)
+            item_manager.add_item(item_to_add)
             # remove reference to the pickupables list
-            item_to_add.remove_from_sprite_lists()
+            closes_pickupable.remove_from_sprite_lists()
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
         self.active_keys[(key, modifiers)] = True  # mark the key as `active`
         # Delegate the input
         self.player.on_key_press(key, modifiers)
+
+        # Debug mode toggle
+        if key == arcade.key.F1:
+            self.debug_mode = not self.debug_mode
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
@@ -278,7 +305,12 @@ class GameView(arcade.View):
         self.player.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        """Adds mouse functionality to the game."""
+        """Adds mouse functionality to the game.
+
+        x: Current mouse x-position in the window ( 0<x<self.window.width).
+        y: Current mouse x-position in the window ( 0<x<self.window.height).
+
+        """
         self.mouse_x = x
         self.mouse_y = y
 
@@ -302,7 +334,7 @@ class GameView(arcade.View):
         # Draw picked up elements to top left corner
         for i, icon in enumerate(self.element_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
-            y = SCREEN_HEIGHT - self.icon_margin_y
+            y = self.window.height - self.icon_margin_y
             if i == self.player.elements.get_current_index():
                 arcade.draw_rectangle_outline(
                     x + self.icon_size // 2,
@@ -345,6 +377,39 @@ class GameView(arcade.View):
         self.skill_slot_1.draw()
         self.skill_slot_2.draw()
 
+    def _draw_debug_info(self):
+        """Print debug text information on the screen."""
+        # TODO: change arcade.draw_text to arcade.Text for better performance
+        arcade.draw_text(
+            f"Mouse: ({self.mouse_x}, {self.mouse_y})",
+            101,
+            101,
+            arcade.color.WHITE,
+            font_size=20,
+        )
+        arcade.draw_text(
+            f"Player: ({self.player.center_x:.1f}, {self.player.center_y:.1f})",
+            101,
+            135,
+            arcade.color.WHITE,
+            font_size=20,
+        )
+        arcade.draw_text(
+            "Debug mode",
+            self.window.width - 250,
+            self.window.height - 50,
+            arcade.color.RED,
+            font_size=20,
+        )
+
+    @staticmethod
+    def _center_camera_to_sprite(camera: arcade.Camera, sprite: arcade.Sprite):
+        screen_center_x = sprite.center_x - (camera.viewport_width / 2)
+        screen_center_y = sprite.center_y - (camera.viewport_height / 2)
+        player_centered = (screen_center_x, screen_center_y)
+
+        camera.move_to(player_centered)
+
 
 class PauseView(arcade.View):
     """Pause screen of the game."""
@@ -364,32 +429,22 @@ class PauseView(arcade.View):
             self._view_to_draw.on_draw()
 
         # Draw the Pause text on the given View as overlay
-        arcade.draw_text(
-            "PAUSED",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 + 50,
-            arcade.color.WHITE,
-            font_size=50,
-            anchor_x="center",
-        )
+        arcade.draw_text("PAUSED", self.window.width / 2, self.window.height / 2 + 50,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
 
         # Show tip to return or reset
-        arcade.draw_text(
-            "Press Esc. to return",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.WHITE,
-            font_size=20,
-            anchor_x="center",
-        )
-        arcade.draw_text(
-            "Press Q to quit",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 30,
-            arcade.color.WHITE,
-            font_size=20,
-            anchor_x="center",
-        )
+        arcade.draw_text("Press Esc. to return",
+                         self.window.width / 2,
+                         self.window.height / 2,
+                         arcade.color.WHITE,
+                         font_size=20,
+                         anchor_x="center")
+        arcade.draw_text("Press Q to quit",
+                         self.window.width / 2,
+                         self.window.height / 2 - 30,
+                         arcade.color.WHITE,
+                         font_size=20,
+                         anchor_x="center")
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
