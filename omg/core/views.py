@@ -3,8 +3,9 @@ from typing import Dict
 
 import arcade
 import arcade.key
+import arcade.key
 
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.events import PickupRequestEvent, ProjectileShotEvent, PickupButtonKeyChangeRequestEvent
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
@@ -59,6 +60,10 @@ class GameView(arcade.View):
         self.observer = Observer()
         self.observer.register_handler("projectile_shot", self._on_projectile_shot)
         self.observer.register_handler("pickup_request", self._on_pickup_request)
+        self.observer.register_handler(
+            "pickup_button_key_change",
+            self._on_player_pickup_button_key_change
+        )
         self.player = Player(
             name="Hero",
             char_class="Wizard",
@@ -131,13 +136,10 @@ class GameView(arcade.View):
             self.pickup_button_text_object.content_height - height_offset
         )
 
-        # Set views to attach on player.key change
-        self.player.attach(self.on_player_pickup_button_key_change)
-
-    def on_player_pickup_button_key_change(self):
+    def _on_player_pickup_button_key_change(self, event: PickupButtonKeyChangeRequestEvent):
         """Update pickup button text when pickup button key changes."""
         self.pickup_button_text_object.text = chr(
-            self.player.pickup_button_key
+            event.key
         ).capitalize()
 
     def _set_pickup_button(
@@ -260,6 +262,7 @@ class GameView(arcade.View):
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
             item_to_add.remove_from_sprite_lists()
+            self.player.pickup_button_key = arcade.key.G
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
