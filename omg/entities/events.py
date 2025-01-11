@@ -1,4 +1,5 @@
 import arcade
+import arcade.key
 from omg.entities.items import ItemManager
 from omg.structural.observer import Event
 from omg.entities.projectile import Projectile
@@ -21,3 +22,11 @@ class ProjectileShotEvent(Event):
     def __init__(self, projectile: Projectile):
         super().__init__("projectile_shot")
         self.projectile = projectile
+
+
+class PickupButtonKeyChangeRequestEvent(Event):
+    """Event triggered when a pickup button key is changed."""
+
+    def __init__(self, key: arcade.key):
+        super().__init__("pickup_button_key_change")
+        self.key = key
