@@ -30,6 +30,7 @@ class Player(ObservableSprite):
         self.angle = initial_angle  # Set initial angle here
 
         # Initialize pickup button key
+        self._button_key_observer = []
         self._pickup_button_key = arcade.key.F
 
         # Movement
@@ -66,19 +67,22 @@ class Player(ObservableSprite):
         self.crafted_skill_slots: list[str] = [None, None]
         self.crafted_skill = SkillFactory()
 
-    # TODO: Two methods below should be changed
     @property
     def pickup_button_key(self):
         """Define self.player.pickup_button_key."""
         return self._pickup_button_key
 
     @pickup_button_key.setter
-    def pickup_button_key(self, new_key: arcade.key):
-        self._pickup_button_key = new_key
-        # Call a method to notify the game window of the change
-        if hasattr(self, "on_key_change"):
-            new_key_text = chr(new_key).capitalize()
-            self.on_key_change(new_key_text)
+    def pickup_button_key(self, new_value):
+        self._pickup_button_key = new_value
+        self._notify_observers()
+
+    def attach(self, observer):
+        self._button_key_observer.append(observer)
+
+    def _notify_observers(self):
+        for observer in self._button_key_observer:
+            observer()
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""

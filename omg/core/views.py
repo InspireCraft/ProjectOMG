@@ -3,6 +3,7 @@ from typing import Dict
 
 import arcade
 import arcade.key
+import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import Pickupable
@@ -130,9 +131,11 @@ class GameView(arcade.View):
         self.pickup_button_text_width = self.pickup_button_text_object.content_width
         self.pickup_button_text_height = self.pickup_button_text_object.content_height - height_offset
 
-        # Set player att to change text_object.text whenever the key changes
-        # TODO: Remove the garbage below
-        self.player.on_key_change = self.update_pickup_button_key_text
+        # Set views to attach on player.key change
+        self.player.attach(self.on_player_pickup_button_key_change)
+
+    def on_player_pickup_button_key_change(self):
+        self.pickup_button_text_object.text = chr(self.player.pickup_button_key).capitalize()
 
     def _set_pickup_button(
         self,
@@ -146,11 +149,6 @@ class GameView(arcade.View):
             pickup_button_dir,
             scale=pickup_button_image_scale,
         )
-
-    # TODO: This method can be called when play.pub is changed
-    def update_pickup_button_key_text(self, new_key_text: str):
-        """Update text_object.text."""
-        self.pickup_button_text_object.text = new_key_text
 
     @property
     def element_icons(self):
@@ -255,6 +253,7 @@ class GameView(arcade.View):
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
             item_to_add.remove_from_sprite_lists()
+            self.player.pickup_button_key = arcade.key.G
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
