@@ -78,6 +78,7 @@ class Player(ObservableSprite):
         self._notify_observers()
 
     def attach(self, observer):
+        """Attach observers for the player pickup button key."""
         self._button_key_observer.append(observer)
 
     def _notify_observers(self):

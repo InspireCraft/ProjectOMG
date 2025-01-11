@@ -3,7 +3,6 @@ from typing import Dict
 
 import arcade
 import arcade.key
-import arcade.key
 
 from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
 from omg.entities.items import Pickupable
@@ -116,7 +115,6 @@ class GameView(arcade.View):
         # Set up pickup button icon
         self.pickup_button = self._set_pickup_button()  # button background
         self.pickup_key_text_font: int = 24
-        # TODO: Rename text_object as pickup button text object
         self.pickup_button_text_object = arcade.Text(
             chr(self.player.pickup_button_key).capitalize(),
             0,
@@ -129,13 +127,18 @@ class GameView(arcade.View):
             self.pickup_key_text_font % 10 + 1
         )
         self.pickup_button_text_width = self.pickup_button_text_object.content_width
-        self.pickup_button_text_height = self.pickup_button_text_object.content_height - height_offset
+        self.pickup_button_text_height = (
+            self.pickup_button_text_object.content_height - height_offset
+        )
 
         # Set views to attach on player.key change
         self.player.attach(self.on_player_pickup_button_key_change)
 
     def on_player_pickup_button_key_change(self):
-        self.pickup_button_text_object.text = chr(self.player.pickup_button_key).capitalize()
+        """Update pickup button text when pickup button key changes."""
+        self.pickup_button_text_object.text = chr(
+            self.player.pickup_button_key
+        ).capitalize()
 
     def _set_pickup_button(
         self,
@@ -213,8 +216,12 @@ class GameView(arcade.View):
 
     def _draw_text_on_pickup_button(self):
         # Calculate initial coordinates of text
-        self.pickup_button_text_object.x = self.pickup_button.center_x - self.pickup_button_text_width / 2
-        self.pickup_button_text_object.y = self.pickup_button.center_y - self.pickup_button_text_height / 2
+        self.pickup_button_text_object.x = (
+            self.pickup_button.center_x - self.pickup_button_text_width / 2
+        )
+        self.pickup_button_text_object.y = (
+            self.pickup_button.center_y - self.pickup_button_text_height / 2
+        )
 
         # Draw the text on the button background
         self.pickup_button_text_object.draw()
