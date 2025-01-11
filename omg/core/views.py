@@ -123,7 +123,7 @@ class GameView(arcade.View):
             arcade.color.BLACK,
             self.pickup_key_text_font,
         )
-        # # Set initial text
+        # # Set pickup button text width and height
         height_offset = (self.pickup_key_text_font // 10) * (
             self.pickup_key_text_font % 10 + 1
         )
