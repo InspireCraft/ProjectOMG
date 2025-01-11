@@ -127,8 +127,8 @@ class GameView(arcade.View):
         height_offset = (self.pickup_key_text_font // 10) * (
             self.pickup_key_text_font % 10 + 1
         )
-        self.text_width = self.pickup_button_text_object.content_width
-        self.text_height = self.pickup_button_text_object.content_height - height_offset
+        self.pickup_button_text_width = self.pickup_button_text_object.content_width
+        self.pickup_button_text_height = self.pickup_button_text_object.content_height - height_offset
 
         # Set player att to change text_object.text whenever the key changes
         # TODO: Remove the garbage below
@@ -215,8 +215,8 @@ class GameView(arcade.View):
 
     def _draw_text_on_pickup_button(self):
         # Calculate initial coordinates of text
-        self.pickup_button_text_object.x = self.pickup_button.center_x - self.text_width / 2
-        self.pickup_button_text_object.y = self.pickup_button.center_y - self.text_height / 2
+        self.pickup_button_text_object.x = self.pickup_button.center_x - self.pickup_button_text_width / 2
+        self.pickup_button_text_object.y = self.pickup_button.center_y - self.pickup_button_text_height / 2
 
         # Draw the text on the button background
         self.pickup_button_text_object.draw()
