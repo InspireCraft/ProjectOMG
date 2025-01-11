@@ -113,9 +113,10 @@ class GameView(arcade.View):
         )
 
         # Set up pickup button icon
-        self.pickup_button = self._set_pickup_button()
+        self.pickup_button = self._set_pickup_button()  # button background
         self.pickup_key_text_font: int = 24
-        self.text_object = arcade.Text(
+        # TODO: Rename text_object as pickup button text object
+        self.pickup_button_text_object = arcade.Text(
             chr(self.player.pickup_button_key).capitalize(),
             0,
             0,
@@ -126,15 +127,12 @@ class GameView(arcade.View):
         height_offset = (self.pickup_key_text_font // 10) * (
             self.pickup_key_text_font % 10 + 1
         )
-        self.text_width = self.text_object.content_width
-        self.text_height = self.text_object.content_height - height_offset
+        self.text_width = self.pickup_button_text_object.content_width
+        self.text_height = self.pickup_button_text_object.content_height - height_offset
 
         # Set player att to change text_object.text whenever the key changes
+        # TODO: Remove the garbage below
         self.player.on_key_change = self.update_pickup_button_key_text
-
-    def update_pickup_button_key_text(self, new_key_text: str):
-        """Update text_object.text."""
-        self.text_object.text = new_key_text
 
     def _set_pickup_button(
         self,
@@ -148,6 +146,11 @@ class GameView(arcade.View):
             pickup_button_dir,
             scale=pickup_button_image_scale,
         )
+
+    # TODO: This method can be called when play.pub is changed
+    def update_pickup_button_key_text(self, new_key_text: str):
+        """Update text_object.text."""
+        self.pickup_button_text_object.text = new_key_text
 
     @property
     def element_icons(self):
@@ -212,11 +215,11 @@ class GameView(arcade.View):
 
     def _draw_text_on_pickup_button(self):
         # Calculate initial coordinates of text
-        self.text_object.x = self.pickup_button.center_x - self.text_width / 2
-        self.text_object.y = self.pickup_button.center_y - self.text_height / 2
+        self.pickup_button_text_object.x = self.pickup_button.center_x - self.text_width / 2
+        self.pickup_button_text_object.y = self.pickup_button.center_y - self.text_height / 2
 
         # Draw the text on the button background
-        self.text_object.draw()
+        self.pickup_button_text_object.draw()
 
     def _draw_pickup_icon(self):
         if len(self.collided_pickupables) >= 1:

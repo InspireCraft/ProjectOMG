@@ -66,6 +66,7 @@ class Player(ObservableSprite):
         self.crafted_skill_slots: list[str] = [None, None]
         self.crafted_skill = SkillFactory()
 
+    # TODO: Two methods below should be changed
     @property
     def pickup_button_key(self):
         """Define self.player.pickup_button_key."""
