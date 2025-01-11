@@ -3,7 +3,11 @@ from typing import Dict, TypeVar, Union
 import arcade
 import arcade.key
 
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent, PickupButtonKeyChangeRequestEvent
+from omg.entities.events import (
+    PickupRequestEvent,
+    ProjectileShotEvent,
+    PickupButtonKeyChangeRequestEvent,
+)
 from omg.entities.items import CircularBuffer
 from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement

@@ -3,9 +3,12 @@ from typing import Dict
 
 import arcade
 import arcade.key
-import arcade.key
 
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent, PickupButtonKeyChangeRequestEvent
+from omg.entities.events import (
+    PickupRequestEvent,
+    ProjectileShotEvent,
+    PickupButtonKeyChangeRequestEvent,
+)
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
@@ -61,8 +64,7 @@ class GameView(arcade.View):
         self.observer.register_handler("projectile_shot", self._on_projectile_shot)
         self.observer.register_handler("pickup_request", self._on_pickup_request)
         self.observer.register_handler(
-            "pickup_button_key_change",
-            self._on_player_pickup_button_key_change
+            "pickup_button_key_change", self._on_player_pickup_button_key_change
         )
         self.player = Player(
             name="Hero",
@@ -136,11 +138,11 @@ class GameView(arcade.View):
             self.pickup_button_text_object.content_height - height_offset
         )
 
-    def _on_player_pickup_button_key_change(self, event: PickupButtonKeyChangeRequestEvent):
+    def _on_player_pickup_button_key_change(
+        self, event: PickupButtonKeyChangeRequestEvent
+    ):
         """Update pickup button text when pickup button key changes."""
-        self.pickup_button_text_object.text = chr(
-            event.key
-        ).capitalize()
+        self.pickup_button_text_object.text = chr(event.key).capitalize()
 
     def _set_pickup_button(
         self,

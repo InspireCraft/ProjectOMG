@@ -8,9 +8,7 @@ from omg.entities.projectile import Projectile
 class PickupRequestEvent(Event):
     """Event triggered when an entity wants to pick up an item from the ground."""
 
-    def __init__(
-        self, entity, entity_pickup_sprite
-    ):
+    def __init__(self, entity, entity_pickup_sprite):
         super().__init__("pickup_request")
         self.entity: ItemManager = entity
         self.entity_pickup_sprite: arcade.Sprite = entity_pickup_sprite
