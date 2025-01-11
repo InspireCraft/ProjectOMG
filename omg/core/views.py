@@ -253,7 +253,6 @@ class GameView(arcade.View):
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
             item_to_add.remove_from_sprite_lists()
-            self.player.pickup_button_key = arcade.key.G
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
