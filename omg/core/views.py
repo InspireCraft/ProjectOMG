@@ -2,8 +2,13 @@ import os.path
 from typing import Dict
 
 import arcade
+import arcade.key
 
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.events import (
+    PickupRequestEvent,
+    ProjectileShotEvent,
+    PickupButtonKeyChangeRequestEvent,
+)
 from omg.entities.items import Pickupable
 from omg.entities.player import Player
 from omg.entities.obstacle import Obstacle
@@ -46,6 +51,9 @@ class GameView(arcade.View):
         self.icon_margin_y = 75
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
+        self.collided_pickupables: list[Pickupable]
+        self.pickup_button: arcade.Sprite = None
+        # self.text_object: arcade.Text = None
 
     def setup(self):
         """Reset the game state."""
@@ -55,6 +63,9 @@ class GameView(arcade.View):
         self.observer = Observer()
         self.observer.register_handler("projectile_shot", self._on_projectile_shot)
         self.observer.register_handler("pickup_request", self._on_pickup_request)
+        self.observer.register_handler(
+            "pickup_button_key_change", self._on_player_pickup_button_key_change
+        )
         self.player = Player(
             name="Hero",
             char_class="Wizard",
@@ -86,8 +97,9 @@ class GameView(arcade.View):
         scale_factor_2 = 0.4
         skill_slot_2_img = os.path.join(ASSET_DIR, "skill_slots_d_f", "F.png")
         self.skill_slot_2 = arcade.Sprite(skill_slot_2_img, scale=scale_factor_2)
-        self.skill_slot_2.center_x = self.skill_slot_1.center_x + \
-            self.skill_slot_2.width
+        self.skill_slot_2.center_x = (
+            self.skill_slot_1.center_x + self.skill_slot_2.width
+        )
         self.skill_slot_2.center_y = self.skill_slot_2.height // 2
 
         self.physics_engine = PhysicsEngineBoundary(
@@ -105,6 +117,44 @@ class GameView(arcade.View):
         )
         self.pickupables.append(
             Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
+        )
+
+        # Set up pickup button icon
+        self.pickup_button = self._set_pickup_button()  # button background
+        self.pickup_key_text_font: int = 24
+        self.pickup_button_text_object = arcade.Text(
+            chr(self.player.pickup_button_key).capitalize(),
+            0,
+            0,
+            arcade.color.BLACK,
+            self.pickup_key_text_font,
+        )
+        # # Set pickup button text width and height
+        height_offset = (self.pickup_key_text_font // 10) * (
+            self.pickup_key_text_font % 10 + 1
+        )
+        self.pickup_button_text_width = self.pickup_button_text_object.content_width
+        self.pickup_button_text_height = (
+            self.pickup_button_text_object.content_height - height_offset
+        )
+
+    def _on_player_pickup_button_key_change(
+        self, event: PickupButtonKeyChangeRequestEvent
+    ):
+        """Update pickup button text when pickup button key changes."""
+        self.pickup_button_text_object.text = chr(event.key).capitalize()
+
+    def _set_pickup_button(
+        self,
+        pickup_button_dir: os.path = os.path.join(
+            ASSET_DIR, "pickup_button", "button_background.png"
+        ),
+        pickup_button_image_scale: float = 0.3,
+    ):
+        # Set pickup_button
+        return arcade.Sprite(
+            pickup_button_dir,
+            scale=pickup_button_image_scale,
         )
 
     @property
@@ -133,6 +183,7 @@ class GameView(arcade.View):
         self.projectiles.draw()
         self.pickupables.draw()
         self._draw_ui()
+        self._draw_pickup_icon()
 
     def update(self, delta_time):
         """Main update window."""
@@ -141,9 +192,53 @@ class GameView(arcade.View):
         self.physics_engine.update()
         self.projectiles.update()
         handle_projectile_collisions(self.projectiles, self.obstacles)
+        self._check_collision_between_player_and_pickupable()
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.projectiles.append(event.projectile)
+
+    def _check_collision_between_player_and_pickupable(self):
+        self.collided_pickupables: list[Pickupable] = (
+            arcade.check_for_collision_with_list(self.player, self.pickupables)
+        )
+
+    def _get_pickup_button_coordinates(self, pickupable: Pickupable):
+        # Calculate directional vector between player and pickupable
+        diff_x: float = pickupable.center_x - self.player.center_x
+        diff_y: float = pickupable.center_y - self.player.center_y
+
+        return pickupable.center_x + diff_x, pickupable.center_y + diff_y
+
+    def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
+        # Place button image at the mirror reflection of player wrt pickupable
+        x, y = self._get_pickup_button_coordinates(pickupable)
+        self.pickup_button.center_x = x
+        self.pickup_button.center_y = y
+
+        # Draw the button background
+        self.pickup_button.draw()
+
+    def _draw_text_on_pickup_button(self):
+        # Calculate initial coordinates of text
+        self.pickup_button_text_object.x = (
+            self.pickup_button.center_x - self.pickup_button_text_width / 2
+        )
+        self.pickup_button_text_object.y = (
+            self.pickup_button.center_y - self.pickup_button_text_height / 2
+        )
+
+        # Draw the text on the button background
+        self.pickup_button_text_object.draw()
+
+    def _draw_pickup_icon(self):
+        if len(self.collided_pickupables) >= 1:
+            for pickupable in self.collided_pickupables:
+                # Draw button background
+                self._draw_pickup_button(pickupable)
+                # Draw the text on the button background
+                self._draw_text_on_pickup_button()
+        else:
+            return
 
     def _on_pickup_request(self, event: PickupRequestEvent):
         """Handles pickup request of an entity.
@@ -156,15 +251,15 @@ class GameView(arcade.View):
         3) Out of all the collisions, let the entity pick up the closest object.
         4) Remove the picked up item from the ground.
         """
-        collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
-            event.entity_pickup_sprite, self.pickupables
-        )
-        if len(collided_sprites) >= 1:
+        # collided_sprites: list[Pickupable] = arcade.check_for_collision_with_list(
+        #     event.entity_pickup_sprite, self.pickupables
+        # )
+        if len(self.collided_pickupables) >= 1:
             # Item is at pick up range
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
-                event.entity_pickup_sprite, collided_sprites
+                event.entity_pickup_sprite, self.collided_pickupables
             )[0]
-            item_to_add = collided_sprites[0]
+            item_to_add = self.collided_pickupables[0]
             item_manager = event.entity
             item_manager.add_item(closes_pickupable.item)
             # remove reference to the pickupables list
@@ -194,7 +289,7 @@ class GameView(arcade.View):
         corresponding `key_release` logic called when the view has been changed.
         Those callbacks are called before the view is changed.
         """
-        for (key_tuple, is_active) in self.active_keys.items():
+        for key_tuple, is_active in self.active_keys.items():
             # NOTE: keys which are also modifiers are pressed and released
             # differently. CTRL is (65507, 18) when pressed, (65507, 16) when
             # released. A more detailed check for those keys might be necessary
@@ -229,9 +324,7 @@ class GameView(arcade.View):
         if self.player.crafted_skill_slots[0] is not None:
             scale_factor_crafted_skill_1 = 0.3
             skill_1_img = os.path.join(
-                ASSET_DIR,
-                "skills",
-                f"{self.player.crafted_skill_slots[0]}.png"
+                ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[0]}.png"
             )
             skill_1 = arcade.Sprite(skill_1_img, scale=scale_factor_crafted_skill_1)
             skill_1.center_x = skill_1.width // 2
@@ -241,9 +334,7 @@ class GameView(arcade.View):
         if self.player.crafted_skill_slots[1] is not None:
             scale_factor_crafted_skill_2 = 0.3
             skill_2_img = os.path.join(
-                ASSET_DIR,
-                "skills",
-                f"{self.player.crafted_skill_slots[1]}.png"
+                ASSET_DIR, "skills", f"{self.player.crafted_skill_slots[1]}.png"
             )
             skill_2 = arcade.Sprite(skill_2_img, scale=scale_factor_crafted_skill_2)
             skill_2.center_x = skill_2.width // 2 + skill_2.width
@@ -273,22 +364,32 @@ class PauseView(arcade.View):
             self._view_to_draw.on_draw()
 
         # Draw the Pause text on the given View as overlay
-        arcade.draw_text("PAUSED", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text(
+            "PAUSED",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 + 50,
+            arcade.color.WHITE,
+            font_size=50,
+            anchor_x="center",
+        )
 
         # Show tip to return or reset
-        arcade.draw_text("Press Esc. to return",
-                         SCREEN_WIDTH / 2,
-                         SCREEN_HEIGHT / 2,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
-        arcade.draw_text("Press Q to quit",
-                         SCREEN_WIDTH / 2,
-                         SCREEN_HEIGHT / 2 - 30,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
+        arcade.draw_text(
+            "Press Esc. to return",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
+        arcade.draw_text(
+            "Press Q to quit",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 - 30,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""

@@ -3,7 +3,11 @@ from typing import Dict, TypeVar, Union
 import arcade
 import arcade.key
 
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+from omg.entities.events import (
+    PickupRequestEvent,
+    ProjectileShotEvent,
+    PickupButtonKeyChangeRequestEvent,
+)
 from omg.entities.items import CircularBuffer
 from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement
@@ -28,6 +32,10 @@ class Player(ObservableSprite):
         self.change_x = 0
         self.change_y = 0
         self.angle = initial_angle  # Set initial angle here
+
+        # Initialize pickup button key
+        self._button_key_observer = []
+        self._pickup_button_key = arcade.key.F
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -63,6 +71,17 @@ class Player(ObservableSprite):
         self.crafted_skill_slots: list[str] = [None, None]
         self.crafted_skill = SkillFactory()
 
+    @property
+    def pickup_button_key(self):
+        """Define self.player.pickup_button_key."""
+        return self._pickup_button_key
+
+    @pickup_button_key.setter
+    def pickup_button_key(self, new_value):
+        self._pickup_button_key = new_value
+        event = PickupButtonKeyChangeRequestEvent(new_value)
+        self.notify_observers(event)
+
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
@@ -81,7 +100,7 @@ class Player(ObservableSprite):
             self.elements.set_prev()
         elif key == arcade.key.E:
             self.elements.set_next()
-        elif key == arcade.key.F:
+        elif key == self.pickup_button_key:
             self.pickup_element()
 
     def on_key_release(self, key, modifiers):
