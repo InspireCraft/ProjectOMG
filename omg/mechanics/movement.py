@@ -45,18 +45,31 @@ class PlayerMovement(ABC):
     # TODO: make calculate_displacement_directions static
     def on_key_press(self, key, modifiers):
         """Called when the user presses a key."""
+        # if key == self.key_forward:
+        #     self.pressed_forward = True
+        #     self.move_direction = (self.move_direction[0], 1)
+        # elif key == self.key_backward:
+        #     self.pressed_backward = True
+        #     self.move_direction = (self.move_direction[0], -1)
+        # elif key == self.key_left:
+        #     self.pressed_left = True
+        #     self.move_direction = (-1, self.move_direction[1])
+        # elif key == self.key_right:
+        #     self.pressed_right = True
+        #     self.move_direction = (1, self.move_direction[1])
+
         if key == self.key_forward:
             self.pressed_forward = True
-            self.move_direction = (self.move_direction[0], 1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1]+1)
         elif key == self.key_backward:
             self.pressed_backward = True
-            self.move_direction = (self.move_direction[0], -1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1]-1)
         elif key == self.key_left:
             self.pressed_left = True
-            self.move_direction = (-1, self.move_direction[1])
+            self.move_direction = (self.move_direction[0]-1, self.move_direction[1])
         elif key == self.key_right:
             self.pressed_right = True
-            self.move_direction = (1, self.move_direction[1])
+            self.move_direction = (self.move_direction[0]+1, self.move_direction[1])
 
         # [self.change_direction_x, self.change_direction_y] = (
         #     self._calculate_displacement_directions()
@@ -64,22 +77,35 @@ class PlayerMovement(ABC):
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
+        # if key == self.key_forward:
+        #     self.pressed_forward = False
+        #     if not self.pressed_backward:
+        #         self.move_direction = (self.move_direction[0], 0)
+        # elif key == self.key_backward:
+        #     self.pressed_backward = False
+        #     if not self.pressed_forward:
+        #         self.move_direction = (self.move_direction[0], 0)
+        # elif key == self.key_left:
+        #     self.pressed_left = False
+        #     if not self.pressed_right:
+        #         self.move_direction = (0, self.move_direction[1])
+        # elif key == self.key_right:
+        #     self.pressed_right = False
+        #     if not self.pressed_left:
+        #         self.move_direction = (0, self.move_direction[1])
+
         if key == self.key_forward:
             self.pressed_forward = False
-            if not self.pressed_backward:
-                self.move_direction = (self.move_direction[0], 0)
+            self.move_direction = (self.move_direction[0], self.move_direction[1]-1)
         elif key == self.key_backward:
             self.pressed_backward = False
-            if not self.pressed_forward:
-                self.move_direction = (self.move_direction[0], 0)
+            self.move_direction = (self.move_direction[0], self.move_direction[1]+1)
         elif key == self.key_left:
             self.pressed_left = False
-            if not self.pressed_right:
-                self.move_direction = (0, self.move_direction[1])
+            self.move_direction = (self.move_direction[0]+1, self.move_direction[1])
         elif key == self.key_right:
             self.pressed_right = False
-            if not self.pressed_left:
-                self.move_direction = (0, self.move_direction[1])
+            self.move_direction = (self.move_direction[0]-1, self.move_direction[1])
 
         # [self.change_direction_x, self.change_direction_y] = (
         #     self._calculate_displacement_directions()
@@ -93,6 +119,14 @@ class PlayerMovement(ABC):
 
         # change_direction_x = left + right
         # change_direction_y = forward + backward
+
+        # forward = 1 if self.pressed_forward else 0
+        # backward = -1 if self.pressed_backward else 0
+        # left = -1 if self.pressed_left else 0
+        # right = 1 if self.pressed_right else 0
+
+        # self.move_direction = (left+right, forward+backward)
+
         if self.action_finished:
             [change_direction_x, change_direction_y] = self.move_direction
         else:

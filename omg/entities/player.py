@@ -33,14 +33,6 @@ class Player(ObservableSprite):
         # self.texture = arcade.load_texture(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites", "Walk_Down0.png")),
         # self.texture = arcade.load_texture(str(ASSET_DIR) + "/characters/demo_archer/sprites/Walk_Down0.png"),
 
-        # Animations
-        self.animation_logic = Animations(
-            slash_key=arcade.key.KEY_1,
-            cast_key=arcade.key.KEY_2,
-            thrust_key=arcade.key.KEY_3,
-            shoot_key=arcade.key.KEY_4,
-        )
-
         # Movement
         self.movement_logic = movement.CompassDirected(
             forward=arcade.key.W,
@@ -48,6 +40,16 @@ class Player(ObservableSprite):
             left=arcade.key.A,
             right=arcade.key.D,
         )
+        
+        # Animations
+        self.animation_logic = Animations(
+            slash_key=arcade.key.KEY_1,
+            cast_key=arcade.key.KEY_2,
+            thrust_key=arcade.key.KEY_3,
+            shoot_key=arcade.key.KEY_4,
+            move_logic=self.movement_logic
+        )
+
         # self.movement_logic = movement.MouseDirected(
         #     forward=arcade.key.W,
         #     backward=arcade.key.S,
@@ -102,10 +104,16 @@ class Player(ObservableSprite):
                 self.mov_speed_ud,
             )
         )
-        self.movement_logic._calculate_displacement_directions()
+        # self.movement_logic._calculate_displacement_directions()
         self.texture = self.animation_logic.update(delta_time, player_change_x=self.change_x, player_change_y=self.change_y)
         self._regenerate_mana(delta_time)
-        print([self.change_x, self.change_y])
+        # print([self.change_x, self.change_y]
+        a =  (1, 2)
+        # a =  {'alp':2, 'arda':3}
+        b =  [1, 2]
+
+        b[0] = 5
+        b.insert(0, 6)
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
