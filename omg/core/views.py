@@ -254,7 +254,10 @@ class GameView(arcade.View):
         diff_x: float = pickupable.center_x - self.player.center_x
         diff_y: float = pickupable.center_y - self.player.center_y
 
-        return pickupable.center_x + diff_x, pickupable.center_y + diff_y
+        x = pickupable.center_x + diff_x - self.camera_sprite.position[0]
+        y = pickupable.center_y + diff_y - self.camera_sprite.position[1]
+
+        return x, y
 
     def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
         # Place button image at the mirror reflection of player wrt pickupable
