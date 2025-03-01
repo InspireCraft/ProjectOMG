@@ -80,6 +80,8 @@ class GameView(arcade.View):
         # Create scene
         self.scene = arcade.Scene()
 
+        self._collided_pickupables: list[Pickupable] = arcade.SpriteList()
+
         # Add obstacles to the scene
         obstacle_image = os.path.join(ASSET_DIR, "obstacles", "obstacle.png")
         obstacle = Obstacle(obstacle_image, 0.2, health=50)
@@ -198,6 +200,7 @@ class GameView(arcade.View):
         if self.debug_mode:
             self.scene.draw_hit_boxes(arcade.color.RED)
             self.player.draw_hit_box(arcade.color.RED)
+            self.player.pickup_sprite.draw_hit_box(arcade.color.RED)
         # Activate GUI camera before drawing GUI elements
         # This is to ensure GUI elements are drawn w.r.t the window
         self.camera_gui.use()
@@ -207,7 +210,17 @@ class GameView(arcade.View):
             self._draw_debug_info()
 
     def update(self, delta_time):
-        """Main update window."""
+        """Main update window.
+
+        The main update is divided into two parts:
+
+        First is to update the Sprites individually without taking any
+        interactions with the other Sprites into account.
+
+        The second part is to update the Sprites which have interactions with
+        each other.
+        """
+        # Scene updates sprites individually
         self.scene.update()
         # Mouse is tracked in the window coordinates, but the player logic needs
         # the mouse in the camera coordinates. Thus, the mouse position relative
@@ -217,9 +230,20 @@ class GameView(arcade.View):
         mouse_in_camera_y = self.mouse_y + self.camera_sprite.position[1]
         self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
 
+        # Update behaviour between the player and the pickupables
+        self._collided_pickupables = arcade.check_for_collision_with_list(
+            self.player.pickup_sprite,
+            self.scene["Pickupables"]
+        )
+
+        # Update behaviour between the player and the obstacles
         self.physics_engine.update()
+
+        # Update behaviour between the projectiles and the obstacles
         handle_projectile_collisions(self.scene["Projectiles"], self.scene["Obstacles"])
-        # Position the camera to the player
+
+        # Update behaviour between the camera and the player, positions the
+        # camera to the player
         self._center_camera_to_sprite(self.camera_sprite, self.player)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):
@@ -254,8 +278,8 @@ class GameView(arcade.View):
         self.pickup_button_text_object.draw()
 
     def _draw_pickup_icon(self):
-        if len(self.collided_pickupables) >= 1:
-            for pickupable in self.collided_pickupables:
+        if len(self._collided_pickupables) >= 1:
+            for pickupable in self._collided_pickupables:
                 # Draw button background
                 self._draw_pickup_button(pickupable)
                 # Draw the text on the button background

@@ -37,6 +37,13 @@ class Player(ObservableSprite):
         self._button_key_observer = []
         self._pickup_button_key = arcade.key.F
 
+        # Initialize item pickup sprite
+        self.item_pickup_radius = 50
+        self._pick_up_sprite = arcade.SpriteCircle(
+            radius=self.item_pickup_radius,
+            color=arcade.color.RED,
+        )  # transparent circular sprite to define the hitbox
+
         # Movement
         self.movement_logic = movement.CompassDirected(
             forward=arcade.key.W,
@@ -64,7 +71,7 @@ class Player(ObservableSprite):
 
         # Skills
         self.elements = ElementManager(N_ELEMENTS_MAX)
-        self.item_pickup_radius = 5
+
         # Initialize an empty element_buffer
         self.to_be_combined_element_buffer: list[str] = []
         # Initialize crafted skill slots as None
@@ -81,6 +88,17 @@ class Player(ObservableSprite):
         self._pickup_button_key = new_value
         event = PickupButtonKeyChangeRequestEvent(new_value)
         self.notify_observers(event)
+
+    @property
+    def pickup_sprite(self):
+        """Define self.player.pickup_sprite."""
+        return self._pick_up_sprite
+
+    @pickup_sprite.getter
+    def pickup_sprite(self):
+        self._pick_up_sprite.center_x = self.center_x
+        self._pick_up_sprite.center_y = self.center_y
+        return self._pick_up_sprite
 
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
@@ -167,17 +185,7 @@ class Player(ObservableSprite):
 
     def pickup_element(self):
         """Publish a skill pickup request event."""
-        # Player will try to pickup the items in a circle around it
-        pick_up_sprite = arcade.SpriteCircle(
-            radius=self.item_pickup_radius,
-            color=arcade.color.RED,
-        )  # transparent circular sprite to define the hitbox
-        pick_up_sprite.center_x = self.center_x
-        pick_up_sprite.center_y = self.center_y
-        pick_up_event = PickupRequestEvent(
-            self.elements,  # send skill manager
-            pick_up_sprite,
-        )
+        pick_up_event = PickupRequestEvent(self.elements, self.pickup_sprite)
         self.notify_observers(pick_up_event)
 
     def set_movement_keys(self, forward, backward, left, right):
