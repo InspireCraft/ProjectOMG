@@ -97,11 +97,14 @@ class GameView(arcade.View):
             use_spatial_hash=True,
         )
         self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10))
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10)
+        )
         self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20))
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20)
+        )
         self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
+        )
 
         # Add projectiles to the scene
         self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
@@ -232,8 +235,7 @@ class GameView(arcade.View):
 
         # Update behaviour between the player and the pickupables
         self._collided_pickupables = arcade.check_for_collision_with_list(
-            self.player.pickup_sprite,
-            self.scene["Pickupables"]
+            self.player.pickup_sprite, self.scene["Pickupables"]
         )
 
         # Update behaviour between the player and the obstacles
@@ -456,22 +458,32 @@ class PauseView(arcade.View):
             self._view_to_draw.on_draw()
 
         # Draw the Pause text on the given View as overlay
-        arcade.draw_text("PAUSED", self.window.width / 2, self.window.height / 2 + 50,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text(
+            "PAUSED",
+            self.window.width / 2,
+            self.window.height / 2 + 50,
+            arcade.color.WHITE,
+            font_size=50,
+            anchor_x="center",
+        )
 
         # Show tip to return or reset
-        arcade.draw_text("Press Esc. to return",
-                         self.window.width / 2,
-                         self.window.height / 2,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
-        arcade.draw_text("Press Q to quit",
-                         self.window.width / 2,
-                         self.window.height / 2 - 30,
-                         arcade.color.WHITE,
-                         font_size=20,
-                         anchor_x="center")
+        arcade.draw_text(
+            "Press Esc. to return",
+            self.window.width / 2,
+            self.window.height / 2,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
+        arcade.draw_text(
+            "Press Q to quit",
+            self.window.width / 2,
+            self.window.height / 2 - 30,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+        )
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
