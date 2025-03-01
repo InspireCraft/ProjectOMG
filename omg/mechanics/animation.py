@@ -38,24 +38,3 @@ class Animation():
 
     def _reset_index(self, direction: str):
         self.counters[direction] = 0
-
-
-
-if __name__ == '__main__':
-    path = 'omg/mechanics/backslash'
-    path = 'omg/assets/images/characters/demo_archer_2/sprites/'
-    our_animations = ["idle", "walk", "slash", "spellcast", "thrust", "shoot", "die", "backslash"]
-    animation = Animation(path, 'backslash')
-
-    all_animations = {}
-    for action in our_animations:
-        all_animations[action] = Animation('omg/assets/images/characters/demo_archer_2/sprites/', action)
-
-
-    for action in all_animations.keys():
-        animation:Animation = all_animations[action]
-        for direction in animation.textures.keys():
-            print(action, direction, animation._number_of_textures[direction])
-
-    print(all_animations)
-    print(animation._number_of_textures)
