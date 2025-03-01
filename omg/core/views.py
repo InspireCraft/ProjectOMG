@@ -220,7 +220,6 @@ class GameView(arcade.View):
         The second part is to update the Sprites which have interactions with
         each other.
         """
-
         # Scene updates sprites individually
         self.scene.update()
         # Mouse is tracked in the window coordinates, but the player logic needs
