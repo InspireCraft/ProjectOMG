@@ -13,8 +13,8 @@ from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement
 from omg.structural.observer import ObservableSprite
 
-MOVEMENT_SPEED_FORWARD = 1
-MOVEMENT_SPEED_SIDE = 1
+MOVEMENT_SPEED_VERTICAL = 5
+MOVEMENT_SPEED_HORIZONTAL = 5
 N_ELEMENTS_MAX = 5
 T = TypeVar("T")  # Define a type variable
 
@@ -44,14 +44,14 @@ class Player(ObservableSprite):
             left=arcade.key.A,
             right=arcade.key.D,
         )
-        self.movement_logic = movement.MouseDirected(
-            forward=arcade.key.W,
-            backward=arcade.key.S,
-            left=arcade.key.A,
-            right=arcade.key.D,
-        )
-        self.mov_speed_lr = MOVEMENT_SPEED_SIDE
-        self.mov_speed_ud = MOVEMENT_SPEED_FORWARD
+        # self.movement_logic = movement.MouseDirected(
+        #     forward=arcade.key.W,
+        #     backward=arcade.key.S,
+        #     left=arcade.key.A,
+        #     right=arcade.key.D,
+        # )
+        self.mov_speed_lr = MOVEMENT_SPEED_HORIZONTAL
+        self.mov_speed_ud = MOVEMENT_SPEED_VERTICAL
         # Health
         self.max_health = 100
         self.current_health = 100
