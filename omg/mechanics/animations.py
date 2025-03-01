@@ -2,6 +2,7 @@ import os
 import arcade
 from omg.mechanics.textures import Textures
 from omg.mechanics.movement import PlayerMovement
+from omg.mechanics.animation import Animation
 
 ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
@@ -13,36 +14,42 @@ PLAYER_MOVEMENT_SPEED = 3
 ANIMATION_SPEED = 0.08
 
 # Character states
-IDLE = "Idle"
-WALK = "Walk"
-SLASH = "Slash"
-SPELLCAST = "SpellCast"
-THRUST = "Thrust"
-SHOOT = "Shoot"
-DIE = "Die"
+IDLE = "idle"
+WALK = "walk"
+SLASH = "slash"
+SPELLCAST = "spellcast"
+THRUST = "thrust"
+SHOOT = "shoot"
+DIE = "die"
 
 # Constants used to track if the player is facing left or right
-DOWN_FACING = 0
-UP_FACING = 1
-RIGHT_FACING = 2
-LEFT_FACING = 3
+DOWN_FACING = "down"
+UP_FACING = "up"
+RIGHT_FACING = "right"
+LEFT_FACING = 'left'
 
 
 class Animations():
-    
+
     def __init__(self, slash_key, cast_key, thrust_key, shoot_key, move_logic):
-        
+
         self.slash_key = slash_key
         self.cast_key = cast_key
         self.thrust_key = thrust_key
         self.shoot_key = shoot_key
-        
+
         self.player_state = IDLE
         self.character_face_direction = DOWN_FACING
         self.player_texture = ""
 
         main_path = str(os.path.join(ASSET_DIR, "characters", "demo_archer_2", "sprites"))
-        self.textures = Textures(sprite_path=main_path)
+
+        animation_types = ["idle", "walk", "slash", "spellcast", "thrust", "shoot", "die"]
+        self.all_animations = {}
+        for action in animation_types:
+            self.all_animations[action] = Animation(main_path, action)
+
+        self.active_direction = "down"
 
         self.animation_timer = 0
 
@@ -64,7 +71,7 @@ class Animations():
     @property
     def move_direction(self):
         return self.move_logic.move_direction
-    
+
     def update(self, delta_time, player_change_x, player_change_y):
         # Movement and game logic
         self.player_change_x = player_change_x
@@ -75,65 +82,31 @@ class Animations():
             self.update_movement()
 
         return self.player_texture
-    
+
     def update_animation(self, delta_time):
 
         # Figure out if we need to flip face left or right
         if self.player_change_y < 0 and self.character_face_direction != DOWN_FACING:
             self.character_face_direction = DOWN_FACING
-            self.textures.set_texture(direction="down")
         if self.player_change_y > 0 and self.character_face_direction != UP_FACING:
             self.character_face_direction = UP_FACING
-            self.textures.set_texture(direction="up")
         if self.player_change_x < 0 and self.character_face_direction != LEFT_FACING:
             self.character_face_direction = LEFT_FACING
-            self.textures.set_texture(direction="left")
         if self.player_change_x > 0 and self.character_face_direction != RIGHT_FACING:
             self.character_face_direction = RIGHT_FACING
-            self.textures.set_texture(direction="right") 
 
         """ Update the animation state of the player """
         self.animation_timer += delta_time
-        
+
         if self.animation_timer > ANIMATION_SPEED:
-            if self.player_state == IDLE:
-                self.player_texture = self.textures.idle[self.textures.idle_index]
-                self.textures.increment_index(state="idle")
-            elif self.player_state == WALK:
-                self.player_texture = self.textures.walk[self.textures.walk_index]
-                self.textures.increment_index(state="walk")
-            elif self.player_state == SLASH:
-                self.player_texture = self.textures.slash[self.textures.slash_index]
-                self.textures.increment_index(state="slash")
-                if self.textures.slash_index >= len(self.textures.slash):
-                    self.finish_action()
-                    self.textures.reset_index(state="slash")
-            elif self.player_state == SPELLCAST:
-                self.player_texture = self.textures.spellcast[self.textures.spellcast_index]
-                self.textures.increment_index(state="spellcast")
-                if self.textures.spellcast_index >= len(self.textures.spellcast):
-                    self.finish_action()
-                    self.textures.reset_index(state="spellcast")
-            elif self.player_state == THRUST:
-                self.player_texture = self.textures.thrust[self.textures.thrust_index]
-                self.textures.increment_index(state="thrust")
-                if self.textures.thrust_index >= len(self.textures.thrust):
-                    self.finish_action()
-                    self.textures.reset_index(state="thrust")
-            elif self.player_state == SHOOT:
-                self.player_texture = self.textures.shoot[self.textures.shoot_index]
-                self.textures.increment_index(state="shoot")
-                if self.textures.shoot_index >= len(self.textures.shoot):
-                    self.finish_action()
-                    self.textures.reset_index(state="shoot")
-            elif self.player_state == DIE:
-                self.player_texture = self.textures.die[self.textures.die_index]
-                self.textures.increment_index(state="die")
-                if self.textures.die_index >= len(self.textures.die):
-                    self.game_over = True
-                    self.textures.reset_index(state="die")
+            current_animation: Animation = self.all_animations[self.player_state]
+            self.player_texture, is_animation_finished = current_animation.get_next_texture(self.character_face_direction)
+
+            if is_animation_finished:
+                self.finish_action()
 
             self.animation_timer = 0
+
 
     def finish_action(self):
         """ Handle finishing an action and transition to the appropriate state """
@@ -145,10 +118,6 @@ class Animations():
 
     def update_movement(self):
         """ Update the player's movement based on the keys pressed """
-        # Player.change_x = self.move_direction[0] * 1
-        # Player.change_y = self.move_direction[1] * 1
-        # self.player_change_x = self.move_direction[0] * 1
-        # self.player_change_y = self.move_direction[1] * 1
         self.action_finished = 1
 
         if self.move_direction[0] == 0 and self.move_direction[1] == 0:
@@ -156,19 +125,6 @@ class Animations():
 
     def on_key_press(self, key, modifiers):
         """ Called whenever a key is pressed. """
-        # if key == arcade.key.W:
-        #     self.w_pressed = True
-        #     self.move_direction = (self.move_direction[0], PLAYER_MOVEMENT_SPEED)
-        #     # self.move_direction = self.move_logic.move_direction
-        # elif key == arcade.key.S:
-        #     self.s_pressed = True
-        #     self.move_direction = (self.move_direction[0], -PLAYER_MOVEMENT_SPEED)
-        # elif key == arcade.key.A:
-        #     self.a_pressed = True
-        #     self.move_direction = (-PLAYER_MOVEMENT_SPEED, self.move_direction[1])
-        # elif key == arcade.key.D:
-        #     self.d_pressed = True
-        #     self.move_direction = (PLAYER_MOVEMENT_SPEED, self.move_direction[1])
 
         if self.player_state not in [SLASH, SPELLCAST, THRUST, SHOOT, DIE]:
             self.player_state = WALK
@@ -191,22 +147,6 @@ class Animations():
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a key is released. """
-        # if key == arcade.key.W:
-        #     self.w_pressed = False
-        #     if not self.s_pressed:
-        #         self.move_direction = (self.move_direction[0], 0)
-        # elif key == arcade.key.S:
-        #     self.s_pressed = False
-        #     if not self.w_pressed:
-        #         self.move_direction = (self.move_direction[0], 0)
-        # elif key == arcade.key.A:
-        #     self.a_pressed = False
-        #     if not self.d_pressed:
-        #         self.move_direction = (0, self.move_direction[1])
-        # elif key == arcade.key.D:
-        #     self.d_pressed = False
-        #     if not self.a_pressed:
-        #         self.move_direction = (0, self.move_direction[1])
 
         self.check_movement_keys()
 
