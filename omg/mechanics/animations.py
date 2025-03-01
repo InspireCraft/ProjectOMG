@@ -1,8 +1,7 @@
 import os
-import arcade
-from omg.mechanics.textures import Textures
-from omg.mechanics.movement import PlayerMovement
+
 from omg.mechanics.animation import Animation
+from omg.mechanics.movement import PlayerMovement
 
 ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
