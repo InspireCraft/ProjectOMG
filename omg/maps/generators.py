@@ -11,6 +11,7 @@ class SpriteGenerator():
     @staticmethod
     def generate_sprites_in_area(
         area_size: tuple[int, int],
+        area_left_bottom: tuple[int, int] = (0, 0),
         count: int = 0,
         no_overlap_sprites: List[arcade.SpriteList] = [],
         min_size=10,
@@ -35,10 +36,18 @@ class SpriteGenerator():
                 sprite.height = max(min(sprite.height, max_size), min_size)
 
             if random_position:
-                x = random.randint(0, int(ceil(area_size[0] - sprite.width)))
+                area_left, area_bottom = area_left_bottom
+                area_right = area_left + area_size[0]
+                area_top = area_bottom + area_size[1]
+
+                x_min = area_left
+                x_max = int(ceil(area_right - sprite.width))
+                x = random.randint(x_min, x_max)
                 sprite.center_x = x
 
-                y = random.randint(0, int(ceil(area_size[1] - sprite.height)))
+                y_min = area_bottom
+                y_max = int(ceil(area_top - sprite.height))
+                y = random.randint(y_min, y_max)
                 sprite.center_y = y
 
             if random_angle:
@@ -68,7 +77,7 @@ class SpriteGenerator():
                 # Update loop counter
                 counter += 1
             else:
-                # Loop ended without  triggering 'break', meaning that the
+                # Loop ended without triggering 'break', meaning that the
                 # sprite could not be placed in the scene without overlapping
                 # with other sprites.
                 is_placeable = False
