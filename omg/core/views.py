@@ -16,6 +16,7 @@ from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
 from omg.entities.elements import ELEMENTS
+from omg.maps.generators import SpriteGenerator
 
 
 ASSET_DIR = os.path.join(
@@ -90,20 +91,47 @@ class GameView(arcade.View):
         self.scene.add_sprite_list("Obstacles", use_spatial_hash=True)
         self.scene.add_sprite("Obstacles", obstacle)
 
+        new_obstacles = SpriteGenerator.generate_sprites_in_area(
+            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            no_overlap_sprites=self.scene.sprite_lists,
+            count=10,
+            min_size=10,
+            max_size=100,
+            random_size=True,
+        )
+        self.scene.add_sprite_list("Walls", sprite_list=new_obstacles, use_spatial_hash=True)
         # Add pickupables to the scene
         self.scene.add_sprite_list_after(
             name="Pickupables",
-            after="Obstacles",
+            after="Walls",
             use_spatial_hash=True,
         )
-        self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 150, 10))
-        self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20))
-        self.scene.add_sprite(
-            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
+        fire_skills = SpriteGenerator.generate_sprites_in_area(
+            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            no_overlap_sprites=self.scene.sprite_lists,
+            count=3,
+            min_size=10,
+            max_size=100,
+            sprite_init_fn=lambda: Pickupable(
+                COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 0, 0
+            ),
+            random_size=False,
+        )
+        self.scene.get_sprite_list("Pickupables").extend(fire_skills)
 
-        # Add projectiles to the scene
+        ice_skills = SpriteGenerator.generate_sprites_in_area(
+            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            no_overlap_sprites=self.scene.sprite_lists,
+            count=3,
+            min_size=10,
+            max_size=100,
+            sprite_init_fn=lambda: Pickupable(
+                COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 0, 0
+            ),
+            random_size=False,
+        )
+        self.scene.get_sprite_list("Pickupables").extend(ice_skills)
+
         self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
 
         self.camera_sprite = arcade.Camera(window=self.window)
