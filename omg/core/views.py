@@ -30,6 +30,7 @@ SCREEN_HEIGHT = 600  # Also defines player's POV
 # player's coordinates are limited to -GAME_MAX_BOUNDS, GAME_MAX_BOUNDS
 GAME_MAX_BOUNDS = 10000
 SCREEN_TITLE = "2D Shooter RPG"
+(ARENA_WIDTH, ARENA_HEIGHT) = (GAME_MAX_BOUNDS / 10, GAME_MAX_BOUNDS / 10)
 
 
 class GameView(arcade.View):
@@ -92,7 +93,7 @@ class GameView(arcade.View):
         self.scene.add_sprite("Obstacles", obstacle)
 
         new_obstacles = SpriteGenerator.generate_sprites_in_area(
-            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            area_size=(ARENA_WIDTH, ARENA_HEIGHT),
             no_overlap_sprites=self.scene.sprite_lists,
             count=10,
             min_size=10,
@@ -107,7 +108,7 @@ class GameView(arcade.View):
             use_spatial_hash=True,
         )
         fire_skills = SpriteGenerator.generate_sprites_in_area(
-            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            area_size=(ARENA_WIDTH, ARENA_HEIGHT),
             no_overlap_sprites=self.scene.sprite_lists,
             count=3,
             min_size=10,
@@ -120,7 +121,7 @@ class GameView(arcade.View):
         self.scene.get_sprite_list("Pickupables").extend(fire_skills)
 
         ice_skills = SpriteGenerator.generate_sprites_in_area(
-            area_size=(SCREEN_WIDTH, SCREEN_HEIGHT),
+            area_size=(ARENA_WIDTH, ARENA_HEIGHT),
             no_overlap_sprites=self.scene.sprite_lists,
             count=3,
             min_size=10,
