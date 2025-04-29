@@ -86,6 +86,9 @@ class SpriteGenerator():
                 sprites.append(sprite)
         return sprites
 
+        # TODO: Add a postprocesing function to remove the smaller sprites that overlap
+        # with the bigger ones ( idea: update no_overlap_sprites as the sprites are generated and whenever there is a collision, remove the smaller one from the list )
+
 
 def _collides_with_lists(sprite: arcade.Sprite, sprite_lists: List[arcade.SpriteList]):
     """Check if sprite collides with the list of given SpriteLists."""
