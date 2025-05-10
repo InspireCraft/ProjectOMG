@@ -40,7 +40,7 @@ class Player(ObservableSprite):
             left=arcade.key.A,
             right=arcade.key.D,
         )
-        
+
         # Animations
         self.animation_logic = Animations(
             slash_key=arcade.key.KEY_1,

@@ -18,7 +18,9 @@ class Animation():
 
             for file_name in os.listdir(path):
                 # print(file_name)
-                if file_name.startswith(f'{action}_{direction}') and file_name.endswith('.png'):
+                if file_name.startswith(f'{action}_{direction}') and (
+                    file_name.endswith('.png')
+                ):
                     image_path = os.path.join(path, file_name)
                     # image = Image.open(image_path)
                     self.textures[direction].append(arcade.load_texture(image_path))

@@ -51,8 +51,6 @@ class GameWindow(arcade.Window):
         self.player = Player(
             name="Hero",
             char_class="Wizard",
-            # image_file=os.path.join(ASSET_DIR, "characters", "wizard_td2.PNG"),
-            # image_file=os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites", "Walk_Down0.png"),
             char_scale=2,
             initial_angle=0,
         )
@@ -118,7 +116,7 @@ class GameWindow(arcade.Window):
         self.obstacles.update()
         self.physics_engine.update()
         self.projectiles.update()
-        
+
         handle_projectile_collisions(self.projectiles, self.obstacles)
 
     def _on_projectile_shot(self, event: ProjectileShotEvent):

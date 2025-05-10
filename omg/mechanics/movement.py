@@ -12,7 +12,7 @@ class PlayerMovement(ABC):
         self.key_backward = backward
         self.key_left = left
         self.key_right = right
-        
+
         # These fields matter when moving the character
         self.change_direction_x = 0
         self.change_direction_y = 0
@@ -99,7 +99,7 @@ class CompassDirected(PlayerMovement):
         center_x,
         center_y,
         mouse_x,
-        mouse_y, 
+        mouse_y,
         mov_speed_lr,
         mov_speed_ud,
         *args,
@@ -118,4 +118,3 @@ class CompassDirected(PlayerMovement):
         shoot_angle_rad = self.face_mouse(mouse_x, mouse_y, center_x, center_y)
         shoot_angle_deg = math.degrees(shoot_angle_rad)
         return vx_wrt_ground, vy_wrt_ground, character_face_angle, shoot_angle_deg
-    

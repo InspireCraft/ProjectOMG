@@ -38,7 +38,7 @@ class Animations():
             thrust_key: THRUST,
             shoot_key: SHOOT,
         }
-        
+
         self._player_state = IDLE
         self.character_face_direction = DOWN_FACING
         self.player_texture = ""
@@ -128,7 +128,7 @@ class Animations():
 
     def on_key_press(self, key, modifiers):
         """ Called whenever a key is pressed. """
-        
+
         if self._player_state not in self.key_to_action_dict.values():
             self._player_state = self.key_to_action_dict.get(key, WALK)
             if self._player_state != WALK:
