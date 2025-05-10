@@ -30,8 +30,6 @@ class Player(ObservableSprite):
         self.change_x = 0
         self.change_y = 0
         self.angle = initial_angle  # Set initial angle here
-        # self.texture = arcade.load_texture(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites", "Walk_Down0.png")),
-        # self.texture = arcade.load_texture(str(ASSET_DIR) + "/characters/demo_archer/sprites/Walk_Down0.png"),
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -47,7 +45,6 @@ class Player(ObservableSprite):
             cast_key=arcade.key.KEY_2,
             thrust_key=arcade.key.KEY_3,
             shoot_key=arcade.key.KEY_4,
-            move_logic=self.movement_logic
         )
 
         # self.movement_logic = movement.MouseDirected(
@@ -104,16 +101,9 @@ class Player(ObservableSprite):
                 self.mov_speed_ud,
             )
         )
-        # self.movement_logic._calculate_displacement_directions()
-        self.texture = self.animation_logic.update(delta_time, player_change_x=self.change_x, player_change_y=self.change_y)
+        is_moving = self.movement_logic.move_direction != (0,0)
+        self.texture = self.animation_logic.update(delta_time, player_change_x=self.change_x, player_change_y=self.change_y, is_moving=is_moving)
         self._regenerate_mana(delta_time)
-        # print([self.change_x, self.change_y]
-        a =  (1, 2)
-        # a =  {'alp':2, 'arda':3}
-        b =  [1, 2]
-
-        b[0] = 5
-        b.insert(0, 6)
 
     def shoot(self):
         """Shoots a projectile and informs the observes with an ProjectileShotEvent."""

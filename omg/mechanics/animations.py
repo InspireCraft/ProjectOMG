@@ -1,7 +1,7 @@
 import os
 
 from omg.mechanics.animation import Animation
-from omg.mechanics.movement import PlayerMovement
+# from omg.mechanics.movement import PlayerMovement
 
 ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
@@ -30,7 +30,7 @@ LEFT_FACING = 'left'
 
 class Animations():
 
-    def __init__(self, slash_key, cast_key, thrust_key, shoot_key, move_logic):
+    def __init__(self, slash_key, cast_key, thrust_key, shoot_key):
 
         self.key_to_action_dict = {
             slash_key: SLASH,
@@ -61,16 +61,15 @@ class Animations():
         self.d_pressed = False
 
         # Movement logic
-        self.move_logic: PlayerMovement = move_logic
+        self._is_moving: bool = False
 
         # Action finish checker
         self.action_finished = 0
 
-    @property
-    def move_direction(self):
-        return self.move_logic.move_direction
 
-    def update(self, delta_time, player_change_x, player_change_y):
+    def update(self, delta_time, player_change_x, player_change_y, is_moving):
+
+        self._is_moving = is_moving
         # Movement and game logic
         self.update_animation(delta_time, player_change_x, player_change_y)
 
@@ -106,7 +105,7 @@ class Animations():
 
     def finish_action(self):
         """ Handle finishing an action and transition to the appropriate state """
-        if self.move_direction != (0, 0):
+        if self._is_moving:
             self._player_state = WALK
             self.update_movement()
         else:
@@ -116,7 +115,7 @@ class Animations():
         """ Update the player's movement based on the keys pressed """
         self.action_finished = 1
 
-        if self.move_direction[0] == 0 and self.move_direction[1] == 0:
+        if not self._is_moving:
             self._player_state = IDLE
 
     def on_key_press(self, key, modifiers):
@@ -130,10 +129,5 @@ class Animations():
     def on_key_release(self, key, modifiers):
         """ Called whenever a key is released. """
 
-        self.check_movement_keys()
-
-    def check_movement_keys(self):
-        """ Check if any movement keys are pressed and update the state """
-        if self.move_direction != (0, 0):
-            if self._player_state == IDLE:
-                self._player_state = WALK
+        if self._is_moving and self._player_state == IDLE:
+            self._player_state = WALK
