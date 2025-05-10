@@ -43,7 +43,7 @@ class Animations():
         self.character_face_direction = DOWN_FACING
         self.player_texture = ""
 
-        main_path = str(os.path.join(ASSET_DIR, "characters", "demo_archer_2", "sprites"))
+        main_path = str(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites"))
 
         animation_types = ["idle", "walk", "slash", "spellcast", "thrust", "shoot", "die"]
         self.all_animations = {}
