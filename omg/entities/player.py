@@ -18,6 +18,7 @@ ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
 )
 
+
 class Player(ObservableSprite):
     """Controllable player logic."""
 
@@ -30,7 +31,7 @@ class Player(ObservableSprite):
         self.change_x = 0
         self.change_y = 0
         self.character_face_angle = initial_angle  # Character facing angle
-        self.shoot_angle = self.character_face_angle # Character shooting angle
+        self.shoot_angle = self.character_face_angle  # Character shooting angle
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -102,8 +103,13 @@ class Player(ObservableSprite):
                 self.mov_speed_ud,
             )
         )
-        is_moving = self.movement_logic.move_direction != (0,0)
-        self.texture = self.animation_logic.update(delta_time, player_change_x=self.change_x, player_change_y=self.change_y, is_moving=is_moving)
+        is_moving = self.movement_logic.move_direction != (0, 0)
+        self.texture = self.animation_logic.update(
+            delta_time,
+            player_change_x=self.change_x,
+            player_change_y=self.change_y,
+            is_moving=is_moving
+        )
         self._regenerate_mana(delta_time)
 
     def shoot(self):

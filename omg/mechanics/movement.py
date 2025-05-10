@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 import math
-import arcade
-import arcade.key
+# import arcade
+# import arcade.key
+
 
 class PlayerMovement(ABC):
     """Player movement logic abstract base class."""
@@ -23,7 +24,7 @@ class PlayerMovement(ABC):
         self.pressed_right: bool = False
 
         # Track animations
-        self.move_direction = (0,0)
+        self.move_direction = (0, 0)
         self.action_finished = 0
 
     @abstractmethod
@@ -48,40 +49,39 @@ class PlayerMovement(ABC):
 
         if key == self.key_forward:
             self.pressed_forward = True
-            self.move_direction = (self.move_direction[0], self.move_direction[1]+1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1] + 1)
         elif key == self.key_backward:
             self.pressed_backward = True
-            self.move_direction = (self.move_direction[0], self.move_direction[1]-1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1] - 1)
         elif key == self.key_left:
             self.pressed_left = True
-            self.move_direction = (self.move_direction[0]-1, self.move_direction[1])
+            self.move_direction = (self.move_direction[0] - 1, self.move_direction[1])
         elif key == self.key_right:
             self.pressed_right = True
-            self.move_direction = (self.move_direction[0]+1, self.move_direction[1])
-
+            self.move_direction = (self.move_direction[0] + 1, self.move_direction[1])
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
 
         if key == self.key_forward:
             self.pressed_forward = False
-            self.move_direction = (self.move_direction[0], self.move_direction[1]-1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1] - 1)
         elif key == self.key_backward:
             self.pressed_backward = False
-            self.move_direction = (self.move_direction[0], self.move_direction[1]+1)
+            self.move_direction = (self.move_direction[0], self.move_direction[1] + 1)
         elif key == self.key_left:
             self.pressed_left = False
-            self.move_direction = (self.move_direction[0]+1, self.move_direction[1])
+            self.move_direction = (self.move_direction[0] + 1, self.move_direction[1])
         elif key == self.key_right:
             self.pressed_right = False
-            self.move_direction = (self.move_direction[0]-1, self.move_direction[1])
+            self.move_direction = (self.move_direction[0] - 1, self.move_direction[1])
 
     def _calculate_displacement_directions(self):
 
         if self.action_finished:
             [change_direction_x, change_direction_y] = self.move_direction
         else:
-            [change_direction_x, change_direction_y] = (0,0)
+            [change_direction_x, change_direction_y] = (0, 0)
         return change_direction_x, change_direction_y
 
     @staticmethod
@@ -114,7 +114,7 @@ class CompassDirected(PlayerMovement):
         """
         vx_wrt_ground = mov_speed_lr * self.change_direction_x
         vy_wrt_ground = mov_speed_ud * self.change_direction_y
-        character_face_angle = 0   #Angle is always 0 to enable proper animations
+        character_face_angle = 0  # Angle is always 0 to enable proper animations
         shoot_angle_rad = self.face_mouse(mouse_x, mouse_y, center_x, center_y)
         shoot_angle_deg = math.degrees(shoot_angle_rad)
         return vx_wrt_ground, vy_wrt_ground, character_face_angle, shoot_angle_deg

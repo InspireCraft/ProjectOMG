@@ -37,15 +37,23 @@ class Animations():
             cast_key: SPELLCAST,
             thrust_key: THRUST,
             shoot_key: SHOOT,
-         }
-
+        }
+        
         self._player_state = IDLE
         self.character_face_direction = DOWN_FACING
         self.player_texture = ""
 
         main_path = str(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites"))
 
-        animation_types = ["idle", "walk", "slash", "spellcast", "thrust", "shoot", "die"]
+        animation_types = [
+            "idle",
+            "walk",
+            "slash",
+            "spellcast",
+            "thrust",
+            "shoot",
+            "die"
+        ]
         self.all_animations = {}
         for action in animation_types:
             self.all_animations[action] = Animation(main_path, action)
@@ -65,7 +73,6 @@ class Animations():
 
         # Action finish checker
         self.action_finished = 0
-
 
     def update(self, delta_time, player_change_x, player_change_y, is_moving):
 
@@ -95,13 +102,14 @@ class Animations():
 
         if self.animation_timer > ANIMATION_SPEED:
             current_animation: Animation = self.all_animations[self._player_state]
-            self.player_texture, is_animation_finished = current_animation.get_next_texture(self.character_face_direction)
+            self.player_texture, is_animation_finished = (
+                current_animation.get_next_texture(self.character_face_direction)
+            )
 
             if is_animation_finished:
                 self.finish_action()
 
             self.animation_timer = 0
-
 
     def finish_action(self):
         """ Handle finishing an action and transition to the appropriate state """
@@ -121,7 +129,7 @@ class Animations():
     def on_key_press(self, key, modifiers):
         """ Called whenever a key is pressed. """
         
-        if self._player_state  not in self.key_to_action_dict.values():
+        if self._player_state not in self.key_to_action_dict.values():
             self._player_state = self.key_to_action_dict.get(key, WALK)
             if self._player_state != WALK:
                 self.action_finished = 0
