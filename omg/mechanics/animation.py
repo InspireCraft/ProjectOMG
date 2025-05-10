@@ -5,6 +5,8 @@ import arcade
 
 
 class Animation():
+    """Class to represent a single type of animation."""
+
     def __init__(self, path: str, action: str):
         self._my_hidden_dict = dict[str, list[list, int, int]]
         self.textures: dict[str, list] = {}
@@ -28,6 +30,7 @@ class Animation():
             self._number_of_textures[direction] = len(self.textures[direction])
 
     def get_next_texture(self, direction: str) -> Tuple[arcade.Texture, bool]:
+        """Get next texture."""
         current_texture = self.textures[direction][self.counters[direction]]
         self.counters[direction] += 1
         if self.counters[direction] >= self._number_of_textures[direction]:

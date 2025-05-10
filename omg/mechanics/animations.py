@@ -29,6 +29,7 @@ LEFT_FACING = 'left'
 
 
 class Animations():
+    """Class to manage a group of animations."""
 
     def __init__(self, slash_key, cast_key, thrust_key, shoot_key):
 
@@ -75,7 +76,7 @@ class Animations():
         self.action_finished = 0
 
     def update(self, delta_time, player_change_x, player_change_y, is_moving):
-
+        """Update logic."""
         self._is_moving = is_moving
         # Movement and game logic
         self.update_animation(delta_time, player_change_x, player_change_y)
@@ -86,7 +87,7 @@ class Animations():
         return self.player_texture
 
     def update_animation(self, delta_time, player_change_x=0, player_change_y=0):
-
+        """Update animation internal logic."""
         # Figure out if we need to flip face left or right
         if player_change_y < 0 and self.character_face_direction != DOWN_FACING:
             self.character_face_direction = DOWN_FACING
@@ -112,7 +113,7 @@ class Animations():
             self.animation_timer = 0
 
     def finish_action(self):
-        """ Handle finishing an action and transition to the appropriate state """
+        """Handle finishing an action and transition to the appropriate state."""
         if self._is_moving:
             self._player_state = WALK
             self.update_movement()
@@ -120,22 +121,20 @@ class Animations():
             self._player_state = IDLE
 
     def update_movement(self):
-        """ Update the player's movement based on the keys pressed """
+        """Update the player's movement based on the keys pressed."""
         self.action_finished = 1
 
         if not self._is_moving:
             self._player_state = IDLE
 
     def on_key_press(self, key, modifiers):
-        """ Called whenever a key is pressed. """
-
+        """Called whenever a key is pressed."""
         if self._player_state not in self.key_to_action_dict.values():
             self._player_state = self.key_to_action_dict.get(key, WALK)
             if self._player_state != WALK:
                 self.action_finished = 0
 
     def on_key_release(self, key, modifiers):
-        """ Called whenever a key is released. """
-
+        """Called whenever a key is released."""
         if self._is_moving and self._player_state == IDLE:
             self._player_state = WALK

@@ -46,7 +46,6 @@ class PlayerMovement(ABC):
     # TODO: make calculate_displacement_directions static
     def on_key_press(self, key, modifiers):
         """Called when the user presses a key."""
-
         if key == self.key_forward:
             self.pressed_forward = True
             self.move_direction = (self.move_direction[0], self.move_direction[1] + 1)
@@ -62,7 +61,6 @@ class PlayerMovement(ABC):
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
-
         if key == self.key_forward:
             self.pressed_forward = False
             self.move_direction = (self.move_direction[0], self.move_direction[1] - 1)
@@ -105,13 +103,13 @@ class CompassDirected(PlayerMovement):
         *args,
         **_ignored
     ):
-        [self.change_direction_x, self.change_direction_y] = (
-            self._calculate_displacement_directions()
-        )
         """Given input player state, move the player.
 
         Velocity is defined relative to the Window.
         """
+        [self.change_direction_x, self.change_direction_y] = (
+            self._calculate_displacement_directions()
+        )
         vx_wrt_ground = mov_speed_lr * self.change_direction_x
         vy_wrt_ground = mov_speed_ud * self.change_direction_y
         character_face_angle = 0  # Angle is always 0 to enable proper animations
