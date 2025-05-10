@@ -30,12 +30,13 @@ class TestPlayer(unittest.TestCase):
             mock_on_key_release.assert_called_once_with(arcade.key.W, None)
 
     def test_update(self):
-        with patch.object(self.player.movement_logic, 'calculate_player_state', return_value=(1, 1, 45)):
+        with patch.object(self.player.movement_logic, 'calculate_player_state', return_value=(1, 1, 45, 15)):
             with patch.object(self.player, '_regenerate_mana') as mock_regen_mana:
                 self.player.update(mouse_x=200, mouse_y=200, delta_time=0.5)
                 self.assertEqual(self.player.change_x, 1)
                 self.assertEqual(self.player.change_y, 1)
                 self.assertEqual(self.player.angle, 45)
+                self.assertEqual(self.player.shoot_angle, 15)
                 mock_regen_mana.assert_called_once_with(0.5)
 
     def test_shoot(self):

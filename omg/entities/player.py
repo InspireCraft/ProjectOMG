@@ -29,7 +29,8 @@ class Player(ObservableSprite):
         self.center_y = 100
         self.change_x = 0
         self.change_y = 0
-        self.angle = initial_angle  # Set initial angle here
+        self.character_face_angle = initial_angle  # Character facing angle
+        self.shoot_angle = self.character_face_angle # Character shooting angle
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -91,7 +92,7 @@ class Player(ObservableSprite):
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
         self.movement_logic.action_finished = self.animation_logic.action_finished
-        (self.change_x, self.change_y, self.angle) = (
+        (self.change_x, self.change_y, self.character_face_angle, self.shoot_angle) = (
             self.movement_logic.calculate_player_state(
                 self.center_x,
                 self.center_y,
@@ -113,7 +114,7 @@ class Player(ObservableSprite):
         self.current_mana -= 20
         selected_skill = self.skills.get_current()
         projectile = selected_skill.create(
-            init_px=self.center_x, init_py=self.center_y, angle=self.angle
+            init_px=self.center_x, init_py=self.center_y, angle=self.shoot_angle
         )
 
         projectile_event = ProjectileShotEvent(projectile)
