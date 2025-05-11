@@ -137,12 +137,10 @@ class GameView(arcade.View):
         self.scene.add_sprite(
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120)
         )
-
         # Add projectiles to the scene
         self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
-
-        self.camera_sprite = arcade.Camera(window=self.window)
-        self.camera_gui = arcade.Camera(window=self.window)
+        self.camera_sprite = arcade.camera.Camera2D(window=self.window)
+        self.camera_gui = arcade.camera.Camera2D(window=self.window)
 
         # GUI elements, these are not added to the scene
         # Skill slot 1
@@ -263,7 +261,7 @@ class GameView(arcade.View):
             shadow_sources = ["Obstacles",]
             affected_by_light = ["Projectiles", "Pickupables"]
             not_affected_by_light = [
-                key for key in self.scene.name_mapping.keys()
+                key for key in self.scene._name_mapping.keys()
                 if key not in affected_by_light
             ]
 
@@ -318,7 +316,7 @@ class GameView(arcade.View):
         if self.debug_mode:
             self._draw_debug_info()
 
-    def update(self, delta_time):
+    def on_update(self, delta_time):
         """Main update window.
 
         The main update is divided into two parts:
@@ -330,7 +328,7 @@ class GameView(arcade.View):
         each other.
         """
         # Scene updates sprites individually
-        self.scene.update()
+        self.scene.update(delta_time)
         # Mouse is tracked in the window coordinates, but the player logic needs
         # the mouse in the camera coordinates. Thus, the mouse position relative
         # to the window should be mapped to the mouse coordinates relative to
@@ -382,7 +380,7 @@ class GameView(arcade.View):
         self.pickup_button.center_y = y
 
         # Draw the button background
-        self.pickup_button.draw()
+        arcade.draw_sprite(self.pickup_button)
 
     def _draw_text_on_pickup_button(self):
         # Calculate initial coordinates of text
@@ -508,7 +506,7 @@ class GameView(arcade.View):
             skill_1 = arcade.Sprite(skill_1_img, scale=scale_factor_crafted_skill_1)
             skill_1.center_x = skill_1.width // 2
             skill_1.center_y = skill_1.height // 2
-            skill_1.draw()
+            arcade.draw_sprite(skill_1)
 
         if self.player.crafted_skill_slots[1] is not None:
             scale_factor_crafted_skill_2 = 0.3
@@ -518,11 +516,11 @@ class GameView(arcade.View):
             skill_2 = arcade.Sprite(skill_2_img, scale=scale_factor_crafted_skill_2)
             skill_2.center_x = skill_2.width // 2 + skill_2.width
             skill_2.center_y = skill_2.height // 2
-            skill_2.draw()
+            arcade.draw_sprite(skill_2)
 
         # Draw usable skill slots to bottom left corner
-        self.skill_slot_1.draw()
-        self.skill_slot_2.draw()
+        arcade.draw_sprite(self.skill_slot_1)
+        arcade.draw_sprite(self.skill_slot_2)
 
     def _draw_debug_info(self):
         """Print debug text information on the screen."""
