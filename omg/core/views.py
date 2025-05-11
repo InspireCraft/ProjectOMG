@@ -1,5 +1,6 @@
 import os.path
 from typing import Dict
+from pyglet.graphics import Batch
 
 import arcade
 import arcade.key
@@ -545,6 +546,55 @@ class PauseView(arcade.View):
     def __init__(self, window: arcade.Window):
         super().__init__(window)
         self._view_to_draw: arcade.View = None
+        self.camera = arcade.camera.Camera2D(window=self.window)
+        self.camera.use()
+        self._pause_view_text_batch = Batch()
+        self._text_offsets = {
+            'paused': 50,
+            'esc': 0,
+            'Q': -30,
+        }
+
+        self._pause_view_texts = {
+            'paused': arcade.Text(
+                "PAUSED",
+                self.window.width / 2,
+                self.window.height / 2 + self._text_offsets['paused'],
+                arcade.color.WHITE,
+                font_size=50,
+                anchor_x="center",
+                batch=self._pause_view_text_batch,
+            ),
+            'esc': arcade.Text(
+                "Press Esc. to return",
+                self.window.width / 2,
+                self.window.height / 2 + self._text_offsets['esc'],
+                arcade.color.WHITE,
+                font_size=20,
+                anchor_x="center",
+                batch=self._pause_view_text_batch,
+            ),
+            'Q': arcade.Text(
+                "Press Q to quit",
+                self.window.width / 2,
+                self.window.height / 2 + self._text_offsets['Q'],
+                arcade.color.WHITE,
+                font_size=20,
+                anchor_x="center",
+                batch=self._pause_view_text_batch,
+            )
+        }
+
+    def on_resize(self, width, height):
+        """Resize the window. Handles the resizing of the subcomponents."""
+        # TODO: text position updates correctly but is not drawn correctly
+        super().on_resize(width, height)
+        self.camera.match_window()
+        self._view_to_draw.on_resize(width, height)
+        center_x = self.window.width / 2
+        center_y = self.window.height / 2
+        for key, text in self._pause_view_texts.items():
+            text.position = (center_x, center_y + self._text_offsets[key])
 
     def update_view_to_draw(self, new_view: arcade.View):
         """Update the View to be drawn in the pause state."""
@@ -552,37 +602,11 @@ class PauseView(arcade.View):
 
     def on_draw(self):
         """Draw the game as is and the pause view extras."""
+        self.camera.use()
         self.clear()
         if self._view_to_draw:
             self._view_to_draw.on_draw()
-
-        # Draw the Pause text on the given View as overlay
-        arcade.draw_text(
-            "PAUSED",
-            self.window.width / 2,
-            self.window.height / 2 + 50,
-            arcade.color.WHITE,
-            font_size=50,
-            anchor_x="center",
-        )
-
-        # Show tip to return or reset
-        arcade.draw_text(
-            "Press Esc. to return",
-            self.window.width / 2,
-            self.window.height / 2,
-            arcade.color.WHITE,
-            font_size=20,
-            anchor_x="center",
-        )
-        arcade.draw_text(
-            "Press Q to quit",
-            self.window.width / 2,
-            self.window.height / 2 - 30,
-            arcade.color.WHITE,
-            font_size=20,
-            anchor_x="center",
-        )
+        self._pause_view_text_batch.draw()
 
     def on_key_release(self, key, modifiers):
         """Key release logic."""
