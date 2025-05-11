@@ -67,6 +67,7 @@ class Player(ObservableSprite):
 
         # Animations
         self.animation_logic = Animations(
+            animation_file=animation_file,
             slash_key=arcade.key.KEY_1,
             cast_key=arcade.key.KEY_2,
             thrust_key=arcade.key.KEY_3,

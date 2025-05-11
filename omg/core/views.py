@@ -53,7 +53,6 @@ class GameView(arcade.View):
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
         self.pickup_button: arcade.Sprite = None
-        # self.text_object: arcade.Text = None
 
         # Debug state
         self.debug_mode: bool = False

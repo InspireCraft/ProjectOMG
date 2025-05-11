@@ -1,11 +1,4 @@
-import os
-
 from omg.mechanics.animation import Animation
-# from omg.mechanics.movement import PlayerMovement
-
-ASSET_DIR = os.path.join(
-    os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
-)
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
@@ -31,7 +24,7 @@ LEFT_FACING = 'left'
 class Animations():
     """Class to manage a group of animations."""
 
-    def __init__(self, slash_key, cast_key, thrust_key, shoot_key):
+    def __init__(self, animation_file, slash_key, cast_key, thrust_key, shoot_key):
 
         self.key_to_action_dict = {
             slash_key: SLASH,
@@ -44,8 +37,6 @@ class Animations():
         self.character_face_direction = DOWN_FACING
         self.player_texture = ""
 
-        main_path = str(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites"))
-
         animation_types = [
             "idle",
             "walk",
@@ -57,7 +48,7 @@ class Animations():
         ]
         self.all_animations = {}
         for action in animation_types:
-            self.all_animations[action] = Animation(main_path, action)
+            self.all_animations[action] = Animation(animation_file, action)
 
         self.active_direction = "down"
 
