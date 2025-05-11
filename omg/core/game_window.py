@@ -18,7 +18,7 @@ class GameWindow(arcade.Window):
     PAUSE_VIEW_KEY = "pause"
 
     def __init__(self, width: int, height: int, title: str):
-        super().__init__(width, height, title)
+        super().__init__(width, height, title, resizable=True)
         self._views: Dict[str, arcade.View] = None
 
     def setup(self):

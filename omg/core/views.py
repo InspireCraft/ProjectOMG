@@ -335,6 +335,14 @@ class GameView(arcade.View):
         # camera to the player
         self._center_camera_to_sprite(self.camera_sprite, self.player)
 
+    def on_resize(self, width, height):
+        """Resize the window. Handles the resizing of the subcomponents."""
+        val = super().on_resize(width, height)
+        self.shadertoy.resize((width, height))
+        self.camera_sprite.match_window()
+        self.camera_gui.match_window()
+        return val
+
     def _on_projectile_shot(self, event: ProjectileShotEvent):
         self.scene["Projectiles"].append(event.projectile)
 
