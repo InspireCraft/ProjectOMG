@@ -22,20 +22,23 @@ MOVEMENT_SPEED_HORIZONTAL = 5
 N_ELEMENTS_MAX = 5
 T = TypeVar("T")  # Define a type variable
 
-ASSET_DIR = os.path.join(
-    os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
-)
-
 
 class Player(ObservableSprite):
     """Controllable player logic."""
 
-    def __init__(self, name, char_class, image_file, scale, initial_angle=0):
+    def __init__(
+        self,
+        name: str,
+        animation_file: str,
+        scale,
+        initial_angle=0
+    ):
         """Initialize Player instance."""
-        super().__init__(image_file, scale)
+        # TODO: Fix super().__init__(animation_idle)
+        animation_idle = str(os.path.join(animation_file, "idle_down0.png"))
+        super().__init__(animation_idle, scale)
 
         self.name = name
-        self.char_class = char_class
         self.center_x = 100
         self.center_y = 100
         self.change_x = 0
