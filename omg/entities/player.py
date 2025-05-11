@@ -73,13 +73,6 @@ class Player(ObservableSprite):
             shoot_key=arcade.key.KEY_4,
         )
 
-        # self.movement_logic = movement.MouseDirected(
-        #     forward=arcade.key.W,
-        #     backward=arcade.key.S,
-        #     left=arcade.key.A,
-        #     right=arcade.key.D,
-        # )
-
         self.mov_speed_lr = MOVEMENT_SPEED_HORIZONTAL
         self.mov_speed_ud = MOVEMENT_SPEED_VERTICAL
 
