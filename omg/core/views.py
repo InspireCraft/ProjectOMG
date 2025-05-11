@@ -335,8 +335,9 @@ class GameView(arcade.View):
         # the mouse in the camera coordinates. Thus, the mouse position relative
         # to the window should be mapped to the mouse coordinates relative to
         # the camera before passing it to the player.
-        mouse_in_camera_x = self.mouse_x + self.camera_sprite.position[0]
-        mouse_in_camera_y = self.mouse_y + self.camera_sprite.position[1]
+        bottomleft_coord = self._find_bottomleft_coord_of_camera(self.camera_sprite)
+        mouse_in_camera_x = self.mouse_x + bottomleft_coord[0]
+        mouse_in_camera_y = self.mouse_y + bottomleft_coord[1]
         self.player.update(mouse_in_camera_x, mouse_in_camera_y, delta_time)
 
         # Update behaviour between the player and the pickupables
@@ -370,16 +371,19 @@ class GameView(arcade.View):
         diff_x: float = pickupable.center_x - self.player.center_x
         diff_y: float = pickupable.center_y - self.player.center_y
 
-        x = pickupable.center_x + diff_x - self.camera_sprite.position[0]
-        y = pickupable.center_y + diff_y - self.camera_sprite.position[1]
+        # This is a GUI element, so we need to convert the coordinates from
+        # camera coordinates to window coordinates
+        window_bottomleft = self._find_bottomleft_coord_of_camera(self.camera_sprite)
+        x_window_coord = pickupable.center_x + diff_x - window_bottomleft[0]
+        y_window_coord = pickupable.center_y + diff_y - window_bottomleft[1]
 
-        return x, y
+        return x_window_coord, y_window_coord
 
     def _draw_pickup_button(self, pickupable: Pickupable) -> arcade.Sprite:
         # Place button image at the mirror reflection of player wrt pickupable
-        x, y = self._get_pickup_button_coordinates(pickupable)
-        self.pickup_button.center_x = x
-        self.pickup_button.center_y = y
+        x_window_coord, y_window_coord = self._get_pickup_button_coordinates(pickupable)
+        self.pickup_button.center_x = x_window_coord
+        self.pickup_button.center_y = y_window_coord
 
         # Draw the button background
         arcade.draw_sprite(self.pickup_button)
@@ -543,6 +547,19 @@ class GameView(arcade.View):
     def _center_camera_to_sprite(camera: arcade.camera.Camera2D, sprite: arcade.Sprite):
         """Scroll the window to the player."""
         camera.position = (sprite.center_x, sprite.center_y)
+
+    @staticmethod
+    def _find_bottomleft_coord_of_camera(camera: arcade.camera.Camera2D):
+        """Find the bottom left corner of the window in camera coordinates.
+
+        This is used to calculate the position of objects defined relative to
+        the window. It assumes that the camera is centered on the player, hence
+        the camera position points to the middle of the window.
+        """
+        return (
+            camera.position[0] - (camera.viewport_width / 2),
+            camera.position[1] - (camera.viewport_height / 2)
+        )
 
 
 class PauseView(arcade.View):
