@@ -1,0 +1,1 @@
+`Player` creates the pickup sprite once. GameView uses it correctly to show the pickup button in the game.

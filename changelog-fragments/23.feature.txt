@@ -1,0 +1,2 @@
+Created different `arcade.View` classes for the game and the pause screen which
+is managed by the custom `GameWindow(arcade.Window)`.

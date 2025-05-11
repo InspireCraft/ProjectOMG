@@ -1,0 +1,1 @@
+Relative position of pickup button was fixed

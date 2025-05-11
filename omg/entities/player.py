@@ -1,17 +1,25 @@
+from typing import Dict, TypeVar, Union
+
 import arcade
-from typing import TypeVar, Type
-from omg.mechanics import movement
-from omg.entities.projectile import ProjectileFactory
-from omg.structural.observer import ObservableSprite
-from omg.entities.events import PickupRequestEvent, ProjectileShotEvent
+import arcade.key
+
+from omg.entities.events import (
+    PickupRequestEvent,
+    ProjectileShotEvent,
+    PickupButtonKeyChangeRequestEvent,
+)
 from omg.entities.items import CircularBuffer
+from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
+from omg.mechanics import movement
+from omg.structural.observer import ObservableSprite
+
 
 from omg.mechanics.animations import Animations
 import os
 
-MOVEMENT_SPEED_FORWARD = 1
-MOVEMENT_SPEED_SIDE = 1
-N_SKILLS_MAX = 5
+MOVEMENT_SPEED_VERTICAL = 5
+MOVEMENT_SPEED_HORIZONTAL = 5
+N_ELEMENTS_MAX = 5
 T = TypeVar("T")  # Define a type variable
 
 ASSET_DIR = os.path.join(
@@ -22,8 +30,10 @@ ASSET_DIR = os.path.join(
 class Player(ObservableSprite):
     """Controllable player logic."""
 
-    def __init__(self, name, char_class, char_scale, initial_angle=0):
-        super().__init__(scale=char_scale,)
+    def __init__(self, name, char_class, image_file, scale, initial_angle=0):
+        """Initialize Player instance."""
+        super().__init__(image_file, scale)
+
         self.name = name
         self.char_class = char_class
         self.center_x = 100
@@ -32,6 +42,17 @@ class Player(ObservableSprite):
         self.change_y = 0
         self.character_face_angle = initial_angle  # Character facing angle
         self.shoot_angle = self.character_face_angle  # Character shooting angle
+
+        # Initialize pickup button key
+        self._button_key_observer = []
+        self._pickup_button_key = arcade.key.F
+
+        # Initialize item pickup sprite
+        self.item_pickup_radius = 50
+        self._pick_up_sprite = arcade.SpriteCircle(
+            radius=self.item_pickup_radius,
+            color=arcade.color.RED,
+        )  # transparent circular sprite to define the hitbox
 
         # Movement
         self.movement_logic = movement.CompassDirected(
@@ -55,8 +76,10 @@ class Player(ObservableSprite):
         #     left=arcade.key.A,
         #     right=arcade.key.D,
         # )
-        self.mov_speed_lr = MOVEMENT_SPEED_SIDE
-        self.mov_speed_ud = MOVEMENT_SPEED_FORWARD
+
+        self.mov_speed_lr = MOVEMENT_SPEED_HORIZONTAL
+        self.mov_speed_ud = MOVEMENT_SPEED_VERTICAL
+
         # Health
         self.max_health = 100
         self.current_health = 100
@@ -68,27 +91,67 @@ class Player(ObservableSprite):
         self.mana_regen_cooldown = 0
 
         # Skills
-        self.skills = SkillManager(N_SKILLS_MAX)
-        self.item_pickup_radius = 5
+        self.elements = ElementManager(N_ELEMENTS_MAX)
+
+        # Initialize an empty element_buffer
+        self.to_be_combined_element_buffer: list[str] = []
+        # Initialize crafted skill slots as None
+        self.crafted_skill_slots: list[str] = [None, None]
+        self.crafted_skill = SkillFactory()
+
+    @property
+    def pickup_button_key(self):
+        """Define self.player.pickup_button_key."""
+        return self._pickup_button_key
+
+    @pickup_button_key.setter
+    def pickup_button_key(self, new_value):
+        self._pickup_button_key = new_value
+        event = PickupButtonKeyChangeRequestEvent(new_value)
+        self.notify_observers(event)
+
+    @property
+    def pickup_sprite(self):
+        """Define self.player.pickup_sprite."""
+        return self._pick_up_sprite
+
+    @pickup_sprite.getter
+    def pickup_sprite(self):
+        self._pick_up_sprite.center_x = self.center_x
+        self._pick_up_sprite.center_y = self.center_y
+        return self._pick_up_sprite
 
     def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed."""
+        """Call whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
         self.animation_logic.on_key_press(key, modifiers)
 
-        if key == arcade.key.SPACE:
-            self.shoot()
+        if key == arcade.key.H:
+            skill_name = self.crafted_skill_slots[0]
+            self.shoot(skill_name)
+        elif key == arcade.key.J:
+            skill_name = self.crafted_skill_slots[1]
+            self.shoot(skill_name)
+        elif key == arcade.key.SPACE:
+            current_element = self.elements.get_current()
+            if current_element:
+                self.to_be_combined_element_buffer.append(current_element["name"])
         elif key == arcade.key.Q:
-            self.skills.set_prev()
+            self.elements.set_prev()
         elif key == arcade.key.E:
-            self.skills.set_next()
-        elif key == arcade.key.F:
-            self.pickup_skill()
+            self.elements.set_next()
+        elif key == self.pickup_button_key:
+            self.pickup_element()
 
     def on_key_release(self, key, modifiers):
-        """Called when the user releases a key."""
+        """Call when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
         self.animation_logic.on_key_release(key, modifiers)
+
+    def _update_crafted_skill_slots(self, new_skill: str):
+        """Update crafted skill slots after combining elements."""
+        self.crafted_skill_slots[1] = self.crafted_skill_slots[0]
+        self.crafted_skill_slots[0] = new_skill
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
@@ -112,15 +175,33 @@ class Player(ObservableSprite):
         )
         self._regenerate_mana(delta_time)
 
-    def shoot(self):
-        """Shoots a projectile and informs the observes with an ProjectileShotEvent."""
-        if self.skills.current_size == 0 or self.current_mana < 20:
+        # Update combined elements
+        if len(self.to_be_combined_element_buffer) == 2:
+            # Get the name of the skill after combining elements
+            new_skill = "".join(self.to_be_combined_element_buffer[::])
+
+            # Update crafted skill slots
+            self._update_crafted_skill_slots(new_skill)
+
+            # Empty the element buffer
+            self.to_be_combined_element_buffer = []
+
+    def shoot(self, skill_name: str):
+        """Shoot a projectile and inform the observers."""
+        skill_attributes: dict = crafted_skill_dictionary.get(skill_name, None)
+        if skill_attributes:
+            self.crafted_skill.set_skill_attributes(skill_attributes)
+        else:
             return
 
-        self.current_mana -= 20
-        selected_skill = self.skills.get_current()
-        projectile = selected_skill.create(
+        mana_cost = self.crafted_skill.mana_cost
+        if self.current_mana < mana_cost:
+            return
+
+        self.current_mana -= mana_cost
+        projectile = self.crafted_skill.create(
             init_px=self.center_x, init_py=self.center_y, angle=self.shoot_angle
+
         )
 
         projectile_event = ProjectileShotEvent(projectile)
@@ -134,23 +215,9 @@ class Player(ObservableSprite):
                 self.current_mana = self.max_mana
             self.mana_regen_cooldown = 0
 
-    def add_skill(self, skill: Type[ProjectileFactory]):
-        """Add skill to the player."""
-        self.skills.add_item(skill)
-
-    def pickup_skill(self):
+    def pickup_element(self):
         """Publish a skill pickup request event."""
-        # Player will try to pickup the items in a circle around it
-        pick_up_sprite = arcade.SpriteCircle(
-            radius=self.item_pickup_radius,
-            color=arcade.color.RED,
-        )  # transparent circular sprite to define the hitbox
-        pick_up_sprite.center_x = self.center_x
-        pick_up_sprite.center_y = self.center_y
-        pick_up_event = PickupRequestEvent(
-            self.skills,  # send skill manager
-            pick_up_sprite,
-        )
+        pick_up_event = PickupRequestEvent(self.elements, self.pickup_sprite)
         self.notify_observers(pick_up_event)
 
     def set_movement_keys(self, forward, backward, left, right):
@@ -213,7 +280,7 @@ class Player(ObservableSprite):
         )
 
 
-class SkillManager(CircularBuffer[ProjectileFactory]):
+class ElementManager(CircularBuffer[Dict[str, Union[str, float]]]):
     """Manages skills of an entity."""
 
     pass
