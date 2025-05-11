@@ -274,9 +274,10 @@ class GameView(arcade.View):
 
             # Calculate the light position. We have to subtract the camera position
             # from the player position to get screen-relative coordinates.
+            left, bottom = self.camera_sprite.bottom_left
             p = (
-                self.player.position[0] - self.camera_sprite.position[0],
-                self.player.position[1] - self.camera_sprite.position[1]
+                self.player.position[0] - left,
+                self.player.position[1] - bottom
             )
 
             # Set the uniform data (data accessible in the shader)
