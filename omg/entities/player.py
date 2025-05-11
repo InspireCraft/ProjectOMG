@@ -1,4 +1,5 @@
 from typing import Dict, TypeVar, Union
+import math
 
 import arcade
 import arcade.key
@@ -12,6 +13,7 @@ from omg.entities.items import CircularBuffer
 from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement
 from omg.structural.observer import ObservableSprite
+from omg.entities.weapons import Weapons
 
 MOVEMENT_SPEED_VERTICAL = 5
 MOVEMENT_SPEED_HORIZONTAL = 5
@@ -78,6 +80,28 @@ class Player(ObservableSprite):
         self.crafted_skill_slots: list[str] = [None, None]
         self.crafted_skill = SkillFactory()
 
+        # Melee attack
+        self._weapon: Weapons = None
+        self._weapon_damagezone_sprites: arcade.SpriteList = None
+        self._melee_dmg = 10  # base_melee_dmg value of player
+        self._melee_atk_speed = 1  # number of seconds between attacks
+        self._melee_range = 55  # attack range for melee attacks
+        self._stab_counter = 0
+
+        # self._weapon_sprite = self._summon_weapon_sprite()
+    @property
+    def weapon(self):
+        return self._weapon
+
+    @weapon.setter
+    def weapon(self, value):
+        self._weapon = value
+        self._weapon_damagezone_sprites = arcade.SpriteList()
+        for _ in range(self.weapon.num_of_dmg_zones):
+            self._weapon_damagezone_sprites.append(
+                arcade.SpriteCircle(radius=13, color=arcade.color.RED)
+            )
+
     @property
     def pickup_button_key(self):
         """Define self.player.pickup_button_key."""
@@ -88,6 +112,64 @@ class Player(ObservableSprite):
         self._pickup_button_key = new_value
         event = PickupButtonKeyChangeRequestEvent(new_value)
         self.notify_observers(event)
+
+    @property
+    def weapon_damagezone_sprites(self):
+        return self._weapon_damagezone_sprites
+
+    @weapon_damagezone_sprites.getter
+    def weapon_damagezone_sprites(self):
+        # TODO: Check if conditions with weapon.name
+        print(self._stab_counter)
+        if self._stab_counter == 0:
+            x, y = self._calculate_weapon_center()
+        else:
+            x, y = self._calculate_weapon_center()
+            dx, dy = self._calculate_stab_xy()
+            x += dx
+            y += dy
+            self._stab_counter -= 1
+        radians = math.radians(self.angle) + math.pi / 2
+        if len(self._weapon_damagezone_sprites) == 1:
+            for s in self._weapon_damagezone_sprites:
+                s.center_x = x + (self.weapon.sprite.height // 2) * math.cos(radians)
+                s.center_y = y + (self.weapon.sprite.height // 2) * math.sin(radians)
+        else:
+            constant_x = (self.weapon.sprite.height // 2) * math.cos(radians - math.pi / 3)
+            constant_y = (self.weapon.sprite.height // 2) * math.sin(radians - math.pi / 3)
+            delta_space = self.weapon.sprite.height // len(self._weapon_damagezone_sprites)
+            for idx, s in enumerate(self._weapon_damagezone_sprites):
+                s.center_x = x + constant_x - (delta_space * math.cos(radians - math.pi / 3)) * idx
+                s.center_y = y + constant_y - (delta_space * math.sin(radians - math.pi / 3)) * idx
+
+        return self._weapon_damagezone_sprites
+
+    @property
+    def stab_counter(self):
+        """Define self.player.stab_counter."""
+        return self._stab_counter
+
+    @stab_counter.setter
+    def stab_counter(self, new_value):
+        self._stab_counter = new_value
+
+    @stab_counter.getter
+    def stab_counter(self):
+        if self._stab_counter > 0:
+            return self._stab_counter
+        else:
+            return 0
+
+    def _calculate_stab_xy(self):
+        # TODO: NOW DAMAGE ZONES ARE CHANGING BASED ON CHR POSITION AND ANGLE
+        # TODO: MAKE IT STATIC
+        # TODO: STABBING ONLY HAS TRUSTING MOTION, DRAWING THE WEAPON BACK TO ITS
+        # TODO: IS NOT COVERED YET => BUT EASY TO IMPLEMENT
+        # TODO: ATK SPEED IS BASED ON HOW FAST ONE CLICKS => CHANGE IT !!!!!
+        cx = 10
+        cy = 10
+        radians = math.radians(self.angle) + math.pi / 2
+        return cx * math.cos(radians) * (11 - self._stab_counter), cy * math.sin(radians) * (11 - self._stab_counter)
 
     @property
     def pickup_sprite(self):
@@ -120,6 +202,12 @@ class Player(ObservableSprite):
             self.elements.set_next()
         elif key == self.pickup_button_key:
             self.pickup_element()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            print("Left mouse button pressed")
+            self._stab_counter = 10
+            print(self._stab_counter)
 
     def on_key_release(self, key, modifiers):
         """Call when the user releases a key."""
@@ -200,6 +288,20 @@ class Player(ObservableSprite):
         super().draw()
         self._draw_health_bar()
         self._draw_mana_bar()
+        if self.weapon is not None:
+            x, y = self._calculate_weapon_center()
+            self._draw_weapon(x, y)
+
+    def _calculate_weapon_center(self):
+        radians = math.radians(self.angle)
+        x = self.center_x + self.weapon.distance_to_body * math.cos(radians)
+        y = self.center_y + self.weapon.distance_to_body * math.sin(radians)
+        return x, y
+
+    def _draw_weapon(self, x, y):
+        self.weapon.sprite.center_x, self.weapon.sprite.center_y = x, y
+        self.weapon.sprite.angle = self.angle
+        self.weapon.sprite.draw()
 
     def _draw_health_bar(self):
         health_bar_width = 50
