@@ -1,0 +1,24 @@
+{
+    "RAPIER": {
+        "type": "weapon",
+        "name": "RAPIER",
+        "distance_to_body": 17,
+        "num_of_dmg_zones": 1,
+        "atk_type": "stab",
+        "atk_dmg": 15,
+        "atk_spd": 15,
+        "image_file": "omg/assets/images/weapons/rapier2.PNG",
+        "scale": 0.05
+    },
+    "GIANT SWORD": {
+        "type": "weapon",
+        "name": "GIANT SWORD",
+        "distance_to_body": 30,
+        "num_of_dmg_zones": 3,
+        "atk_dmg": 15,
+        "atk_spd": 15,
+        "atk_type": "swing",
+        "image_file": "omg/assets/images/weapons/giant_sword.PNG",
+        "scale": 0.15
+    }
+}
