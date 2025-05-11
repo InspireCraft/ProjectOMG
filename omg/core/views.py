@@ -16,6 +16,8 @@ from omg.mechanics.collision import handle_projectile_collisions
 from omg.mechanics.physics import PhysicsEngineBoundary
 from omg.structural.observer import Observer
 from omg.entities.elements import ELEMENTS
+from omg.entities.weapons import WEAPONS, Weapons
+
 
 
 ASSET_DIR = os.path.join(
@@ -102,6 +104,10 @@ class GameView(arcade.View):
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["ICE"], 250, 20))
         self.scene.add_sprite(
             "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, ELEMENTS["FIRE"], 250, 120))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, WEAPONS["RAPIER"], 200, 100))
+        self.scene.add_sprite(
+            "Pickupables", Pickupable(COIN_IMAGE_PATH, 0.5, WEAPONS["GIANT SWORD"], 75, 100))
 
         # Add projectiles to the scene
         self.scene.add_sprite_list("Projectiles", use_spatial_hash=False)
@@ -201,6 +207,9 @@ class GameView(arcade.View):
             self.scene.draw_hit_boxes(arcade.color.RED)
             self.player.draw_hit_box(arcade.color.RED)
             self.player.pickup_sprite.draw_hit_box(arcade.color.RED)
+            if self.player.weapon is not None:
+                for s in self.player.weapon_damagezone_sprites:
+                    s.draw_hit_box(arcade.color.RED)
         # Activate GUI camera before drawing GUI elements
         # This is to ensure GUI elements are drawn w.r.t the window
         self.camera_gui.use()
@@ -306,11 +315,19 @@ class GameView(arcade.View):
             closes_pickupable: Pickupable = arcade.get_closest_sprite(
                 event.entity_pickup_sprite, collided_sprites
             )[0]
-            item_to_add = closes_pickupable.item
-            item_manager = event.entity
-            item_manager.add_item(item_to_add)
+            if closes_pickupable.item["type"] == "weapon":
+                self.player.weapon = Weapons(name=closes_pickupable.item["name"])
+            elif closes_pickupable.item["type"] == "element":
+                item_to_add = closes_pickupable.item
+                item_manager = event.entity
+                item_manager.add_item(item_to_add)
+            else:
+                raise ValueError("closes_pickupable.item[type] is either no exist or unkown")
             # remove reference to the pickupables list
             closes_pickupable.remove_from_sprite_lists()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.player.on_mouse_press(x, y, button, modifiers)
 
     def on_key_press(self, key, modifiers):
         """Key press logic."""
