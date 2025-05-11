@@ -17,7 +17,6 @@ class GameWindow(arcade.Window):
     GAME_VIEW_KEY = "game"
     PAUSE_VIEW_KEY = "pause"
 
-
     def __init__(self, width: int, height: int, title: str):
         super().__init__(width, height, title)
         self._views: Dict[str, arcade.View] = None
@@ -36,7 +35,6 @@ class GameWindow(arcade.Window):
     def _game_view(self) -> GameView:
         """Define self._game_view which always refers to a View in self._views."""
         return self._views.get(self.GAME_VIEW_KEY, None)
-
 
     @property
     def _pause_view(self) -> PauseView:
