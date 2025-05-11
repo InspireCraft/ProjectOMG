@@ -18,11 +18,12 @@ from omg.structural.observer import Observer
 from omg.entities.elements import ELEMENTS
 
 
+# TODO: Manage assets in a more generic way
 ASSET_DIR = os.path.join(
     os.path.join(os.path.dirname(__file__), ".."), "assets", "images"
 )
-
 COIN_IMAGE_PATH = ":resources:images/items/coinGold.png"
+ARCHER_PATH = str(os.path.join(ASSET_DIR, "characters", "demo_archer", "sprites"))
 
 SCREEN_WIDTH = 800  # Also defines player's POV
 SCREEN_HEIGHT = 600  # Also defines player's POV
@@ -52,7 +53,6 @@ class GameView(arcade.View):
         self.icon_size = 64
         self.active_keys: Dict[tuple, bool] = None
         self.pickup_button: arcade.Sprite = None
-        # self.text_object: arcade.Text = None
 
         # Debug state
         self.debug_mode: bool = False
@@ -70,9 +70,8 @@ class GameView(arcade.View):
         )
         self.player = Player(
             name="Hero",
-            char_class="Wizard",
-            image_file=os.path.join(ASSET_DIR, "characters", "wizard_td2.PNG"),
-            scale=0.2,
+            animation_file=ARCHER_PATH,
+            scale=1.0,
             initial_angle=0,
         )
         self.player.add_observer(self.observer)

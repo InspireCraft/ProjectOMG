@@ -13,6 +13,10 @@ from omg.entities.projectile import SkillFactory, crafted_skill_dictionary
 from omg.mechanics import movement
 from omg.structural.observer import ObservableSprite
 
+
+from omg.mechanics.animations import Animations
+import os
+
 MOVEMENT_SPEED_VERTICAL = 5
 MOVEMENT_SPEED_HORIZONTAL = 5
 N_ELEMENTS_MAX = 5
@@ -22,16 +26,25 @@ T = TypeVar("T")  # Define a type variable
 class Player(ObservableSprite):
     """Controllable player logic."""
 
-    def __init__(self, name, char_class, image_file, scale, initial_angle=0):
+    def __init__(
+        self,
+        name: str,
+        animation_file: str,
+        scale,
+        initial_angle=0
+    ):
         """Initialize Player instance."""
-        super().__init__(image_file, scale)
+        # TODO: Fix super().__init__(animation_idle)
+        animation_idle = str(os.path.join(animation_file, "idle_down0.png"))
+        super().__init__(animation_idle, scale)
+
         self.name = name
-        self.char_class = char_class
         self.center_x = 100
         self.center_y = 100
         self.change_x = 0
         self.change_y = 0
-        self.angle = initial_angle  # Set initial angle here
+        self.character_face_angle = initial_angle  # Character facing angle
+        self.shoot_angle = self.character_face_angle  # Character shooting angle
 
         # Initialize pickup button key
         self._button_key_observer = []
@@ -51,14 +64,19 @@ class Player(ObservableSprite):
             left=arcade.key.A,
             right=arcade.key.D,
         )
-        # self.movement_logic = movement.MouseDirected(
-        #     forward=arcade.key.W,
-        #     backward=arcade.key.S,
-        #     left=arcade.key.A,
-        #     right=arcade.key.D,
-        # )
+
+        # Animations
+        self.animation_logic = Animations(
+            animation_file=animation_file,
+            slash_key=arcade.key.KEY_1,
+            cast_key=arcade.key.KEY_2,
+            thrust_key=arcade.key.KEY_3,
+            shoot_key=arcade.key.KEY_4,
+        )
+
         self.mov_speed_lr = MOVEMENT_SPEED_HORIZONTAL
         self.mov_speed_ud = MOVEMENT_SPEED_VERTICAL
+
         # Health
         self.max_health = 100
         self.current_health = 100
@@ -103,6 +121,7 @@ class Player(ObservableSprite):
     def on_key_press(self, key, modifiers):
         """Call whenever a key is pressed."""
         self.movement_logic.on_key_press(key, modifiers)
+        self.animation_logic.on_key_press(key, modifiers)
 
         if key == arcade.key.H:
             skill_name = self.crafted_skill_slots[0]
@@ -124,6 +143,7 @@ class Player(ObservableSprite):
     def on_key_release(self, key, modifiers):
         """Call when the user releases a key."""
         self.movement_logic.on_key_release(key, modifiers)
+        self.animation_logic.on_key_release(key, modifiers)
 
     def _update_crafted_skill_slots(self, new_skill: str):
         """Update crafted skill slots after combining elements."""
@@ -132,7 +152,8 @@ class Player(ObservableSprite):
 
     def update(self, mouse_x, mouse_y, delta_time):
         """Update the sprite."""
-        (self.change_x, self.change_y, self.angle) = (
+        self.movement_logic.action_finished = self.animation_logic.action_finished
+        (self.change_x, self.change_y, self.character_face_angle, self.shoot_angle) = (
             self.movement_logic.calculate_player_state(
                 self.center_x,
                 self.center_y,
@@ -141,6 +162,13 @@ class Player(ObservableSprite):
                 self.mov_speed_lr,
                 self.mov_speed_ud,
             )
+        )
+        is_moving = self.movement_logic.move_direction != (0, 0)
+        self.texture = self.animation_logic.update(
+            delta_time,
+            player_change_x=self.change_x,
+            player_change_y=self.change_y,
+            is_moving=is_moving
         )
         self._regenerate_mana(delta_time)
 
@@ -169,7 +197,8 @@ class Player(ObservableSprite):
 
         self.current_mana -= mana_cost
         projectile = self.crafted_skill.create(
-            init_px=self.center_x, init_py=self.center_y, angle=self.angle
+            init_px=self.center_x, init_py=self.center_y, angle=self.shoot_angle
+
         )
 
         projectile_event = ProjectileShotEvent(projectile)

@@ -1,5 +1,6 @@
 from typing import Dict
 
+
 import arcade
 import arcade.key
 
