@@ -189,6 +189,7 @@ class GameView(arcade.View):
             pickup_button_dir,
             scale=pickup_button_image_scale,
         )
+
     def _load_shader(self):
 
         # Create the shader toy
