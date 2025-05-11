@@ -477,25 +477,32 @@ class GameView(arcade.View):
         self.active_keys = {}  # reset the dictionary
 
     def _draw_ui(self):
+        # Drawing ui is very slow in 3.0, investigate this
+        return
         # Draw picked up elements to top left corner
         for i, icon in enumerate(self.element_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = self.window.height - self.icon_margin_y
             if i == self.player.elements.get_current_index():
-                arcade.draw_rectangle_outline(
+                pass
+                arcade.draw_rect_outline(
+                    arcade.rect.XYWH(
+                        x + self.icon_size // 2,
+                        y + self.icon_size // 2,
+                        self.icon_size,
+                        self.icon_size,
+                    ),
+                    arcade.color.RED,
+                    border_width=3
+                )
+            arcade.draw_texture_rect(
+                texture=icon,
+                rect=arcade.rect.XYWH(
                     x + self.icon_size // 2,
                     y + self.icon_size // 2,
                     self.icon_size,
                     self.icon_size,
-                    arcade.color.RED,
-                    border_width=3,
                 )
-            arcade.draw_texture_rectangle(
-                x + self.icon_size // 2,
-                y + self.icon_size // 2,
-                self.icon_size,
-                self.icon_size,
-                icon,
             )
 
         # Draw combined skill icons
