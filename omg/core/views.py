@@ -70,6 +70,24 @@ class GameView(arcade.View):
         self._load_shader()
         self.raycasting_mode: bool = False
 
+        # Debug text objects
+        self._debug_text_batch = Batch()
+        self._debug_text_objects = {
+            'mouse_pos': arcade.Text(
+                "Mouse",
+                101, 101, arcade.color.WHITE, 20, batch=self._debug_text_batch
+            ),
+            'player_pos': arcade.Text(
+                "Player",
+                101, 135, arcade.color.WHITE, 20, batch=self._debug_text_batch
+            ),
+            'debug_label': arcade.Text(
+                "Debug mode",
+                self.window.width - 250, self.window.height - 50,
+                arcade.color.RED, 20, batch=self._debug_text_batch
+            )
+        }
+
         # Debug state
         self.debug_mode: bool = False
 
@@ -508,36 +526,23 @@ class GameView(arcade.View):
 
     def _draw_debug_info(self):
         """Print debug text information on the screen."""
-        # TODO: change arcade.draw_text to arcade.Text for better performance
-        arcade.draw_text(
-            f"Mouse: ({self.mouse_x}, {self.mouse_y})",
-            101,
-            101,
-            arcade.color.WHITE,
-            font_size=20,
-        )
-        arcade.draw_text(
-            f"Player: ({self.player.center_x:.1f}, {self.player.center_y:.1f})",
-            101,
-            135,
-            arcade.color.WHITE,
-            font_size=20,
-        )
-        arcade.draw_text(
-            "Debug mode",
-            self.window.width - 250,
-            self.window.height - 50,
-            arcade.color.RED,
-            font_size=20,
-        )
+        if self.player:
+            pass
+            # Update the text content for position values
+            self._debug_text_objects['mouse_pos'].text = (
+                f"Mouse: ({self.mouse_x}, {self.mouse_y})"
+            )
+            self._debug_text_objects['player_pos'].text = (
+                f"Player: ({self.player.center_x:.1f}, {self.player.center_y:.1f})"
+            )
+
+        # Fastest way to draw text objects
+        self._debug_text_batch.draw()
 
     @staticmethod
-    def _center_camera_to_sprite(camera: arcade.Camera, sprite: arcade.Sprite):
-        screen_center_x = sprite.center_x - (camera.viewport_width / 2)
-        screen_center_y = sprite.center_y - (camera.viewport_height / 2)
-        player_centered = (screen_center_x, screen_center_y)
-
-        camera.move_to(player_centered)
+    def _center_camera_to_sprite(camera: arcade.camera.Camera2D, sprite: arcade.Sprite):
+        """Scroll the window to the player."""
+        camera.position = (sprite.center_x, sprite.center_y)
 
 
 class PauseView(arcade.View):
