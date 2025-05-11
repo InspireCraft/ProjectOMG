@@ -226,7 +226,7 @@ class Player(ObservableSprite):
 
     def draw(self):
         """Draw the sprite."""
-        super().draw()
+        arcade.draw_sprite(self)
         self._draw_health_bar()
         self._draw_mana_bar()
 
@@ -235,21 +235,30 @@ class Player(ObservableSprite):
         health_bar_height = 5
         health_bar_x = self.center_x
         health_bar_y = self.center_y + self.height / 2 + 10
-        arcade.draw_rectangle_filled(
-            health_bar_x,
-            health_bar_y,
-            health_bar_width,
-            health_bar_height,
+
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH
+            (
+                health_bar_x,
+                health_bar_y,
+                health_bar_width,
+                health_bar_height
+            ),
             arcade.color.RED,
         )
+
         current_health_width = health_bar_width * (
             self.current_health / self.max_health
         )
-        arcade.draw_rectangle_filled(
-            health_bar_x - (health_bar_width - current_health_width) / 2,
-            health_bar_y,
-            current_health_width,
-            health_bar_height,
+        health_bar_x - (health_bar_width - current_health_width) / 2
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH
+            (
+                health_bar_x - (health_bar_width - current_health_width) / 2,
+                health_bar_y,
+                health_bar_width,
+                health_bar_height
+            ),
             arcade.color.GREEN,
         )
 
@@ -260,19 +269,25 @@ class Player(ObservableSprite):
         mana_bar_y = (
             self.center_y + self.height / 2 + 2
         )  # Slightly below the health bar
-        arcade.draw_rectangle_filled(
-            mana_bar_x,
-            mana_bar_y,
-            mana_bar_width,
-            mana_bar_height,
+        # TODO: Create and store Rect objects and update them here before
+        # drawing
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH(
+                mana_bar_x,
+                mana_bar_y,
+                mana_bar_width,
+                mana_bar_height
+            ),
             arcade.color.DARK_BLUE,
         )
         current_mana_width = mana_bar_width * (self.current_mana / self.max_mana)
-        arcade.draw_rectangle_filled(
-            mana_bar_x - (mana_bar_width - current_mana_width) / 2,
-            mana_bar_y,
-            current_mana_width,
-            mana_bar_height,
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH(
+                mana_bar_x - (mana_bar_width - current_mana_width) / 2,
+                mana_bar_y,
+                current_mana_width,
+                mana_bar_height
+            ),
             arcade.color.LIGHT_BLUE,
         )
 
