@@ -234,7 +234,9 @@ class GameView(arcade.View):
         # For example "element_acquired event" can trigger an update when necessary
         if self.player:
             return [
-                arcade.load_texture(element_type["image_file"])
+                arcade.texture.default_texture_cache.load_or_get_texture(
+                    element_type["image_file"]
+                )
                 for element_type in self.player.elements
             ]
         else:
@@ -245,7 +247,6 @@ class GameView(arcade.View):
         # Activate player camera to draw Sprites
         # sprites outside of the player camera are not drawn
         self.camera_sprite.use()
-
         # Raycasting part
         if self.raycasting_mode:
             # TODO: encapsulate this logic in a separate class
@@ -477,32 +478,25 @@ class GameView(arcade.View):
         self.active_keys = {}  # reset the dictionary
 
     def _draw_ui(self):
-        # Drawing ui is very slow in 3.0, investigate this
-        return
         # Draw picked up elements to top left corner
         for i, icon in enumerate(self.element_icons):
             x = self.icon_margin_x + i * (self.icon_size + self.icon_margin_x)
             y = self.window.height - self.icon_margin_y
+            rectangle = arcade.rect.XYWH(
+                x + self.icon_size // 2,
+                y + self.icon_size // 2,
+                self.icon_size,
+                self.icon_size
+            )
             if i == self.player.elements.get_current_index():
-                pass
                 arcade.draw_rect_outline(
-                    arcade.rect.XYWH(
-                        x + self.icon_size // 2,
-                        y + self.icon_size // 2,
-                        self.icon_size,
-                        self.icon_size,
-                    ),
+                    rectangle,
                     arcade.color.RED,
                     border_width=3
                 )
             arcade.draw_texture_rect(
                 texture=icon,
-                rect=arcade.rect.XYWH(
-                    x + self.icon_size // 2,
-                    y + self.icon_size // 2,
-                    self.icon_size,
-                    self.icon_size,
-                )
+                rect=rectangle,
             )
 
         # Draw combined skill icons
